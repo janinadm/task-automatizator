@@ -1,0 +1,39 @@
+{
+  // VS Code Workspace Settings (Configuración del espacio de trabajo VS Code)
+  // These settings apply to everyone working on this project
+  // (Estas configuraciones aplican a todos los que trabajan en este proyecto)
+
+  // Format on save — Prettier auto-formats your code when you hit Ctrl+S
+  // (Formatear al guardar — Prettier auto-formatea tu código al pulsar Ctrl+S)
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // ESLint validates on save (ESLint valida al guardar)
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
+  // TypeScript settings (Configuración de TypeScript)
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.tsdk": "node_modules/typescript/lib",
+
+  // Tailwind CSS IntelliSense — suggest classes in Vue templates
+  // (IntelliSense de Tailwind CSS — sugerir clases en templates Vue)
+  "tailwindCSS.experimental.classRegex": [
+    ["class=\"([^\"]*)\"", "([^\"\\s]*)"],
+    ["className=\"([^\"]*)\"", "([^\"\\s]*)"]
+  ],
+
+  // File associations (Asociaciones de archivos)
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+
+  // Hide noisy folders from the explorer (Ocultar carpetas ruidosas del explorador)
+  "files.exclude": {
+    "**/.nuxt": true,
+    "**/.output": true,
+    "**/node_modules": true,
+    "**/.turbo": true
+  }
+}

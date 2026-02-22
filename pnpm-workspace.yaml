@@ -1,0 +1,9 @@
+packages:
+  - packages/*
+
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - esbuild
+  - prisma

@@ -1,0 +1,119 @@
+/*
+  Global Styles (Estilos globales)
+  These are the base styles applied to the entire application.
+  @tailwind directives inject Tailwind's generated CSS.
+  (Estos son los estilos base aplicados a toda la aplicación.
+   Las directivas @tailwind inyectan el CSS generado por Tailwind.)
+*/
+
+/* === Tailwind Layers (Capas de Tailwind) === */
+/* base: resets and element defaults (resets y defaults de elementos) */
+/* components: reusable component classes (clases de componentes reutilizables) */
+/* utilities: single-purpose utility classes (clases utilitarias de propósito único) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === Base Layer (Capa base) === */
+/* Custom element defaults that apply everywhere */
+/* (Defaults de elementos personalizados que se aplican en todas partes) */
+@layer base {
+  /* Smooth scrolling for the entire page (Scroll suave para toda la página) */
+  html {
+    @apply scroll-smooth;
+  }
+
+  /* Default body styles — dark background for glassmorphism to shine */
+  /* (Estilos por defecto del body — fondo oscuro para que el glassmorfismo brille) */
+  body {
+    @apply bg-gray-950 text-white font-sans antialiased;
+  }
+
+  /* Custom scrollbar styling — subtle, matches our dark theme */
+  /* (Estilo personalizado del scrollbar — sutil, combina con nuestro tema oscuro) */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-white/20 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-white/30;
+  }
+}
+
+/* === Component Layer (Capa de componentes) === */
+/* Reusable classes for common UI patterns */
+/* (Clases reutilizables para patrones de UI comunes) */
+@layer components {
+  /* --- Glassmorphism Card Variants (Variantes de tarjeta glassmorfismo) --- */
+  /* The core visual style of our application */
+  /* (El estilo visual central de nuestra aplicación) */
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-glass;
+  }
+
+  .glass-card-sm {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-xl shadow-glass-sm;
+  }
+
+  .glass-card-heavy {
+    @apply bg-white/20 backdrop-blur-xl border border-white/25 rounded-2xl shadow-glass-lg;
+  }
+
+  /* --- Button Variants (Variantes de botón) --- */
+  .btn-primary {
+    @apply px-6 py-3 bg-brand-500 hover:bg-brand-600 active:bg-brand-700
+           rounded-xl text-white font-medium
+           transition-all duration-300
+           shadow-lg shadow-brand-500/30 hover:shadow-brand-500/50
+           focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-transparent;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-white/10 hover:bg-white/20 active:bg-white/25
+           backdrop-blur-sm border border-white/20
+           rounded-xl text-white font-medium
+           transition-all duration-300
+           focus:outline-none focus:ring-2 focus:ring-white/30;
+  }
+
+  .btn-danger {
+    @apply px-6 py-3 bg-red-500/80 hover:bg-red-500 active:bg-red-600
+           rounded-xl text-white font-medium
+           transition-all duration-300
+           shadow-lg shadow-red-500/30
+           focus:outline-none focus:ring-2 focus:ring-red-400;
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 hover:bg-white/10 rounded-lg text-white/70 hover:text-white
+           transition-all duration-200;
+  }
+
+  /* --- Input Styles (Estilos de input) --- */
+  .input-glass {
+    @apply w-full px-4 py-3 bg-white/5 border border-white/10
+           rounded-xl text-white placeholder-white/40
+           focus:outline-none focus:border-brand-400 focus:bg-white/10
+           transition-all duration-300;
+  }
+
+  /* --- Badge Styles (Estilos de badge) --- */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  /* --- Gradient Background (Fondo con gradiente) --- */
+  /* The main background gradient used throughout the app */
+  /* (El gradiente de fondo principal usado en toda la app) */
+  .bg-app-gradient {
+    @apply bg-gradient-to-br from-indigo-950 via-purple-900 to-pink-800;
+  }
+}

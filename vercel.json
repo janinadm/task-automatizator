@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nuxt",
+  "installCommand": "pnpm install",
+  "buildCommand": "cd packages/web && pnpm build",
+  "outputDirectory": "packages/web/.output",
+  "crons": [
+    {
+      "path": "/api/cron/check-sla",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/auto-close",
+      "schedule": "0 * * * *"
+    }
+  ]
+}

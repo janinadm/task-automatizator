@@ -1,0 +1,292 @@
+// ============================================================================
+// Prisma Schema — The Database Blueprint
+// (Esquema de Prisma — El plano de la base de datos)
+// ============================================================================
+// This file defines EVERY table, column, relationship, and index in our database.
+// When you run `prisma migrate dev`, Prisma reads this file and generates SQL
+// to create/update the actual PostgreSQL tables in Supabase.
+//
+// Think of it as the "single source of truth" for your data structure.
+// Change this file → run migration → database updates automatically.
+//
+// (Este archivo define CADA tabla, columna, relación e índice en nuestra base de datos.
+//  Cuando ejecutas `prisma migrate dev`, Prisma lee este archivo y genera SQL
+//  para crear/actualizar las tablas PostgreSQL reales en Supabase.
+//  Piensa en él como la "fuente única de verdad" para tu estructura de datos.
+//  Cambiar este archivo → ejecutar migración → la base de datos se actualiza automáticamente.)
+// ============================================================================
+
+// === Data Source Configuration (Configuración de la fuente de datos) ===
+// `provider`: We use PostgreSQL (Supabase's underlying database)
+// `url`: The pooled connection URL (goes through Supabase's connection pooler for efficiency)
+// `directUrl`: The direct connection URL (required for migrations — pooler can interfere)
+// (`provider`: Usamos PostgreSQL (la base de datos subyacente de Supabase)
+//  `url`: La URL de conexión con pooler (pasa por el pooler de conexiones de Supabase)
+//  `directUrl`: La URL de conexión directa (necesaria para migraciones))
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// === Prisma Client Generator (Generador del cliente Prisma) ===
+// This generates the TypeScript client code that you use in your app.
+// After modifying this schema, run `prisma generate` to regenerate the client.
+// (Esto genera el código del cliente TypeScript que usas en tu app.
+//  Después de modificar este esquema, ejecuta `prisma generate` para regenerar el cliente.)
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ============================================================================
+// ENUMS — Fixed sets of values (Conjuntos fijos de valores)
+// ============================================================================
+// In PostgreSQL, enums are actual database types that restrict column values.
+// This is safer than raw strings — the DB itself rejects invalid values.
+// (En PostgreSQL, los enums son tipos de base de datos reales que restringen valores de columnas.
+//  Es más seguro que strings crudos — la BD misma rechaza valores inválidos.)
+
+enum Role {
+  ADMIN // Can configure AI, manage team, view analytics
+        // (Puede configurar IA, gestionar equipo, ver analíticas)
+  AGENT // Can manage tickets, respond to customers
+        // (Puede gestionar tickets, responder a clientes)
+}
+
+enum TicketStatus {
+  OPEN        // New, unassigned (Nuevo, sin asignar)
+  IN_PROGRESS // Being worked on (En proceso)
+  RESOLVED    // Issue addressed (Problema atendido)
+  CLOSED      // Archived (Archivado)
+}
+
+enum Priority {
+  LOW    // Informational (Informativo)
+  MEDIUM // Standard (Estándar)
+  HIGH   // Needs prompt attention (Necesita atención pronta)
+  URGENT // Critical — SLA ticking (Crítico — SLA corriendo)
+}
+
+enum Sentiment {
+  POSITIVE // Happy/grateful customer (Cliente contento/agradecido)
+  NEUTRAL  // Factual tone (Tono factual)
+  NEGATIVE // Frustrated/angry customer (Cliente frustrado/enojado)
+}
+
+enum Channel {
+  EMAIL    // Email integration (Integración de email)
+  WHATSAPP // WhatsApp messages (Mensajes de WhatsApp)
+  WEB      // Web form/chat (Formulario/chat web)
+  SLACK    // Slack messages (Mensajes de Slack)
+}
+
+enum SenderType {
+  CUSTOMER // End client (Cliente final)
+  AGENT    // Support team member (Miembro del equipo de soporte)
+  AI       // AI-generated (Generado por IA)
+}
+
+enum Plan {
+  FREE
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+// ============================================================================
+// MODELS — Database Tables (Tablas de la base de datos)
+// ============================================================================
+
+// === Organization (Organización) ===
+// The top-level tenant entity. ALL data is scoped to an organization.
+// This is the foundation of our multi-tenancy architecture.
+// (La entidad tenant de nivel superior. TODOS los datos están limitados a una organización.
+//  Esta es la base de nuestra arquitectura multi-tenant.)
+model Organization {
+  id        String   @id @default(cuid())  // CUID: Collision-resistant Unique ID (ID único resistente a colisiones)
+  name      String                          // Display name (Nombre para mostrar)
+  slug      String   @unique                // URL-friendly ID: "acme-corp" (ID amigable para URL)
+  plan      Plan     @default(FREE)
+  logoUrl   String?                         // ? = nullable (permite null)
+  createdAt DateTime @default(now())        // Auto-set on creation (Se establece automáticamente al crear)
+  updatedAt DateTime @updatedAt             // Auto-updated on any change (Se actualiza automáticamente)
+
+  // === Relations (Relaciones) ===
+  // One Organization has many Users, Tickets, and SLAs
+  // (Una Organización tiene muchos Usuarios, Tickets y SLAs)
+  users      User[]
+  tickets    Ticket[]
+  slaConfigs SlaConfig[]
+
+  // === Index (Índice) ===
+  // Speeds up lookups by slug (Acelera búsquedas por slug)
+  @@index([slug])
+  // Map to a specific table name in PostgreSQL (Mapear a un nombre específico de tabla en PostgreSQL)
+  @@map("organizations")
+}
+
+// === User (Usuario) ===
+// A member of an organization. The `id` MUST match the Supabase Auth UUID —
+// this is how we link our app's user data to Supabase's authentication.
+// (Un miembro de una organización. El `id` DEBE coincidir con el UUID de Supabase Auth —
+//  así vinculamos los datos de usuario de nuestra app con la autenticación de Supabase.)
+model User {
+  id        String   @id                    // Supabase Auth UUID — NOT auto-generated!
+                                             // (UUID de Supabase Auth — ¡NO auto-generado!)
+  email     String   @unique
+  fullName  String
+  role      Role     @default(AGENT)
+  avatarUrl String?
+  isActive  Boolean  @default(true)
+
+  // === Foreign Key (Clave foránea) ===
+  // Links this user to their organization
+  // (Vincula este usuario a su organización)
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  // onDelete: Cascade = if the org is deleted, delete all its users too
+  // (si la org se elimina, eliminar todos sus usuarios también)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // === Reverse Relations (Relaciones inversas) ===
+  assignedTickets Ticket[]       @relation("AssignedAgent")
+  messages        TicketMessage[]
+
+  @@index([orgId])
+  @@index([email])
+  @@map("users")
+}
+
+// === Ticket ===
+// The CORE entity of our application. Each ticket represents a customer
+// inquiry/issue that needs to be triaged and resolved.
+// AI automatically enriches tickets with sentiment, priority, and category.
+// (La entidad CENTRAL de nuestra aplicación. Cada ticket representa una
+//  consulta/problema de cliente que necesita ser triado y resuelto.
+//  La IA enriquece automáticamente los tickets con sentimiento, prioridad y categoría.)
+model Ticket {
+  id             String       @id @default(cuid())
+  subject        String                              // Brief description (Descripción breve)
+  body           String                              // Full message text (Texto completo del mensaje)
+  channel        Channel      @default(WEB)
+  status         TicketStatus @default(OPEN)
+  priority       Priority     @default(MEDIUM)
+
+  // === AI-Enriched Fields (Campos enriquecidos por IA) ===
+  // These are filled automatically when a ticket is created
+  // (Estos se llenan automáticamente cuando se crea un ticket)
+  category       String?                             // AI-detected: "billing", "technical" (Detectado por IA)
+  sentiment      Sentiment?                          // AI-detected emotion (Emoción detectada por IA)
+  sentimentScore Float?                              // 0.0–1.0 intensity (Intensidad)
+  language       String?                             // ISO code: "en", "es" (Código ISO)
+  summary        String?                             // AI-generated summary (Resumen generado por IA)
+
+  // === Customer Info (Información del cliente) ===
+  customerName   String?
+  customerEmail  String?
+
+  // === Organization Scope (Alcance de la organización) ===
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  // === Agent Assignment (Asignación de agente) ===
+  assignedToId String?
+  assignedTo   User?   @relation("AssignedAgent", fields: [assignedToId], references: [id], onDelete: SetNull)
+  // onDelete: SetNull = if the agent is deleted, unassign the ticket (don't delete it)
+  // (si el agente se elimina, desasignar el ticket (no eliminarlo))
+
+  // === Timestamps (Marcas de tiempo) ===
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  resolvedAt DateTime?                              // Set when status → RESOLVED (Se establece cuando status → RESOLVED)
+
+  // === Relations (Relaciones) ===
+  messages      TicketMessage[]
+  aiSuggestions AiSuggestion[]
+
+  // === Indexes (Índices) ===
+  // These speed up the most common queries (Estos aceleran las consultas más comunes)
+  @@index([orgId])                    // Filter by organization (Filtrar por organización)
+  @@index([status])                   // Filter by status (Filtrar por estado)
+  @@index([priority])                 // Filter by priority (Filtrar por prioridad)
+  @@index([sentiment])                // Filter by sentiment (Filtrar por sentimiento)
+  @@index([orgId, status])            // Combined: org + status (Combinado: org + estado)
+  @@index([orgId, priority, status])  // Combined: org + priority + status
+  @@index([createdAt])                // Sort by date (Ordenar por fecha)
+  @@map("tickets")
+}
+
+// === Ticket Message (Mensaje del Ticket) ===
+// Individual messages in a ticket's conversation thread.
+// Can be from the customer, an agent, or AI.
+// (Mensajes individuales en el hilo de conversación de un ticket.
+//  Pueden ser del cliente, un agente o IA.)
+model TicketMessage {
+  id         String     @id @default(cuid())
+  body       String                                  // Message content (Contenido del mensaje)
+  senderType SenderType
+  senderName String?                                 // Display name of sender (Nombre del remitente)
+
+  // === Relations (Relaciones) ===
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  senderId String?                                   // Null for customers and AI (Null para clientes e IA)
+  sender   User?  @relation(fields: [senderId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])                                // Fast lookup of messages by ticket
+  @@index([ticketId, createdAt])                     // Messages ordered by date within a ticket
+  @@map("ticket_messages")
+}
+
+// === AI Suggestion (Sugerencia de IA) ===
+// Suggested responses generated by the AI engine for a ticket.
+// Agents can accept (use as their reply) or discard them.
+// (Respuestas sugeridas generadas por el motor de IA para un ticket.
+//  Los agentes pueden aceptarlas (usar como su respuesta) o descartarlas.)
+model AiSuggestion {
+  id             String   @id @default(cuid())
+  suggestedReply String                              // The AI's suggested response text (El texto de respuesta sugerido por la IA)
+  confidence     Float                               // 0.0–1.0: How confident is the AI (Confianza de la IA)
+  accepted       Boolean?                            // null=pending, true=used, false=discarded
+                                                     // (null=pendiente, true=usada, false=descartada)
+
+  // === Relations (Relaciones) ===
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])
+  @@map("ai_suggestions")
+}
+
+// === SLA Configuration (Configuración de SLA) ===
+// Service Level Agreement: "We promise to respond to URGENT tickets within 30 minutes"
+// Each organization can customize their SLA times per priority level.
+// (Acuerdo de Nivel de Servicio: "Prometemos responder tickets URGENTES en 30 minutos"
+//  Cada organización puede personalizar sus tiempos SLA por nivel de prioridad.)
+model SlaConfig {
+  id                 String   @id @default(cuid())
+  priority           Priority
+  maxResponseMinutes Int                              // Maximum minutes to first response
+                                                      // (Máximo de minutos para primera respuesta)
+
+  // === Relations (Relaciones) ===
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // === Unique Constraint (Restricción única) ===
+  // Each org can have only ONE SLA config per priority level
+  // (Cada org puede tener solo UNA configuración SLA por nivel de prioridad)
+  @@unique([orgId, priority])
+  @@index([orgId])
+  @@map("sla_configs")
+}

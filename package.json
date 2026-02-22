@@ -1,0 +1,48 @@
+{
+  "name": "agency-task-automator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Intelligent customer service triage platform powered by AI (Plataforma inteligente de triaje de atención al cliente con IA)",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "format": "prettier --write \"**/*.{ts,vue,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,vue,json,md,css}\"",
+    "db:migrate": "pnpm --filter @ata/db migrate:dev",
+    "db:push": "pnpm --filter @ata/db db:push",
+    "db:seed": "pnpm --filter @ata/db seed",
+    "db:studio": "pnpm --filter @ata/db studio",
+    "clean": "turbo clean && rm -rf node_modules"
+  },
+  "keywords": [
+    "customer-service",
+    "ai-triage",
+    "sentiment-analysis",
+    "saas",
+    "nuxt3",
+    "vue3",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.30.1",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "prisma",
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "@parcel/watcher"
+    ]
+  },
+  "devDependencies": {
+    "prettier": "^3.8.1",
+    "turbo": "^2.8.10"
+  }
+}

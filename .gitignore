@@ -1,0 +1,42 @@
+# === Dependencies (Dependencias) ===
+node_modules/
+.pnpm-store/
+
+# === Build Outputs (Archivos de compilación) ===
+.output/
+.nuxt/
+dist/
+.turbo/
+
+# === Environment Variables (Variables de entorno — NUNCA subir a Git) ===
+.env
+.env.local
+.env.*.local
+
+# === IDE / Editor ===
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# === Logs ===
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# === Testing ===
+coverage/
+
+# === Prisma ===
+# Don't ignore migrations — they are version-controlled
+# (No ignorar migraciones — están bajo control de versiones)
+
+# === OS Files ===
+Thumbs.db
+.DS_Store

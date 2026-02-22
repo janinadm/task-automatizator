@@ -1,0 +1,16 @@
+{
+  // Recommended VS Code Extensions for this project
+  // (Extensiones de VS Code recomendadas para este proyecto)
+  // VS Code will prompt team members to install these
+  // (VS Code pedirá a los miembros del equipo que las instalen)
+  "recommendations": [
+    "vue.volar",                        // Vue 3 language support (Soporte de lenguaje Vue 3)
+    "dbaeumer.vscode-eslint",           // ESLint integration (Integración ESLint)
+    "esbenp.prettier-vscode",           // Prettier formatter (Formateador Prettier)
+    "bradlc.vscode-tailwindcss",        // Tailwind CSS IntelliSense
+    "prisma.prisma",                    // Prisma schema syntax highlighting
+    "nuxtr.nuxtr-vscode",              // Nuxt 3 helpers
+    "antfu.iconify",                    // Icon preview
+    "formulahendry.auto-rename-tag"     // Auto rename HTML tags
+  ]
+}
