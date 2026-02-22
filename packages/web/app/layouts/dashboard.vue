@@ -363,11 +363,11 @@ const planColors: Record<string, string> = {
               </div>
             </Transition>
 
-            <!-- Click-outside overlay to close -->
+            <!-- Click-outside overlay to close (below the dropdown) -->
             <div
               v-if="showNotifications"
               class="fixed inset-0 z-40"
-              @click="closeNotifications"
+              @click.self="closeNotifications"
             />
           </div>
         </div>

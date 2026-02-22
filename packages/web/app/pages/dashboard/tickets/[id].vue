@@ -119,7 +119,7 @@ async function sendReply() {
   try {
     await $fetch(`/api/tickets/${ticketId.value}/messages`, {
       method: 'POST',
-      body: { content: replyText.value, senderType: 'AGENT' },
+      body: { body: replyText.value, senderType: 'AGENT' },
     })
     replyText.value = ''
     // Don't manually re-fetch — the Realtime subscription will pick up the

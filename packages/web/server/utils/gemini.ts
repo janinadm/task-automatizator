@@ -64,34 +64,59 @@ async function callGemini(prompt: string): Promise<string> {
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`
 
-  const response = await $fetch<any>(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: {
-      contents: [
-        {
-          parts: [{ text: prompt }],
-        },
-      ],
-      // generationConfig controls the output: low temperature = more deterministic
-      // (generationConfig controla la salida: temperatura baja = más determinista)
-      generationConfig: {
-        temperature: 0.3,
-        maxOutputTokens: 1024,
-        // Tell Gemini to respond in JSON
-        // (Decirle a Gemini que responda en JSON)
-        responseMimeType: 'application/json',
-      },
-    },
-  })
+  // Retry with exponential backoff on 429 (rate limit) errors
+  // (Reintentar con backoff exponencial en errores 429 (límite de tasa))
+  const MAX_RETRIES = 3
+  let lastError: any = null
 
-  // Gemini response structure: { candidates: [{ content: { parts: [{ text: "..." }] } }] }
-  const text = response?.candidates?.[0]?.content?.parts?.[0]?.text
-  if (!text) {
-    throw createError({ statusCode: 502, message: 'Empty response from Gemini AI' })
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      const response = await $fetch<any>(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: {
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+          // generationConfig controls the output: low temperature = more deterministic
+          // (generationConfig controla la salida: temperatura baja = más determinista)
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 1024,
+            // Tell Gemini to respond in JSON
+            // (Decirle a Gemini que responda en JSON)
+            responseMimeType: 'application/json',
+          },
+        },
+      })
+
+      // Gemini response structure: { candidates: [{ content: { parts: [{ text: "..." }] } }] }
+      const text = response?.candidates?.[0]?.content?.parts?.[0]?.text
+      if (!text) {
+        throw createError({ statusCode: 502, message: 'Empty response from Gemini AI' })
+      }
+
+      return text
+    } catch (err: any) {
+      lastError = err
+      const status = err?.response?.status ?? err?.statusCode ?? err?.status
+
+      // Only retry on 429 (rate limit) or 503 (service unavailable)
+      // (Solo reintentar en 429 (límite de tasa) o 503 (servicio no disponible))
+      if ((status === 429 || status === 503) && attempt < MAX_RETRIES - 1) {
+        const delay = Math.pow(2, attempt + 1) * 1000 // 2s, 4s, 8s
+        console.warn(`[Gemini] Rate limited (${status}), retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`)
+        await new Promise(resolve => setTimeout(resolve, delay))
+        continue
+      }
+
+      throw err
+    }
   }
 
-  return text
+  throw lastError
 }
 
 // ── Public functions ───────────────────────────────────────────────────────────

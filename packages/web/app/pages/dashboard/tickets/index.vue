@@ -203,7 +203,8 @@ const hasActiveFilters = computed(
         <!-- Status filter (Filtro de estado) -->
         <select
           v-model="selectedStatus"
-          class="input-glass text-sm min-w-[130px] cursor-pointer"
+          class="input-glass text-sm min-w-[130px] cursor-pointer appearance-none bg-[length:16px_16px] bg-[right_12px_center] bg-no-repeat"
+          style="background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.4)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\"); padding-right: 2.5rem;"
           @change="onStatusChange"
         >
           <option value="">All statuses</option>
@@ -216,7 +217,8 @@ const hasActiveFilters = computed(
         <!-- Priority filter (Filtro de prioridad) -->
         <select
           v-model="selectedPriority"
-          class="input-glass text-sm min-w-[130px] cursor-pointer"
+          class="input-glass text-sm min-w-[130px] cursor-pointer appearance-none bg-[length:16px_16px] bg-[right_12px_center] bg-no-repeat"
+          style="background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.4)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\"); padding-right: 2.5rem;"
           @change="onPriorityChange"
         >
           <option value="">All priorities</option>
