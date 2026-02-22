@@ -9,14 +9,10 @@ import type { Config } from 'tailwindcss'
 export default {
   // === Content Sources (Fuentes de contenido) ===
   // Tailwind scans these files to know which classes are used (tree-shaking)
+  // In Nuxt 4, all source files live inside the app/ directory
   // (Tailwind escanea estos archivos para saber qué clases se usan)
   content: [
     './app/**/*.{vue,ts,js}',
-    './components/**/*.{vue,ts,js}',
-    './layouts/**/*.{vue,ts,js}',
-    './pages/**/*.{vue,ts,js}',
-    './composables/**/*.{ts,js}',
-    './plugins/**/*.{ts,js}',
   ],
 
   // === Dark Mode (Modo oscuro) ===

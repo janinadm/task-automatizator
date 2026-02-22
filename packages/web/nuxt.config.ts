@@ -31,6 +31,20 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',     // Supabase integration: Auth, DB, Realtime (Integración con Supabase)
   ],
 
+  // === Global CSS (CSS global) ===
+  // Our custom CSS with @tailwind directives + glassmorphism components + dark theme
+  // (Nuestro CSS personalizado con directivas @tailwind + componentes glassmorfismo + tema oscuro)
+  css: ['~/assets/css/main.css'],
+
+  // === Tailwind Module Config (Configuración del módulo Tailwind) ===
+  // cssPath: false prevents the module from injecting its own CSS file,
+  // since we already include @tailwind directives in our main.css
+  // (cssPath: false evita que el módulo inyecte su propio CSS,
+  //  ya que incluimos las directivas @tailwind en nuestro main.css)
+  tailwindcss: {
+    cssPath: false,
+  },
+
   // === Supabase Configuration (Configuración de Supabase) ===
   // The module reads SUPABASE_URL and SUPABASE_KEY from .env automatically
   // (El módulo lee SUPABASE_URL y SUPABASE_KEY del .env automáticamente)

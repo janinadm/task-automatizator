@@ -101,16 +101,13 @@ const planColors: Record<string, string> = {
     </Transition>
 
     <!-- Sidebar (Barra lateral) -->
-    <!-- v-show on desktop is handled by CSS (lg:flex class); isSidebarOpen controls mobile visibility -->
-    <!-- We avoid 'typeof window' in templates (it's undefined during SSR) -->
-    <!-- (v-show en escritorio se maneja por CSS; isSidebarOpen controla visibilidad móvil) -->
-    <Transition name="slide-left">
-      <aside
-        v-show="isSidebarOpen"
-        class="fixed inset-y-0 left-0 z-40 w-64 lg:relative lg:flex lg:flex-col flex-col hidden lg:flex"
-        :class="{ 'flex': isSidebarOpen }"
-      >
-        <div class="flex flex-col h-full bg-[#0d0b24]/90 backdrop-blur-xl border-r border-white/[0.06] rounded-none">
+    <!-- On desktop (lg+): always visible. On mobile: slides in/out via translate -->
+    <!-- (En escritorio: siempre visible. En móvil: se desliza con translate) -->
+    <aside
+      class="fixed inset-y-0 left-0 z-40 w-64 flex flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0"
+      :class="isSidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+    >
+      <div class="flex flex-col h-full bg-[#0d0b24]/90 backdrop-blur-xl border-r border-white/[0.06]">
           <!-- Logo / Brand (Logo / Marca) -->
           <div class="flex items-center gap-3 p-6 border-b border-white/10">
             <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-glow flex-shrink-0">
@@ -182,7 +179,6 @@ const planColors: Record<string, string> = {
           </div>
         </div>
       </aside>
-    </Transition>
 
     <!-- Main content area (Área de contenido principal) -->
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -249,7 +245,6 @@ const planColors: Record<string, string> = {
 
 <style scoped>
 /* Vue transition classes for the mobile sidebar overlay */
-/* (Clases de transición de Vue para el overlay del sidebar móvil) */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;
@@ -258,17 +253,5 @@ const planColors: Record<string, string> = {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-}
-
-/* Slide in from left for mobile sidebar */
-/* (Deslizar desde la izquierda para el sidebar móvil) */
-.slide-left-enter-active,
-.slide-left-leave-active {
-  transition: transform 0.25s ease;
-}
-
-.slide-left-enter-from,
-.slide-left-leave-to {
-  transform: translateX(-100%);
 }
 </style>
