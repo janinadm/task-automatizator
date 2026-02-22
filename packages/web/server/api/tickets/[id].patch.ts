@@ -4,8 +4,8 @@
  * Partially updates a ticket. Agents can update:
  * - status (e.g., OPEN → IN_PROGRESS → RESOLVED)
  * - priority
- * - assignedAgentId (reassign)
- * - title, customerName, customerEmail (admin only)
+ * - assignedToId (reassign)
+ * - category
  *
  * Uses Prisma's UPDATE + returns the full updated ticket.
  *
@@ -33,32 +33,30 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = UpdateTicketSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, message: result.error.errors[0].message })
+    throw createError({ statusCode: 400, message: result.error.errors[0]?.message ?? 'Validation error' })
   }
 
-  // Fetch caller's org (Obtener organzation del usuario)
+  // Fetch caller's org (Obtener organización del usuario)
   const dbUser = await prisma.user.findUnique({
     where: { id: authUser.id },
-    select: { organizationId: true, role: true },
+    select: { orgId: true, role: true },
   })
   if (!dbUser) throw createError({ statusCode: 404, message: 'User not found' })
 
   // Verify ticket belongs to the caller's org (Verificar que el ticket pertenece a la org)
   const existing = await prisma.ticket.findUnique({
     where: { id },
-    select: { organizationId: true, status: true },
+    select: { orgId: true, status: true },
   })
   if (!existing) throw createError({ statusCode: 404, message: 'Ticket not found' })
-  if (existing.organizationId !== dbUser.organizationId) {
+  if (existing.orgId !== dbUser.orgId) {
     throw createError({ statusCode: 403, message: 'Forbidden' })
   }
 
-  // Only admins can change title / customer info
-  // (Solo los admins pueden cambiar el título / info del cliente)
-  const { title, customerName, customerEmail, ...agentFields } = result.data
-  const updateData = dbUser.role === 'ADMIN'
-    ? result.data
-    : agentFields // Agents get a restricted subset (Los agentes obtienen un subconjunto restringido)
+  // UpdateTicketSchema only allows: status, priority, assignedToId, category
+  // Admins get all fields; agents get same set (schema already limits scope)
+  // (UpdateTicketSchema solo permite: status, priority, assignedToId, category)
+  const updateData = result.data
 
   const updated = await prisma.ticket.update({
     where: { id },
@@ -71,7 +69,7 @@ export default defineEventHandler(async (event) => {
         : {}),
     },
     include: {
-      assignedAgent: { select: { id: true, name: true, avatarUrl: true } },
+      assignedTo: { select: { id: true, fullName: true, avatarUrl: true } },
       _count: { select: { messages: true, aiSuggestions: true } },
     },
   })

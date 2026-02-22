@@ -38,6 +38,8 @@ export interface TicketFilters {
   dateTo?: string
   page?: number
   pageSize?: number
+  sortBy?: 'createdAt' | 'updatedAt' | 'priority' | 'subject'
+  sortOrder?: 'asc' | 'desc'
 }
 
 // Payload for creating a new ticket (Carga para crear un nuevo ticket)

@@ -19,12 +19,32 @@
  *  Los stores más pequeños son más fáciles de probar, mantener y entender.)
  */
 
-import type { Ticket, PaginatedResponse, TicketFilters } from '@ata/shared'
+import type { Ticket, TicketFilters } from '@ata/shared'
 import { PAGINATION } from '@ata/shared'
+
+// Local pagination meta type — the /api/tickets endpoint returns a `meta` object
+// with these fields (not the flat PaginatedResponse shape from @ata/shared).
+// (Tipo de meta de paginación local — el endpoint /api/tickets retorna un objeto `meta`
+//  con estos campos, no la forma plana de PaginatedResponse de @ata/shared.)
+type TicketListMeta = {
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+}
+
+// The actual shape returned by GET /api/tickets
+// (La forma real retornada por GET /api/tickets)
+type TicketListResponse = {
+  data: TicketWithRelations[]
+  meta: TicketListMeta
+}
 
 // Type for a single ticket with relations (Tipo para un ticket con relaciones)
 type TicketWithRelations = Ticket & {
-  assignedAgent?: { id: string; name: string; avatarUrl: string | null } | null
+  assignedTo?: { id: string; fullName: string; avatarUrl: string | null } | null
   isBreachingSla?: boolean
   _count?: { messages: number; aiSuggestions: number }
 }
@@ -34,10 +54,10 @@ type TicketWithRelations = Ticket & {
 type TicketDetail = TicketWithRelations & {
   messages: Array<{
     id: string
-    content: string
+    body: string
     senderType: string
     createdAt: string
-    sender?: { id: string; name: string; avatarUrl: string | null; role: string } | null
+    sender?: { id: string; fullName: string; avatarUrl: string | null; role: string } | null
   }>
   aiSuggestions: Array<{
     id: string
@@ -53,7 +73,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   // --- STATE (ESTADO) ---
   // The paginated list of tickets (La lista paginada de tickets)
   const tickets = ref<TicketWithRelations[]>([])
-  const meta = ref<PaginatedResponse<unknown>['meta'] | null>(null)
+  const meta = ref<TicketListMeta | null>(null)
 
   // The currently open ticket in the detail view
   // (El ticket actualmente abierto en la vista de detalle)
@@ -63,7 +83,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   // (Estado de filtros activos — en el store para que los filtros persistan entre navegaciones)
   const filters = ref<TicketFilters>({
     page: 1,
-    limit: PAGINATION.DEFAULT_LIMIT,
+    pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
     sortBy: 'createdAt',
     sortOrder: 'desc',
   })
@@ -107,7 +127,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         .filter(([, v]) => v !== undefined && v !== null && v !== '')
         .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {} as Record<string, any>)
 
-      const response = await $fetch<PaginatedResponse<TicketWithRelations>>('/api/tickets', {
+      const response = await $fetch<TicketListResponse>('/api/tickets', {
         query,
       })
 
@@ -167,7 +187,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       currentTicket.value = { ...currentTicket.value, ...data } as TicketDetail
     }
     if (listIndex >= 0) {
-      tickets.value[listIndex] = { ...tickets.value[listIndex], ...data }
+      tickets.value[listIndex] = { ...tickets.value[listIndex], ...data } as TicketWithRelations
     }
 
     try {
@@ -181,7 +201,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         currentTicket.value = { ...currentTicket.value, ...response.data } as TicketDetail
       }
       if (listIndex >= 0) {
-        tickets.value[listIndex] = { ...tickets.value[listIndex], ...response.data }
+        tickets.value[listIndex] = { ...tickets.value[listIndex], ...response.data } as TicketWithRelations
       }
 
       return response.data
@@ -213,7 +233,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   function resetFilters() {
     filters.value = {
       page: 1,
-      limit: PAGINATION.DEFAULT_LIMIT,
+      pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
       sortBy: 'createdAt',
       sortOrder: 'desc',
     }

@@ -139,7 +139,7 @@ const slaStatus = computed(() => {
         </svg>
       </NuxtLink>
       <h2 class="text-lg font-semibold text-white truncate">
-        {{ ticketsStore.isLoadingDetail ? 'Loading ticket...' : (ticket?.title ?? 'Ticket not found') }}
+        {{ ticketsStore.isLoadingDetail ? 'Loading ticket...' : (ticket?.subject ?? 'Ticket not found') }}
       </h2>
     </div>
 
@@ -203,14 +203,14 @@ const slaStatus = computed(() => {
                   <svg v-if="msg.senderType === 'AI'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  <span v-else>{{ (msg.sender?.name ?? 'C').charAt(0).toUpperCase() }}</span>
+                  <span v-else>{{ (msg.sender?.fullName ?? 'C').charAt(0).toUpperCase() }}</span>
                 </div>
 
                 <!-- Message content (Contenido del mensaje) -->
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 mb-1">
                     <span class="text-white text-sm font-medium">
-                      {{ msg.senderType === 'AI' ? '⚡ AI Assistant' : (msg.sender?.name ?? 'Customer') }}
+                      {{ msg.senderType === 'AI' ? '⚡ AI Assistant' : (msg.sender?.fullName ?? 'Customer') }}
                     </span>
                     <span
                       v-if="msg.senderType !== 'CUSTOMER'"
@@ -385,13 +385,13 @@ const slaStatus = computed(() => {
         <!-- Assigned Agent (Agente asignado) -->
         <UiGlassCard padding="md">
           <h3 class="text-white/60 text-xs font-medium uppercase tracking-wider mb-3">Assigned Agent</h3>
-          <div v-if="ticket.assignedAgent" class="flex items-center gap-3">
+          <div v-if="ticket.assignedTo" class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold">
-              {{ ticket.assignedAgent.name.charAt(0).toUpperCase() }}
+              {{ ticket.assignedTo.fullName.charAt(0).toUpperCase() }}
             </div>
             <div>
-              <p class="text-white text-sm font-medium">{{ ticket.assignedAgent.name }}</p>
-              <p class="text-white/40 text-xs">{{ ticket.assignedAgent.email }}</p>
+              <p class="text-white text-sm font-medium">{{ ticket.assignedTo.fullName }}</p>
+              <p class="text-white/40 text-xs">{{ ticket.assignedTo.email }}</p>
             </div>
           </div>
           <div v-else class="text-white/40 text-sm text-center py-3">

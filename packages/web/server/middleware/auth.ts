@@ -83,6 +83,10 @@ export default defineEventHandler(async (event) => {
     const match = cookieString.match(supabaseCookiePattern)
 
     if (!match) return
+    // Defensive check: regex captured group could be empty
+    // (?!match[1]) = if capture group is empty, bail out
+    // (Verificación defensiva: el grupo capturado del regex podría estar vacío)
+    if (!match[1]) return
 
     let tokenData: any
     try {

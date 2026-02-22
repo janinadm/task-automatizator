@@ -33,11 +33,14 @@ export default defineEventHandler(async (event) => {
   }
 
   // Fetch the user from Prisma with their organization
+  // 'org' is the relation field name in our Prisma schema
+  // We rename it to 'organization' in the API response for a cleaner API surface
   // (Obtener el usuario de Prisma con su organización)
+  // ('org' es el nombre del campo de relación en nuestro esquema Prisma)
   const user = await prisma.user.findUnique({
     where: { id: authUser.id },
     include: {
-      organization: {
+      org: {
         select: {
           id: true,
           name: true,
@@ -68,11 +71,11 @@ export default defineEventHandler(async (event) => {
     data: {
       id: user.id,
       email: user.email,
-      name: user.name,
+      fullName: user.fullName,   // schema field is 'fullName' (not 'name')
       avatarUrl: user.avatarUrl,
       role: user.role,
-      organizationId: user.organizationId,
-      organization: user.organization,
+      orgId: user.orgId,         // schema field is 'orgId' (not 'organizationId')
+      organization: user.org,    // remap Prisma's 'org' relation to 'organization' for the API
       createdAt: user.createdAt,
     },
   }

@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
   // (Obtener la org del usuario para verificación de autorización multi-tenant)
   const dbUser = await prisma.user.findUnique({
     where: { id: authUser.id },
-    select: { organizationId: true },
+    select: { orgId: true },
   })
   if (!dbUser) throw createError({ statusCode: 404, message: 'User not found' })
 
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
         orderBy: { createdAt: 'asc' }, // Conversation order (Orden de conversación)
         include: {
           sender: {
-            select: { id: true, name: true, avatarUrl: true, role: true },
+            select: { id: true, fullName: true, avatarUrl: true, role: true },
           },
         },
       },
@@ -47,10 +47,10 @@ export default defineEventHandler(async (event) => {
         orderBy: { createdAt: 'desc' },
         take: 5, // Latest 5 suggestions (Últimas 5 sugerencias)
       },
-      assignedAgent: {
-        select: { id: true, name: true, avatarUrl: true, email: true },
+      assignedTo: {
+        select: { id: true, fullName: true, avatarUrl: true, email: true },
       },
-      organization: {
+      org: {
         select: { id: true, name: true, plan: true },
       },
     },
@@ -62,18 +62,22 @@ export default defineEventHandler(async (event) => {
   // AUTHORIZATION: verify this ticket belongs to the caller's org
   // Even if someone guesses the UUID, they can't read another org's ticket
   // (AUTORIZACIÓN: verificar que este ticket pertenece a la org del usuario)
-  // (Incluso si alguien adivina el UUID, no puede leer el ticket de otra org)
-  if (ticket.organizationId !== dbUser.organizationId) {
+  if (ticket.orgId !== dbUser.orgId) {
     throw createError({ statusCode: 403, message: 'Forbidden' })
   }
 
-  const now = new Date()
+  // SLA approximation: URGENT tickets open for more than 2 hours are breaching SLA
+  // (Aproximación SLA: tickets URGENT abiertos más de 2 horas están incumpliendo SLA)
+  const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000)
+  const isBreachingSla =
+    ticket.priority === 'URGENT' &&
+    ['OPEN', 'IN_PROGRESS'].includes(ticket.status) &&
+    ticket.createdAt < twoHoursAgo
+
   return {
     data: {
       ...ticket,
-      isBreachingSla: ticket.slaDeadline
-        ? ticket.slaDeadline < now && ['OPEN', 'IN_PROGRESS'].includes(ticket.status)
-        : false,
+      isBreachingSla,
     },
   }
 })

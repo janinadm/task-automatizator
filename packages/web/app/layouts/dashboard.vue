@@ -101,11 +101,12 @@ const planColors: Record<string, string> = {
     </Transition>
 
     <!-- Sidebar (Barra lateral) -->
-    <!-- Transitions between hidden (mobile) and visible (desktop) states -->
-    <!-- (Transiciones entre oculto (móvil) y visible (escritorio)) -->
+    <!-- v-show on desktop is handled by CSS (lg:flex class); isSidebarOpen controls mobile visibility -->
+    <!-- We avoid 'typeof window' in templates (it's undefined during SSR) -->
+    <!-- (v-show en escritorio se maneja por CSS; isSidebarOpen controla visibilidad móvil) -->
     <Transition name="slide-left">
       <aside
-        v-show="isSidebarOpen || typeof window !== 'undefined'"
+        v-show="isSidebarOpen"
         class="fixed inset-y-0 left-0 z-40 w-64 lg:relative lg:flex lg:flex-col flex-col hidden lg:flex"
         :class="{ 'flex': isSidebarOpen }"
       >
@@ -157,11 +158,11 @@ const planColors: Record<string, string> = {
             <div class="flex items-center gap-3 px-3 py-2">
               <!-- Avatar (initial letter as placeholder) (Avatar — letra inicial como placeholder) -->
               <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                {{ authStore.currentUser?.name?.charAt(0)?.toUpperCase() || '?' }}
+                {{ authStore.currentUser?.fullName?.charAt(0)?.toUpperCase() || '?' }}
               </div>
               <div class="min-w-0 flex-1">
                 <p class="text-white text-sm font-medium truncate">
-                  {{ authStore.currentUser?.name || 'User' }}
+                  {{ authStore.currentUser?.fullName || 'User' }}
                 </p>
                 <p class="text-white/40 text-xs truncate">
                   {{ authStore.currentUser?.role?.toLowerCase() }}

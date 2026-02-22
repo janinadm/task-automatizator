@@ -65,7 +65,9 @@ const strengthLabel = computed(() => {
 
 const strengthColor = computed(() => {
   const colors = ['', 'bg-red-500', 'bg-amber-500', 'bg-indigo-500', 'bg-green-500']
-  return colors[passwordStrength.value]
+  // ?? '' ensures we always return a string (never undefined)
+  // (??  '' asegura que siempre retornamos un string)
+  return colors[passwordStrength.value] ?? ''
 })
 
 /**
@@ -100,7 +102,7 @@ async function handleSignup() {
   })
 
   if (!result.success) {
-    error.value = result.error.errors[0].message
+    error.value = result.error.errors[0]?.message ?? 'Validation error'
     return
   }
 

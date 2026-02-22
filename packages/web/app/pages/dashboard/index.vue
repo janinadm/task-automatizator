@@ -22,10 +22,34 @@ definePageMeta({ layout: 'dashboard' })
 
 const authStore = useAuthStore()
 
+// Type the expected API response so TypeScript knows what `stats.value.data` contains.
+// Without this, useFetch returns Ref<unknown> and we'd get type errors on nested access.
+// (Tipar la respuesta esperada de la API para que TypeScript sepa qué contiene `stats.value.data`.)
+type DashboardStatsResponse = {
+  data: {
+    openTickets: number
+    resolvedToday: number
+    slaBreaching: number
+    aiSuggestionsGenerated: number
+    sentiment: { positive: number; neutral: number; negative: number }
+    priority: { urgent: number; high: number; medium: number; low: number }
+    recentTickets: Array<{
+      id: string
+      subject: string
+      status: string
+      priority: string
+      sentiment: string | null
+      category: string | null
+      createdAt: string
+      isBreachingSla: boolean
+    }>
+  }
+}
+
 // useFetch('/api/dashboard/stats') calls our server API route.
 // Nuxt automatically deduplicates this fetch using the `key`.
 // (Nuxt deduplica automáticamente este fetch usando la `key`.)
-const { data: stats, pending, error, refresh } = await useFetch('/api/dashboard/stats', {
+const { data: stats, pending, error, refresh } = await useFetch<DashboardStatsResponse>('/api/dashboard/stats', {
   key: 'dashboard-stats',
 })
 
@@ -118,7 +142,7 @@ function timeAgo(date: string | Date) {
     <div class="flex items-start justify-between">
       <div>
         <h2 class="text-2xl font-bold text-white">
-          {{ greeting }}, {{ authStore.currentUser?.name?.split(' ')[0] || 'there' }} 👋
+          {{ greeting }}, {{ authStore.currentUser?.fullName?.split(' ')[0] || 'there' }} 👋
         </h2>
         <p class="text-white/50 mt-1 text-sm">Here's what's happening with your tickets today.</p>
       </div>
@@ -236,7 +260,7 @@ function timeAgo(date: string | Date) {
               <!-- Title + category (Título + categoría) -->
               <div class="flex-1 min-w-0">
                 <p class="text-white text-sm font-medium truncate group-hover:text-indigo-300 transition-colors">
-                  {{ ticket.title }}
+                  {{ ticket.subject }}
                 </p>
                 <p v-if="ticket.category" class="text-white/40 text-xs">
                   {{ ticket.category }}

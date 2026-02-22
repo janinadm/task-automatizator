@@ -76,6 +76,9 @@ export const TicketFiltersSchema = z.object({
   dateTo: z.string().datetime().optional(),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  // Sorting (Ordenamiento)
+  sortBy: z.enum(['createdAt', 'updatedAt', 'priority', 'subject']).optional().default('createdAt'),
+  sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
 })
 
 // === Message Validators (Validadores de Mensaje) ===
@@ -129,6 +132,10 @@ export const LoginSchema = z.object({
 })
 
 export const AuthSetupSchema = z.object({
+  // The Supabase Auth UUID — needed to create the Prisma User record
+  // (El UUID de Supabase Auth — necesario para crear el registro de Usuario en Prisma)
+  userId: z.string().uuid('Invalid user ID'),
+  email: z.string().email('Invalid email'),
   fullName: z.string().min(2).max(100).trim(),
   organizationName: z.string().min(2).max(100).trim(),
 })
@@ -157,4 +164,6 @@ export type CreateMessageInput = z.infer<typeof CreateMessageSchema>
 export type SignUpInput = z.infer<typeof SignUpSchema>
 export type LoginInput = z.infer<typeof LoginSchema>
 export type AuthSetupInput = z.infer<typeof AuthSetupSchema>
+// TicketFilters is defined in types/api.ts to avoid duplicate exports from the barrel
+// (TicketFilters está definido en types/api.ts para evitar exportaciones duplicadas del barrel)
 export type SlaConfigInput = z.infer<typeof SlaConfigSchema>

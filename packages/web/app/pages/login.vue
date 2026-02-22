@@ -58,7 +58,9 @@ async function handleLogin() {
   // Client-side validation with Zod (Validación del lado del cliente con Zod)
   const result = LoginSchema.safeParse({ email: email.value, password: password.value })
   if (!result.success) {
-    error.value = result.error.errors[0].message
+    // errors[0] could technically be undefined — the ?. ensures we don't crash
+    // (errors[0] podría ser undefined — el ?. asegura que no se rompa)
+    error.value = result.error.errors[0]?.message ?? 'Validation error'
     return
   }
 

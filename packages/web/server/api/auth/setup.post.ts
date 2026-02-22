@@ -41,7 +41,11 @@ export default defineEventHandler(async (event) => {
   if (!result.success) {
     throw createError({
       statusCode: 400,
-      message: result.error.errors[0].message,
+      // Zod returns an array of errors — we show the first one
+      // errors[0] could be undefined if the array is empty (defensive coding!)
+      // (Zod retorna un array de errores — mostramos el primero;
+      //  errors[0] puede ser undefined si el array está vacío — programación defensiva)
+      message: result.error.errors[0]?.message ?? 'Validation error',
     })
   }
 
@@ -71,7 +75,7 @@ export default defineEventHandler(async (event) => {
     // (IDEMPOTENCIA: Verificar si el usuario ya tiene registros Prisma)
     const existingUser = await prisma.user.findUnique({
       where: { id: userId },
-      include: { organization: true },
+      include: { org: true }, // 'org' is the relation name in the Prisma schema
     })
 
     if (existingUser) {
@@ -80,7 +84,7 @@ export default defineEventHandler(async (event) => {
       return {
         success: true,
         user: existingUser,
-        organization: existingUser.organization,
+        organization: existingUser.org, // remap to 'organization' for the API response
         isNewUser: false,
       }
     }
@@ -128,9 +132,9 @@ export default defineEventHandler(async (event) => {
         data: {
           id: userId,           // Supabase Auth UUID — the link between auth and our DB
           email,
-          name: fullName,
+          fullName,             // schema field is 'fullName' (not 'name')
           role: 'ADMIN',        // Enum value from our Prisma schema
-          organizationId: organization.id,
+          orgId: organization.id, // schema field is 'orgId' (not 'organizationId')
         },
       })
 

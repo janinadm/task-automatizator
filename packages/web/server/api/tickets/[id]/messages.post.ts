@@ -28,30 +28,32 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const result = CreateMessageSchema.safeParse(body)
   if (!result.success) {
-    throw createError({ statusCode: 400, message: result.error.errors[0].message })
+    throw createError({ statusCode: 400, message: result.error.errors[0]?.message ?? 'Validation error' })
   }
 
   // Verify the ticket belongs to the caller's org (Verificar que el ticket pertenece a la org)
   const dbUser = await prisma.user.findUnique({
     where: { id: authUser.id },
-    select: { organizationId: true, id: true },
+    select: { orgId: true, id: true },
   })
   if (!dbUser) throw createError({ statusCode: 404, message: 'User not found' })
 
   const ticket = await prisma.ticket.findUnique({
     where: { id },
-    select: { organizationId: true },
+    select: { orgId: true },
   })
   if (!ticket) throw createError({ statusCode: 404, message: 'Ticket not found' })
-  if (ticket.organizationId !== dbUser.organizationId) {
+  if (ticket.orgId !== dbUser.orgId) {
     throw createError({ statusCode: 403, message: 'Forbidden' })
   }
 
   // Create the message (Crear el mensaje)
+  // Schema field is `body` (not `content`) — matches the TicketMessage Prisma model
+  // (El campo del schema es `body` — coincide con el modelo TicketMessage de Prisma)
   const message = await prisma.ticketMessage.create({
     data: {
       ticketId: id,
-      content: result.data.content,
+      body: result.data.body,
       // senderType tells us who sent it (agent or AI, not customer for inbound here)
       // (senderType nos dice quién lo envió)
       senderType: result.data.senderType,
@@ -59,7 +61,7 @@ export default defineEventHandler(async (event) => {
       ...(result.data.senderType === 'AGENT' && { senderId: dbUser.id }),
     },
     include: {
-      sender: { select: { id: true, name: true, avatarUrl: true, role: true } },
+      sender: { select: { id: true, fullName: true, avatarUrl: true, role: true } },
     },
   })
 

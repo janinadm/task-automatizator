@@ -284,7 +284,7 @@ const hasActiveFilters = computed(
                 title="SLA Breaching"
               />
               <p class="text-white text-sm font-medium truncate group-hover:text-indigo-300 transition-colors">
-                {{ ticket.title }}
+                {{ ticket.subject }}
               </p>
               <!-- Sentiment + channel (Sentimiento + canal) -->
               <span v-if="ticket.sentiment" class="flex-shrink-0 text-xs" :title="ticket.sentiment">
@@ -318,11 +318,11 @@ const hasActiveFilters = computed(
           <!-- Assigned agent avatar (Avatar del agente asignado) -->
           <div class="hidden lg:flex items-center justify-center w-7 h-7">
             <div
-              v-if="ticket.assignedAgent"
+              v-if="ticket.assignedTo"
               class="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold"
-              :title="ticket.assignedAgent.name"
+              :title="ticket.assignedTo.fullName"
             >
-              {{ ticket.assignedAgent.name.charAt(0).toUpperCase() }}
+              {{ ticket.assignedTo.fullName.charAt(0).toUpperCase() }}
             </div>
             <div v-else class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-white/20">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

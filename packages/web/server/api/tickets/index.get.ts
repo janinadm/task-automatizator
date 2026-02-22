@@ -30,11 +30,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'Unauthorized' })
   }
 
-  // Get the user's organizationId from DB (not from query param — security!)
-  // (Obtener organizationId del usuario desde BD — no del parámetro de consulta — seguridad)
+  // Get the user's orgId from DB (not from query param — security!)
+  // (Obtener orgId del usuario desde BD — no del parámetro de consulta — seguridad)
   const dbUser = await prisma.user.findUnique({
     where: { id: authUser.id },
-    select: { organizationId: true },
+    select: { orgId: true }, // 'orgId' is the FK in the User model
   })
   if (!dbUser) throw createError({ statusCode: 404, message: 'User not found' })
 
@@ -48,18 +48,18 @@ export default defineEventHandler(async (event) => {
   if (!filtersResult.success) {
     throw createError({
       statusCode: 400,
-      message: filtersResult.error.errors[0].message,
+      message: filtersResult.error.errors[0]?.message ?? 'Invalid query parameters',
     })
   }
 
   const {
     page = 1,
-    limit = 20,
+    pageSize: limit = 20,   // schema uses 'pageSize'; rename to 'limit' locally for clarity
     status,
     priority,
     sentiment,
     channel,
-    assignedAgentId,
+    assignedToId,           // schema uses 'assignedToId' (not 'assignedAgentId')
     search,
     sortBy = 'createdAt',
     sortOrder = 'desc',
@@ -70,18 +70,18 @@ export default defineEventHandler(async (event) => {
   // (Construir la cláusula where de Prisma dinámicamente)
   // (Solo añadimos condiciones para filtros que estén configurados)
   const where: Prisma.TicketWhereInput = {
-    organizationId: dbUser.organizationId,
+    orgId: dbUser.orgId,    // multi-tenant filter: only this org's tickets
     // Spread conditions conditionally using the "filter && { condition }" pattern
     ...(status && { status: Array.isArray(status) ? { in: status } : status }),
     ...(priority && { priority: Array.isArray(priority) ? { in: priority } : priority }),
     ...(sentiment && { sentiment: Array.isArray(sentiment) ? { in: sentiment } : sentiment }),
     ...(channel && { channel: Array.isArray(channel) ? { in: channel } : channel }),
-    ...(assignedAgentId && { assignedAgentId }),
+    ...(assignedToId && { assignedToId }), // 'assignedToId' is the FK field name
     ...(search && {
       OR: [
         // Prisma's 'contains' + 'mode: insensitive' = case-insensitive search
         // (El 'contains' + 'mode: insensitive' de Prisma = búsqueda sin distinción de mayúsculas)
-        { title: { contains: search, mode: 'insensitive' } },
+        { subject: { contains: search, mode: 'insensitive' } }, // 'subject' (not 'title')
         { customerName: { contains: search, mode: 'insensitive' } },
         { customerEmail: { contains: search, mode: 'insensitive' } },
         { summary: { contains: search, mode: 'insensitive' } },
@@ -100,8 +100,8 @@ export default defineEventHandler(async (event) => {
       take: limit,
       orderBy: { [sortBy]: sortOrder },
       include: {
-        assignedAgent: {
-          select: { id: true, name: true, avatarUrl: true },
+        assignedTo: {         // 'assignedTo' is the relation name in Prisma schema
+          select: { id: true, fullName: true, avatarUrl: true }, // 'fullName' (not 'name')
         },
         _count: {
           select: { messages: true, aiSuggestions: true },
@@ -110,13 +110,16 @@ export default defineEventHandler(async (event) => {
     }),
   ])
 
-  // Add SLA breach flag (Agregar bandera de incumplimiento SLA)
-  const now = new Date()
+  // Add SLA breach flag — URGENT tickets open for more than 2 hours
+  // (Note: no slaDeadline column in schema; Phase 7 will add a proper SLA engine)
+  // (Agregar bandera de SLA: tickets URGENTES abiertos más de 2 horas)
+  const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000)
   const data = tickets.map(t => ({
     ...t,
-    isBreachingSla: t.slaDeadline
-      ? t.slaDeadline < now && ['OPEN', 'IN_PROGRESS'].includes(t.status)
-      : false,
+    isBreachingSla:
+      t.priority === 'URGENT' &&
+      ['OPEN', 'IN_PROGRESS'].includes(t.status) &&
+      t.createdAt < twoHoursAgo,
   }))
 
   // PaginatedResponse format (Formato de respuesta paginada)
