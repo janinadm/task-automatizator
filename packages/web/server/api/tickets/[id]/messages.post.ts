@@ -66,9 +66,22 @@ export default defineEventHandler(async (event) => {
   })
 
   // Update ticket's updatedAt timestamp (Actualizar timestamp updatedAt del ticket)
+  // Also set firstResponseAt if this is the first agent reply (for SLA tracking)
+  const updateData: Record<string, any> = { updatedAt: new Date() }
+
+  if (result.data.senderType === 'AGENT') {
+    const existingTicket = await prisma.ticket.findUnique({
+      where: { id },
+      select: { firstResponseAt: true },
+    })
+    if (existingTicket && !existingTicket.firstResponseAt) {
+      updateData.firstResponseAt = new Date()
+    }
+  }
+
   await prisma.ticket.update({
     where: { id },
-    data: { updatedAt: new Date() },
+    data: updateData,
   })
 
   return { data: message }

@@ -53,6 +53,12 @@ let ticketChannel: ReturnType<typeof supabase.channel> | null = null
 // (Obtener al montar — vuelve a obtener si el ID cambia)
 onMounted(async () => {
   await ticketsStore.fetchTicket(ticketId.value)
+  await fetchSlaForTicket()
+
+  // Start SLA timer (tick every minute)
+  slaTimer.value = setInterval(() => {
+    slaElapsed.value++
+  }, 60000)
 
   // Subscribe to messages for THIS ticket
   // (Suscribirse a mensajes de ESTE ticket)
@@ -91,9 +97,83 @@ onUnmounted(() => {
     supabase.removeChannel(ticketChannel)
     ticketChannel = null
   }
+  if (slaTimer.value) {
+    clearInterval(slaTimer.value)
+    slaTimer.value = null
+  }
 })
 
 const ticket = computed(() => ticketsStore.currentTicket)
+
+// --- CANNED RESPONSES ---
+const showCannedPicker = ref(false)
+const cannedResponses = ref<any[]>([])
+const cannedSearch = ref('')
+
+async function fetchCannedResponses() {
+  try {
+    const res = await $fetch<{ data: any[] }>('/api/canned-responses')
+    cannedResponses.value = res.data.filter((r: any) => r.isActive)
+  } catch { /* ignore */ }
+}
+
+const filteredCanned = computed(() => {
+  const q = cannedSearch.value.toLowerCase()
+  if (!q) return cannedResponses.value
+  return cannedResponses.value.filter((r: any) =>
+    r.title.toLowerCase().includes(q) ||
+    r.shortcut?.toLowerCase().includes(q) ||
+    r.category?.toLowerCase().includes(q)
+  )
+})
+
+function useCannedResponse(response: any) {
+  // Replace template variables
+  let body = response.body
+  if (ticket.value) {
+    body = body.replace(/\{\{ticket\.customerName\}\}/g, ticket.value.customerName ?? 'Customer')
+    body = body.replace(/\{\{ticket\.subject\}\}/g, ticket.value.subject ?? '')
+  }
+  replyText.value = body
+  showCannedPicker.value = false
+  cannedSearch.value = ''
+  // Track usage
+  $fetch(`/api/canned-responses/${response.id}/use`, { method: 'POST' }).catch(() => {})
+}
+
+onMounted(() => fetchCannedResponses())
+
+// --- SLA TIMER ---
+const slaData = ref<any>(null)
+const slaTimer = ref<ReturnType<typeof setInterval> | null>(null)
+const slaElapsed = ref(0)
+
+async function fetchSlaForTicket() {
+  if (!ticket.value) return
+  try {
+    const res = await $fetch<{ data: { statuses: any[] } }>('/api/tickets/sla-status')
+    const found = res.data.statuses.find((s: any) => s.ticketId === ticketId.value)
+    slaData.value = found ?? null
+    if (found) slaElapsed.value = found.minutesElapsed
+  } catch { /* ignore */ }
+}
+
+const slaCountdown = computed(() => {
+  if (!slaData.value || slaData.value.maxResponseMinutes === null) return null
+  if (slaData.value.firstResponseAt) return { responded: true }
+  const remaining = slaData.value.maxResponseMinutes - slaElapsed.value
+  const absRemaining = Math.abs(remaining)
+  const hours = Math.floor(absRemaining / 60)
+  const mins = absRemaining % 60
+  return {
+    responded: false,
+    remaining,
+    display: remaining < 0
+      ? `-${hours}h ${mins}m overdue`
+      : `${hours}h ${mins}m remaining`,
+    severity: slaData.value.breachSeverity,
+  }
+})
 
 // --- STATUS UPDATE ---
 // When the agent clicks a new status, call PATCH and update optimistically
@@ -323,7 +403,56 @@ const slaStatus = computed(() => {
               @keydown.enter.exact.prevent="sendReply"
             />
             <div class="flex items-center justify-between mt-3">
-              <p class="text-white/30 text-xs">Press Enter to send · Shift+Enter for new line</p>
+              <div class="flex items-center gap-2">
+                <p class="text-white/30 text-xs">Enter to send · Shift+Enter for new line</p>
+                <!-- Canned response picker trigger -->
+                <div class="relative">
+                  <button
+                    class="text-white/40 hover:text-indigo-400 transition-colors text-xs flex items-center gap-1 border border-white/10 rounded-lg px-2 py-1 hover:border-indigo-500/30 hover:bg-indigo-500/5"
+                    @click="showCannedPicker = !showCannedPicker"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    Templates
+                  </button>
+
+                  <!-- Canned responses dropdown -->
+                  <Transition name="fade">
+                    <div
+                      v-if="showCannedPicker"
+                      class="absolute left-0 bottom-full mb-2 w-80 max-h-72 bg-[#12101f] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
+                    >
+                      <div class="px-3 py-2 border-b border-white/[0.06]">
+                        <input
+                          v-model="cannedSearch"
+                          type="text"
+                          placeholder="Search templates..."
+                          class="input-glass w-full text-xs py-1.5"
+                        />
+                      </div>
+                      <div class="overflow-y-auto max-h-52 divide-y divide-white/[0.04]">
+                        <button
+                          v-for="cr in filteredCanned"
+                          :key="cr.id"
+                          class="w-full text-left px-3 py-2.5 hover:bg-white/[0.04] transition-colors"
+                          @click="useCannedResponse(cr)"
+                        >
+                          <div class="flex items-center gap-2">
+                            <span class="text-white/80 text-sm font-medium truncate">{{ cr.title }}</span>
+                            <span v-if="cr.shortcut" class="text-indigo-400/60 text-[10px] font-mono">{{ cr.shortcut }}</span>
+                          </div>
+                          <p class="text-white/30 text-xs mt-0.5 truncate">{{ cr.body }}</p>
+                          <span v-if="cr.category" class="text-white/20 text-[10px] mt-0.5 block">{{ cr.category }}</span>
+                        </button>
+                        <div v-if="!filteredCanned.length" class="py-4 text-center text-white/30 text-xs">
+                          No templates found
+                        </div>
+                      </div>
+                    </div>
+                  </Transition>
+                </div>
+              </div>
               <button
                 class="btn-primary text-sm flex items-center gap-2"
                 :disabled="!replyText.trim() || isSendingReply"
@@ -441,8 +570,27 @@ const slaStatus = computed(() => {
               <dd class="text-white/70 text-sm uppercase">{{ ticket.language }}</dd>
             </div>
 
-            <!-- SLA Deadline (Fecha límite SLA) -->
-            <div v-if="slaStatus" class="flex items-center justify-between">
+            <!-- SLA Timer (Temporizador SLA) -->
+            <div v-if="slaCountdown" class="flex items-center justify-between">
+              <dt class="text-white/40 text-xs">SLA</dt>
+              <dd>
+                <span v-if="slaCountdown.responded" class="px-2 py-0.5 rounded-full text-xs border bg-green-500/10 border-green-500/20 text-green-400">
+                  ✓ Responded
+                </span>
+                <span
+                  v-else
+                  class="px-2 py-0.5 rounded-full text-xs border font-mono"
+                  :class="{
+                    'bg-red-500/10 border-red-500/20 text-red-400 animate-pulse': slaCountdown.severity === 'breached' || slaCountdown.severity === 'critical',
+                    'bg-amber-500/10 border-amber-500/20 text-amber-400': slaCountdown.severity === 'warning',
+                    'bg-green-500/10 border-green-500/20 text-green-400': slaCountdown.severity === 'none',
+                  }"
+                >
+                  {{ slaCountdown.display }}
+                </span>
+              </dd>
+            </div>
+            <div v-else-if="slaStatus" class="flex items-center justify-between">
               <dt class="text-white/40 text-xs">SLA</dt>
               <dd>
                 <span class="px-2 py-0.5 rounded-full text-xs border" :class="slaStatus.bgClass + ' ' + slaStatus.class">

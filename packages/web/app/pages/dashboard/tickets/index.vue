@@ -160,6 +160,54 @@ function timeAgo(date: string | Date) {
 const hasActiveFilters = computed(
   () => !!(searchInput.value || selectedStatus.value || selectedPriority.value)
 )
+
+// --- BULK ACTIONS ---
+const selectedTickets = ref<Set<string>>(new Set())
+const isBulkProcessing = ref(false)
+const toast = useToast()
+
+const isAllSelected = computed(() => {
+  if (!ticketsStore.tickets.length) return false
+  return ticketsStore.tickets.every((t: any) => selectedTickets.value.has(t.id))
+})
+
+function toggleSelectAll() {
+  if (isAllSelected.value) {
+    selectedTickets.value.clear()
+  } else {
+    ticketsStore.tickets.forEach((t: any) => selectedTickets.value.add(t.id))
+  }
+}
+
+function toggleTicket(id: string) {
+  if (selectedTickets.value.has(id)) {
+    selectedTickets.value.delete(id)
+  } else {
+    selectedTickets.value.add(id)
+  }
+}
+
+async function bulkAction(action: string, value?: string) {
+  if (!selectedTickets.value.size) return
+  isBulkProcessing.value = true
+  try {
+    const res = await $fetch<{ data: { updatedCount: number } }>('/api/tickets/bulk', {
+      method: 'POST',
+      body: {
+        ticketIds: Array.from(selectedTickets.value),
+        action,
+        value,
+      },
+    })
+    toast.success(`Updated ${res.data.updatedCount} ticket(s)`)
+    selectedTickets.value.clear()
+    await ticketsStore.fetchTickets()
+  } catch (e: any) {
+    toast.error(e?.data?.message ?? 'Bulk action failed')
+  } finally {
+    isBulkProcessing.value = false
+  }
+}
 </script>
 
 <template>
@@ -240,11 +288,74 @@ const hasActiveFilters = computed(
       </div>
     </UiGlassCard>
 
+    <!-- Bulk Action Bar (Barra de acciones masivas) -->
+    <Transition name="fade">
+      <UiGlassCard v-if="selectedTickets.size > 0" padding="md">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-white font-medium text-sm">{{ selectedTickets.size }} selected</span>
+            <button class="text-white/40 hover:text-white/60 text-xs underline transition-colors" @click="selectedTickets.clear()">
+              Clear
+            </button>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <!-- Status actions -->
+            <button
+              class="btn-ghost text-xs px-3 py-1.5 flex items-center gap-1.5"
+              :disabled="isBulkProcessing"
+              @click="bulkAction('updateStatus', 'IN_PROGRESS')"
+            >
+              ⚙️ Mark In Progress
+            </button>
+            <button
+              class="btn-ghost text-xs px-3 py-1.5 flex items-center gap-1.5"
+              :disabled="isBulkProcessing"
+              @click="bulkAction('updateStatus', 'RESOLVED')"
+            >
+              ✅ Resolve
+            </button>
+            <button
+              class="btn-ghost text-xs px-3 py-1.5 flex items-center gap-1.5"
+              :disabled="isBulkProcessing"
+              @click="bulkAction('updateStatus', 'CLOSED')"
+            >
+              🔒 Close
+            </button>
+            <!-- Priority actions -->
+            <button
+              class="btn-ghost text-xs px-3 py-1.5 flex items-center gap-1.5 text-red-400 hover:text-red-300"
+              :disabled="isBulkProcessing"
+              @click="bulkAction('updatePriority', 'URGENT')"
+            >
+              🔴 Urgent
+            </button>
+            <!-- Unassign action -->
+            <button
+              class="btn-ghost text-xs px-3 py-1.5 flex items-center gap-1.5"
+              :disabled="isBulkProcessing"
+              @click="bulkAction('unassign')"
+            >
+              Unassign
+            </button>
+          </div>
+        </div>
+      </UiGlassCard>
+    </Transition>
+
     <!-- Tickets Table (Tabla de tickets) -->
     <UiGlassCard padding="none">
       <!-- Table header (Encabezado de tabla) -->
       <div class="px-5 py-3 border-b border-white/10">
-        <div class="grid grid-cols-[1fr_auto_auto_auto_auto] gap-3 items-center text-xs text-white/40 font-medium uppercase tracking-wider">
+        <div class="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-3 items-center text-xs text-white/40 font-medium uppercase tracking-wider">
+          <!-- Select all checkbox -->
+          <label class="flex items-center cursor-pointer" @click.stop>
+            <input
+              type="checkbox"
+              :checked="isAllSelected"
+              class="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-indigo-500 focus:ring-indigo-500/30 cursor-pointer"
+              @change="toggleSelectAll"
+            />
+          </label>
           <button class="text-left flex items-center gap-1 hover:text-white/60 transition-colors" @click="toggleSort('createdAt')">
             Ticket
             <svg v-if="ticketsStore.filters.sortBy === 'createdAt'" class="w-3 h-3" :class="ticketsStore.filters.sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -301,14 +412,23 @@ const hasActiveFilters = computed(
 
       <!-- Ticket rows (Filas de tickets) -->
       <div v-else class="divide-y divide-white/5">
-        <NuxtLink
+        <div
           v-for="ticket in ticketsStore.tickets"
           :key="ticket.id"
-          :to="`/dashboard/tickets/${ticket.id}`"
-          class="grid grid-cols-[1fr_auto_auto_auto_auto] gap-3 items-center px-5 py-4 hover:bg-white/5 transition-colors group"
+          class="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-3 items-center px-5 py-4 hover:bg-white/5 transition-colors group"
+          :class="{ 'bg-indigo-500/5': selectedTickets.has(ticket.id) }"
         >
-          <!-- Ticket info + SLA warning -->
-          <div class="min-w-0">
+          <!-- Checkbox -->
+          <label class="flex items-center cursor-pointer" @click.stop>
+            <input
+              type="checkbox"
+              :checked="selectedTickets.has(ticket.id)"
+              class="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-indigo-500 focus:ring-indigo-500/30 cursor-pointer"
+              @change="toggleTicket(ticket.id)"
+            />
+          </label>
+          <!-- Ticket info + SLA warning (clickable) -->
+          <NuxtLink :to="`/dashboard/tickets/${ticket.id}`" class="min-w-0">
             <div class="flex items-center gap-2">
               <!-- SLA breach indicator (Indicador de incumplimiento SLA) -->
               <span
@@ -333,7 +453,7 @@ const hasActiveFilters = computed(
                 · {{ ticket._count?.messages }} msg{{ (ticket._count?.messages ?? 0) === 1 ? '' : 's' }}
               </span>
             </p>
-          </div>
+          </NuxtLink>
 
           <!-- Status badge (Insignia de estado) -->
           <span class="hidden md:inline-flex px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap" :class="statusConfig[ticket.status]?.class">
@@ -368,7 +488,7 @@ const hasActiveFilters = computed(
           <span class="text-white/30 text-xs whitespace-nowrap">
             {{ timeAgo(ticket.updatedAt) }}
           </span>
-        </NuxtLink>
+        </div>
       </div>
 
       <!-- Pagination (Paginación) -->

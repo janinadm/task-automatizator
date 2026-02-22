@@ -28,6 +28,7 @@ export default defineEventHandler(async (event) => {
       name: true,
       slug: true,
       plan: true,
+      autoAssign: true,
       logoUrl: true,
       createdAt: true,
     },

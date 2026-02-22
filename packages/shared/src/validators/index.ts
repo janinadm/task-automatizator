@@ -208,3 +208,55 @@ export type CreateInvitationInput = z.infer<typeof CreateInvitationSchema>
 export type AcceptInvitationInput = z.infer<typeof AcceptInvitationSchema>
 export type CreateIntegrationInput = z.infer<typeof CreateIntegrationSchema>
 export type UpdateIntegrationInput = z.infer<typeof UpdateIntegrationSchema>
+
+// === Canned Response Validators (Validadores de Respuestas Predefinidas) ===
+
+export const CreateCannedResponseSchema = z.object({
+  title: z
+    .string()
+    .min(1, 'Title is required')
+    .max(100, 'Title must be under 100 characters')
+    .trim(),
+  body: z
+    .string()
+    .min(1, 'Response body is required')
+    .max(5000, 'Response is too long')
+    .trim(),
+  category: z.string().max(50).trim().optional(),
+  shortcut: z
+    .string()
+    .max(30)
+    .trim()
+    .regex(/^\/[a-z0-9_-]+$/, 'Shortcut must start with / and use lowercase letters, numbers, hyphens')
+    .optional(),
+})
+
+export const UpdateCannedResponseSchema = z.object({
+  title: z.string().min(1).max(100).trim().optional(),
+  body: z.string().min(1).max(5000).trim().optional(),
+  category: z.string().max(50).trim().nullable().optional(),
+  shortcut: z
+    .string()
+    .max(30)
+    .trim()
+    .regex(/^\/[a-z0-9_-]+$/, 'Shortcut must start with / and use lowercase letters')
+    .nullable()
+    .optional(),
+  isActive: z.boolean().optional(),
+})
+
+// === Bulk Ticket Actions Validator (Validador de Acciones Masivas de Tickets) ===
+
+export const BulkTicketActionSchema = z.object({
+  ticketIds: z
+    .array(z.string().cuid())
+    .min(1, 'At least one ticket must be selected')
+    .max(100, 'Cannot update more than 100 tickets at once'),
+  action: z.enum(['updateStatus', 'updatePriority', 'assign', 'unassign']),
+  value: z.string().optional(), // The status/priority value or assignedToId
+})
+
+// === Inferred Types ===
+export type CreateCannedResponseInput = z.infer<typeof CreateCannedResponseSchema>
+export type UpdateCannedResponseInput = z.infer<typeof UpdateCannedResponseSchema>
+export type BulkTicketActionInput = z.infer<typeof BulkTicketActionSchema>

@@ -44,6 +44,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Update auto-assign setting
+  if (typeof body.autoAssign === 'boolean') {
+    await prisma.organization.update({
+      where: { id: dbUser.orgId },
+      data: { autoAssign: body.autoAssign },
+    })
+  }
+
   // Update SLA configs
   if (body.slaConfigs && Array.isArray(body.slaConfigs)) {
     const validPriorities = ['LOW', 'MEDIUM', 'HIGH', 'URGENT']

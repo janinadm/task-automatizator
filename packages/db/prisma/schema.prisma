@@ -107,18 +107,18 @@ model Organization {
   name      String                          // Display name (Nombre para mostrar)
   slug      String   @unique                // URL-friendly ID: "acme-corp" (ID amigable para URL)
   plan      Plan     @default(FREE)
+  autoAssign Boolean  @default(false)         // Enable round-robin auto-assignment
   logoUrl   String?                         // ? = nullable (permite null)
-  createdAt DateTime @default(now())        // Auto-set on creation (Se establece automáticamente al crear)
-  updatedAt DateTime @updatedAt             // Auto-updated on any change (Se actualiza automáticamente)
+  createdAt DateTime @default(now())        // Auto-set on creation
+  updatedAt DateTime @updatedAt             // Auto-updated on any change
 
   // === Relations (Relaciones) ===
-  // One Organization has many Users, Tickets, and SLAs
-  // (Una Organización tiene muchos Usuarios, Tickets y SLAs)
   users      User[]
   tickets    Ticket[]
   slaConfigs SlaConfig[]
   invitations Invitation[]
   integrations Integration[]
+  cannedResponses CannedResponse[]
 
   // === Index (Índice) ===
   // Speeds up lookups by slug (Acelera búsquedas por slug)
@@ -201,9 +201,10 @@ model Ticket {
   // (si el agente se elimina, desasignar el ticket (no eliminarlo))
 
   // === Timestamps (Marcas de tiempo) ===
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  resolvedAt DateTime?                              // Set when status → RESOLVED (Se establece cuando status → RESOLVED)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  resolvedAt      DateTime?                          // Set when status → RESOLVED
+  firstResponseAt DateTime?                          // Set when first agent replies (for SLA tracking)
 
   // === Relations (Relaciones) ===
   messages      TicketMessage[]
@@ -363,4 +364,30 @@ model Integration {
   @@index([orgId])
   @@index([webhookUrl])
   @@map("integrations")
+}
+
+// ============================================================================
+// CANNED RESPONSE — Quick reply templates for agents
+// (Respuestas predefinidas — Plantillas de respuesta rápida para agentes)
+// ============================================================================
+model CannedResponse {
+  id        String   @id @default(cuid())
+  title     String                                    // Short label: "Greeting", "Refund Policy"
+  body      String                                    // The full response text (supports {{ticket.customerName}} etc.)
+  category  String?                                   // Optional grouping: "General", "Billing", "Technical"
+  shortcut  String?                                   // Quick-access shortcut key: "/greet", "/refund"
+  isActive  Boolean  @default(true)
+  usageCount Int     @default(0)                      // Track popularity for sorting
+
+  // Which organization owns this template
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orgId, shortcut])                         // Unique shortcut per org
+  @@index([orgId])
+  @@index([orgId, category])
+  @@map("canned_responses")
 }
