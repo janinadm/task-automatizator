@@ -257,7 +257,7 @@ const planColors: Record<string, string> = {
     <!-- Main content area (Área de contenido principal) -->
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
       <!-- Top Header (Encabezado superior) -->
-      <header class="flex items-center gap-4 px-6 py-4 border-b border-white/[0.06] bg-white/[0.02] backdrop-blur-sm">
+      <header class="relative z-40 flex items-center gap-4 px-6 py-4 border-b border-white/[0.06] bg-white/[0.02] backdrop-blur-sm">
         <!-- Mobile menu button (Botón de menú móvil) -->
         <button
           class="lg:hidden text-white/60 hover:text-white transition-colors"
@@ -371,7 +371,7 @@ const planColors: Record<string, string> = {
             <!-- Click-outside overlay to close (below the dropdown) -->
             <div
               v-if="showNotifications"
-              class="fixed inset-0 z-40"
+              class="fixed inset-0 z-30"
               @click.self="closeNotifications"
             />
           </div>
