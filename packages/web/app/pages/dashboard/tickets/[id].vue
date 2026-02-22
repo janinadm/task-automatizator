@@ -170,6 +170,31 @@ function timeAgo(date: string | Date) {
   return `${Math.floor(h / 24)}d ago`
 }
 
+// --- AI ANALYSIS ---
+// On-demand AI analysis: classifies sentiment, priority, category + generates a suggested reply
+// (Análisis de IA bajo demanda: clasifica sentimiento, prioridad, categoría + genera respuesta sugerida)
+const isAnalyzing = ref(false)
+const analysisError = ref<string | null>(null)
+const toast = useToast()
+
+async function analyzeWithAI() {
+  if (!ticketId.value) return
+  isAnalyzing.value = true
+  analysisError.value = null
+  try {
+    await $fetch(`/api/tickets/${ticketId.value}/analyze`, { method: 'POST' })
+    // Re-fetch the ticket to get the updated fields + new AI suggestion
+    // (Re-obtener el ticket para obtener los campos actualizados + nueva sugerencia IA)
+    await ticketsStore.fetchTicket(ticketId.value)
+    toast.success('AI analysis complete')
+  } catch (e: any) {
+    analysisError.value = e?.data?.message ?? 'AI analysis failed'
+    toast.error(analysisError.value!)
+  } finally {
+    isAnalyzing.value = false
+  }
+}
+
 // SLA status — based on isBreachingSla flag returned by the API
 // (Estado de SLA — basado en el flag isBreachingSla retornado por la API)
 const slaStatus = computed(() => {
@@ -457,7 +482,35 @@ const slaStatus = computed(() => {
           </div>
         </UiGlassCard>
 
-        <!-- AI Summary (Resumen de IA) — Phase 6 will populate this -->
+        <!-- AI Analyze Button (Botón de análisis IA) -->
+        <UiGlassCard padding="md">
+          <h3 class="text-white/60 text-xs font-medium uppercase tracking-wider mb-3 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            AI Analysis
+          </h3>
+          <button
+            class="w-full btn-primary text-sm flex items-center justify-center gap-2"
+            :disabled="isAnalyzing"
+            @click="analyzeWithAI"
+          >
+            <svg v-if="isAnalyzing" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            {{ isAnalyzing ? 'Analyzing...' : 'Analyze with AI' }}
+          </button>
+          <p v-if="analysisError" class="text-red-400 text-xs mt-2 text-center">{{ analysisError }}</p>
+          <p class="text-white/30 text-xs mt-2 text-center">
+            Detects sentiment, priority, category &amp; suggests a reply
+          </p>
+        </UiGlassCard>
+
+        <!-- AI Summary (Resumen de IA) -->
         <UiGlassCard v-if="ticket.summary" padding="md">
           <h3 class="text-white/60 text-xs font-medium uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
