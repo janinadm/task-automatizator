@@ -110,7 +110,7 @@ const planColors: Record<string, string> = {
         class="fixed inset-y-0 left-0 z-40 w-64 lg:relative lg:flex lg:flex-col flex-col hidden lg:flex"
         :class="{ 'flex': isSidebarOpen }"
       >
-        <div class="flex flex-col h-full glass-card-heavy border-r border-white/10 rounded-none">
+        <div class="flex flex-col h-full bg-[#0d0b24]/90 backdrop-blur-xl border-r border-white/[0.06] rounded-none">
           <!-- Logo / Brand (Logo / Marca) -->
           <div class="flex items-center gap-3 p-6 border-b border-white/10">
             <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-glow flex-shrink-0">
@@ -187,7 +187,7 @@ const planColors: Record<string, string> = {
     <!-- Main content area (Área de contenido principal) -->
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
       <!-- Top Header (Encabezado superior) -->
-      <header class="flex items-center gap-4 px-6 py-4 border-b border-white/10 bg-white/5 backdrop-blur-sm">
+      <header class="flex items-center gap-4 px-6 py-4 border-b border-white/[0.06] bg-white/[0.02] backdrop-blur-sm">
         <!-- Mobile menu button (Botón de menú móvil) -->
         <button
           class="lg:hidden text-white/60 hover:text-white transition-colors"

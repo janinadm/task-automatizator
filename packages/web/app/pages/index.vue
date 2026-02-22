@@ -8,9 +8,9 @@
    Por ahora muestra una bienvenida simple con estilo glassmorfismo.)
 -->
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-950 via-purple-900 to-pink-800">
+  <div class="min-h-screen flex items-center justify-center" style="background: linear-gradient(135deg, #0c0a2a 0%, #1a0e35 35%, #1e0a2e 65%, #150a20 100%);">
     <!-- GlassMorphism Card (Tarjeta con efecto glassmorfismo) -->
-    <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-2xl p-12 max-w-lg text-center">
+    <div class="bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-glass-lg p-12 max-w-lg text-center">
       <h1 class="text-4xl font-bold text-white mb-4">
         Agency Task Automator
       </h1>
@@ -20,7 +20,7 @@
       <div class="flex gap-4 justify-center">
         <NuxtLink
           to="/login"
-          class="px-6 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl text-white font-medium transition-all duration-300"
+          class="px-6 py-3 bg-white/[0.08] hover:bg-white/[0.14] backdrop-blur-sm border border-white/[0.12] rounded-xl text-white font-medium transition-all duration-300"
         >
           Log In
         </NuxtLink>

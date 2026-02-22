@@ -151,7 +151,7 @@ async function handleGoogleLogin() {
     <!-- (Este es el "login social" — un clic, sin necesidad de contraseña) -->
     <button
       :disabled="isLoading"
-      class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mb-6"
+      class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/[0.07] hover:bg-white/[0.12] border border-white/[0.1] rounded-xl text-white font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mb-6"
       @click="handleGoogleLogin"
     >
       <!-- Google logo SVG (Logo SVG de Google) -->

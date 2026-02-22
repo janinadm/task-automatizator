@@ -70,7 +70,7 @@ const kpis = computed(() => {
       label: 'Open Tickets',
       value: s?.openTickets ?? '—',
       icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
-      color: 'from-blue-500/20 to-indigo-500/20 border-blue-500/30',
+      color: 'bg-blue-500/[0.08] border-blue-500/20 hover:border-blue-400/40',
       iconColor: 'text-blue-400',
       link: '/dashboard/tickets?status=OPEN',
     },
@@ -78,8 +78,8 @@ const kpis = computed(() => {
       label: 'Resolved Today',
       value: s?.resolvedToday ?? '—',
       icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-      color: 'from-green-500/20 to-emerald-500/20 border-green-500/30',
-      iconColor: 'text-green-400',
+      color: 'bg-emerald-500/[0.08] border-emerald-500/20 hover:border-emerald-400/40',
+      iconColor: 'text-emerald-400',
       link: '/dashboard/tickets?status=RESOLVED',
     },
     {
@@ -87,8 +87,8 @@ const kpis = computed(() => {
       value: s?.slaBreaching ?? '—',
       icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z',
       color: (s?.slaBreaching ?? 0) > 0
-        ? 'from-red-500/20 to-orange-500/20 border-red-500/30'
-        : 'from-white/5 to-white/5 border-white/10',
+        ? 'bg-red-500/[0.1] border-red-500/30 hover:border-red-400/50'
+        : 'bg-white/[0.03] border-white/[0.06] hover:border-white/10',
       iconColor: (s?.slaBreaching ?? 0) > 0 ? 'text-red-400' : 'text-white/40',
       link: '/dashboard/tickets',
     },
@@ -96,7 +96,7 @@ const kpis = computed(() => {
       label: 'AI Suggestions',
       value: s?.aiSuggestionsGenerated ?? '—',
       icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-      color: 'from-purple-500/20 to-pink-500/20 border-purple-500/30',
+      color: 'bg-purple-500/[0.08] border-purple-500/20 hover:border-purple-400/40',
       iconColor: 'text-purple-400',
       link: '/dashboard/analytics',
     },
@@ -189,7 +189,7 @@ function timeAgo(date: string | Date) {
           v-for="kpi in kpis"
           :key="kpi.label"
           :to="kpi.link"
-          class="relative overflow-hidden p-5 rounded-2xl border bg-gradient-to-br transition-all duration-200 hover:scale-[1.02] hover:shadow-glass"
+          class="relative overflow-hidden p-5 rounded-2xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-glow"
           :class="kpi.color"
         >
           <!-- Icon -->

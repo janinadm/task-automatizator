@@ -36,9 +36,9 @@ const props = withDefaults(
 // Compute CSS classes based on props
 // (Calcular clases CSS basadas en las props)
 const variantClasses = computed(() => ({
-  default: 'bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-glass',
-  heavy: 'bg-white/20 backdrop-blur-xl border border-white/25 rounded-2xl shadow-glass-lg',
-  subtle: 'bg-white/5 backdrop-blur-md border border-white/10 rounded-xl shadow-glass-sm',
+  default: 'bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-glass',
+  heavy: 'bg-white/[0.1] backdrop-blur-xl border border-white/[0.12] rounded-2xl shadow-glass-lg',
+  subtle: 'bg-white/[0.03] backdrop-blur-md border border-white/[0.06] rounded-xl shadow-glass-sm',
 }[props.variant]))
 
 const paddingClasses = computed(() => ({

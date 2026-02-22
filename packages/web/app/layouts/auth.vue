@@ -9,17 +9,18 @@
 <template>
   <!-- Full-screen gradient background (Fondo con gradiente de pantalla completa) -->
   <div
-    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-950 via-purple-900 to-pink-800 p-4"
+    class="min-h-screen flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #0c0a2a 0%, #1a0e35 35%, #1e0a2e 65%, #150a20 100%);"
   >
     <!-- Decorative background blobs for depth (Manchas decorativas de fondo para profundidad) -->
     <div
-      class="absolute top-0 left-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+      class="absolute top-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"
     />
     <div
-      class="absolute bottom-0 right-0 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none"
+      class="absolute bottom-0 right-0 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none"
     />
     <div
-      class="absolute top-1/2 right-1/4 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"
+      class="absolute top-1/2 right-1/4 w-64 h-64 bg-indigo-500/[0.06] rounded-full blur-3xl pointer-events-none"
     />
 
     <!-- Page content slot (Slot de contenido de la página) -->
