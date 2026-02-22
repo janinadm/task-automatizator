@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "prettier": "^3.8.1",
-    "turbo": "^2.8.10"
+    "turbo": "^2.8.10",
+    "vue-tsc": "^3.2.5"
   }
 }

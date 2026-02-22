@@ -30,10 +30,68 @@ const authStore = useAuthStore()
 // (useRoute().params.id es el segmento dinámico de [id].vue)
 const ticketId = computed(() => String(route.params.id))
 
+// ── Realtime subscriptions (Suscripciones en tiempo real) ──────────────────
+// Two channels here:
+//   1. ticket_messages → live chat (new messages appear instantly)
+//   2. tickets        → ticket metadata changes (status, priority, assignment)
+//
+// The message channel is fine-grained: filtered to THIS ticket's ID only.
+// The ticket channel comes from useRealtimeTickets (watches the whole org).
+//
+// (Dos canales aquí:
+//  1. ticket_messages → chat en vivo (los nuevos mensajes aparecen al instante)
+//  2. tickets → cambios de metadatos (estado, prioridad, asignación)
+//  El canal de mensajes es de grano fino: filtrado solo al ID de ESTE ticket.)
+const { subscribe: subscribeMessages } = useRealtimeMessages()
+const { subscribe: subscribeTickets } = useRealtimeTickets()
+const supabase = useSupabaseClient()
+
+let msgChannel: ReturnType<typeof supabase.channel> | null = null
+let ticketChannel: ReturnType<typeof supabase.channel> | null = null
+
 // Fetch on mount — re-fetches if the ID changes (e.g., user navigates between tickets)
 // (Obtener al montar — vuelve a obtener si el ID cambia)
-onMounted(() => ticketsStore.fetchTicket(ticketId.value))
-watch(ticketId, (newId) => ticketsStore.fetchTicket(newId))
+onMounted(async () => {
+  await ticketsStore.fetchTicket(ticketId.value)
+
+  // Subscribe to messages for THIS ticket
+  // (Suscribirse a mensajes de ESTE ticket)
+  msgChannel = subscribeMessages(ticketId.value)
+
+  // Also subscribe to ticket-level changes (status, priority) for the whole org
+  // (También suscribirse a cambios a nivel de ticket para toda la org)
+  const orgId = authStore.currentUser?.orgId
+  if (orgId) {
+    ticketChannel = subscribeTickets(orgId)
+  }
+})
+
+// When the user navigates to a different ticket in the same page:
+// tear down old subscriptions, fetch new data, and re-subscribe.
+// (Cuando el usuario navega a un ticket diferente en la misma página:
+//  eliminar las suscripciones antiguas, obtener nuevos datos y volver a suscribirse.)
+watch(ticketId, async (newId) => {
+  // Clean up previous message subscription (Limpiar suscripción de mensajes anterior)
+  if (msgChannel) {
+    supabase.removeChannel(msgChannel)
+    msgChannel = null
+  }
+
+  await ticketsStore.fetchTicket(newId)
+  msgChannel = subscribeMessages(newId)
+})
+
+// Cleanup on page exit (Limpieza al salir de la página)
+onUnmounted(() => {
+  if (msgChannel) {
+    supabase.removeChannel(msgChannel)
+    msgChannel = null
+  }
+  if (ticketChannel) {
+    supabase.removeChannel(ticketChannel)
+    ticketChannel = null
+  }
+})
 
 const ticket = computed(() => ticketsStore.currentTicket)
 
@@ -64,8 +122,10 @@ async function sendReply() {
       body: { content: replyText.value, senderType: 'AGENT' },
     })
     replyText.value = ''
-    // Refresh ticket to get the new message (Actualizar ticket para obtener el nuevo mensaje)
-    await ticketsStore.fetchTicket(ticketId.value)
+    // Don't manually re-fetch — the Realtime subscription will pick up the
+    // new message and re-fetch for us via useRealtimeMessages
+    // (No re-obtener manualmente — la suscripción Realtime reconocerá el nuevo mensaje
+    //  y re-obtendrá por nosotros vía useRealtimeMessages)
   } catch (e: any) {
     console.error('Failed to send reply:', e)
   } finally {

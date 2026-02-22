@@ -237,6 +237,14 @@ const planColors: Record<string, string> = {
       </main>
     </div>
   </div>
+
+  <!--
+    Toast container — teleports to <body> (see Toast.vue).
+    Placed here so it's alive for the entire dashboard session.
+    (Contenedor de toasts — usa Teleport a <body>. Colocado aquí para que viva
+    durante toda la sesión del dashboard.)
+  -->
+  <UiToast />
 </template>
 
 <style scoped>

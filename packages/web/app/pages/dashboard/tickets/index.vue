@@ -18,12 +18,29 @@
 -->
 <script setup lang="ts">
 import { useTicketsStore } from '~/stores/tickets'
+import { useAuthStore } from '~/stores/auth'
 
 definePageMeta({ layout: 'dashboard' })
 
 const ticketsStore = useTicketsStore()
+const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
+
+// ── Realtime subscription (Suscripción en tiempo real) ──────────────────────
+// We subscribe to ticket changes for this org as soon as the page mounts.
+// When another agent creates/updates a ticket, our list auto-refreshes.
+//
+// LIFECYCLE PATTERN:
+//   onMounted  → start channel (open WebSocket connection)
+//   onUnmounted → remove channel (close WebSocket, free memory)
+//
+// (PATRÓN DE CICLO DE VIDA:
+//  onMounted → iniciar canal (abrir conexión WebSocket)
+//  onUnmounted → eliminar canal (cerrar WebSocket, liberar memoria))
+const { subscribe } = useRealtimeTickets()
+const supabase = useSupabaseClient()
+let realtimeChannel: ReturnType<typeof supabase.channel> | null = null
 
 // Local search input — separate from filters so we can debounce it
 // (Input de búsqueda local — separado de filtros para poder debouncearlo)
@@ -41,6 +58,22 @@ onMounted(async () => {
     status: (selectedStatus.value as any) || undefined,
     priority: (selectedPriority.value as any) || undefined,
   })
+
+  // Start the realtime subscription once auth is ready and orgId is known
+  // (Iniciar la suscripción realtime una vez que la auth está lista y el orgId es conocido)
+  const orgId = authStore.currentUser?.orgId
+  if (orgId) {
+    realtimeChannel = subscribe(orgId)
+  }
+})
+
+// Clean up WebSocket when user leaves the page
+// (Limpiar el WebSocket cuando el usuario deja la página)
+onUnmounted(() => {
+  if (realtimeChannel) {
+    supabase.removeChannel(realtimeChannel)
+    realtimeChannel = null
+  }
 })
 
 // Debounced search: wait 400ms after last keystroke, then call the API
