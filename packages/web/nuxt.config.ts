@@ -47,6 +47,10 @@ export default defineNuxtConfig({
     public: {
       // Client-accessible (Accesible desde el cliente) — safe to expose
       appName: 'Agency Task Automator',
+      // Supabase URL is public (it's in the Supabase dashboard, not a secret)
+      // We need it on the server too for creating admin clients
+      // (La URL de Supabase es pública — también la necesitamos en el servidor para clientes admin)
+      supabaseUrl: process.env.SUPABASE_URL || '',
     },
   },
 
