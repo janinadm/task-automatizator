@@ -37,6 +37,75 @@ if (!authStore.isInitialized) {
 
 const isSidebarOpen = ref(false)
 
+// --- Notification Panel ---
+const showNotifications = ref(false)
+const notifLoading = ref(false)
+
+type Notification = {
+  id: string
+  type: 'new_ticket' | 'customer_message' | 'sla_breach' | 'ai_suggestion'
+  title: string
+  description: string
+  ticketId: string | null
+  createdAt: string
+  priority?: string
+}
+
+const notifications = ref<Notification[]>([])
+const unreadCount = ref(0)
+
+async function fetchNotifications() {
+  notifLoading.value = true
+  try {
+    const res = await $fetch<{ data: { notifications: Notification[], unreadCount: number } }>('/api/notifications')
+    notifications.value = res.data.notifications
+    unreadCount.value = res.data.unreadCount
+  } catch { /* silently fail */ }
+  finally { notifLoading.value = false }
+}
+
+function toggleNotifications() {
+  showNotifications.value = !showNotifications.value
+  if (showNotifications.value) fetchNotifications()
+}
+
+function closeNotifications() {
+  showNotifications.value = false
+}
+
+function notifIcon(type: string) {
+  switch (type) {
+    case 'new_ticket': return 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'
+    case 'customer_message': return 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'
+    case 'sla_breach': return 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
+    case 'ai_suggestion': return 'M13 10V3L4 14h7v7l9-11h-7z'
+    default: return 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'
+  }
+}
+
+function notifColor(type: string) {
+  switch (type) {
+    case 'new_ticket': return 'text-blue-400'
+    case 'customer_message': return 'text-emerald-400'
+    case 'sla_breach': return 'text-red-400'
+    case 'ai_suggestion': return 'text-purple-400'
+    default: return 'text-white/40'
+  }
+}
+
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  return `${Math.floor(hrs / 24)}d ago`
+}
+
+// Load notification count on mount
+onMounted(() => fetchNotifications())
+
 // Navigation items — each page in the app (Elementos de navegación — cada página de la app)
 const navigation = [
   {
@@ -214,15 +283,93 @@ const planColors: Record<string, string> = {
             New Ticket
           </NuxtLink>
 
-          <!-- Notification bell placeholder (Placeholder de campana de notificaciones) -->
-          <button class="relative text-white/50 hover:text-white transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            <!-- Red dot indicator — will show real count in Phase 5 -->
-            <!-- (Indicador de punto rojo — mostrará conteo real en Fase 5) -->
-            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
-          </button>
+          <!-- Notification bell (Campana de notificaciones) -->
+          <div class="relative">
+            <button
+              class="relative text-white/50 hover:text-white transition-colors"
+              @click="toggleNotifications"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <!-- Badge count -->
+              <span
+                v-if="unreadCount > 0"
+                class="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-red-500 rounded-full text-[10px] text-white font-bold flex items-center justify-center"
+              >
+                {{ unreadCount > 99 ? '99+' : unreadCount }}
+              </span>
+            </button>
+
+            <!-- Notification dropdown panel -->
+            <Transition name="fade">
+              <div
+                v-if="showNotifications"
+                class="absolute right-0 top-full mt-2 w-80 sm:w-96 max-h-[28rem] bg-[#12101f] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50"
+              >
+                <!-- Header -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+                  <h3 class="text-white font-semibold text-sm">Notifications</h3>
+                  <button @click="closeNotifications" class="text-white/30 hover:text-white/60 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Loading -->
+                <div v-if="notifLoading" class="flex items-center justify-center py-8">
+                  <div class="animate-spin w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full" />
+                </div>
+
+                <!-- Notifications list -->
+                <div v-else-if="notifications.length" class="overflow-y-auto max-h-[22rem] divide-y divide-white/[0.04]">
+                  <NuxtLink
+                    v-for="n in notifications"
+                    :key="n.id"
+                    :to="n.ticketId ? `/dashboard/tickets/${n.ticketId}` : '/dashboard'"
+                    class="flex items-start gap-3 px-4 py-3 hover:bg-white/[0.04] transition-colors block"
+                    @click="closeNotifications"
+                  >
+                    <div class="mt-0.5 flex-shrink-0">
+                      <svg :class="['w-4 h-4', notifColor(n.type)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="notifIcon(n.type)" />
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2">
+                        <span class="text-white/80 text-sm font-medium">{{ n.title }}</span>
+                        <span
+                          v-if="n.priority === 'URGENT'"
+                          class="px-1.5 py-0.5 bg-red-500/20 text-red-300 text-[9px] rounded-full uppercase font-bold"
+                        >
+                          Urgent
+                        </span>
+                      </div>
+                      <p class="text-white/40 text-xs mt-0.5 truncate">{{ n.description }}</p>
+                      <p class="text-white/20 text-[10px] mt-1">{{ timeAgo(n.createdAt) }}</p>
+                    </div>
+                  </NuxtLink>
+                </div>
+
+                <!-- Empty -->
+                <div v-else class="py-8 text-center">
+                  <svg class="w-8 h-8 mx-auto text-white/10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                  <p class="text-white/30 text-sm">No notifications yet</p>
+                  <p class="text-white/20 text-xs mt-1">Create tickets to see activity here</p>
+                </div>
+              </div>
+            </Transition>
+
+            <!-- Click-outside overlay to close -->
+            <div
+              v-if="showNotifications"
+              class="fixed inset-0 z-40"
+              @click="closeNotifications"
+            />
+          </div>
         </div>
       </header>
 
