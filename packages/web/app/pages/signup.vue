@@ -171,42 +171,38 @@ async function handleSignup() {
 </script>
 
 <template>
-  <UiGlassCard padding="lg">
-    <h2 class="text-2xl font-bold text-white mb-2">
-      Create your workspace
-    </h2>
-    <p class="text-white/60 text-sm mb-8">
-      Set up your agency's AI-powered support hub
-    </p>
+  <div>
+    <!-- Header -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-extrabold text-white">
+        Create your workspace
+      </h2>
+      <p class="text-white/50 text-sm mt-2">
+        Set up your agency's AI-powered support hub
+      </p>
+    </div>
 
-    <!-- Success message (Mensaje de éxito) — shown when email confirmation needed -->
+    <!-- Success message — shown when email confirmation needed -->
     <div
       v-if="successMessage"
-      class="p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-300 text-sm text-center animate-fade-in"
+      class="p-5 bg-emerald-500/[0.08] border border-emerald-500/15 rounded-2xl text-emerald-300 text-sm text-center animate-fade-in"
     >
       {{ successMessage }}
-      <NuxtLink
-        to="/login"
-        class="block mt-3 text-white font-medium underline"
-      >
+      <NuxtLink to="/login" class="block mt-4 text-white font-semibold underline">
         Back to Login
       </NuxtLink>
     </div>
 
     <!-- Form (only shown when no success message) -->
-    <!-- (Formulario — solo se muestra cuando no hay mensaje de éxito) -->
     <form
       v-else
-      class="space-y-4"
+      class="space-y-5"
       @submit.prevent="handleSignup"
     >
-      <!-- Org Name & Full Name side by side on desktop -->
-      <!-- (Nombre de org y nombre completo lado a lado en escritorio) -->
+      <!-- Org + Full Name -->
       <div class="grid grid-cols-1 gap-4">
         <div>
-          <label class="block text-sm text-white/70 mb-1.5">
-            Agency / Company name
-          </label>
+          <label class="block text-sm text-white/60 mb-2 font-medium">Agency / Company name</label>
           <input
             v-model="organizationName"
             type="text"
@@ -216,9 +212,7 @@ async function handleSignup() {
           />
         </div>
         <div>
-          <label class="block text-sm text-white/70 mb-1.5">
-            Your full name
-          </label>
+          <label class="block text-sm text-white/60 mb-2 font-medium">Your full name</label>
           <input
             v-model="fullName"
             type="text"
@@ -230,9 +224,7 @@ async function handleSignup() {
       </div>
 
       <div>
-        <label class="block text-sm text-white/70 mb-1.5">
-          Work email
-        </label>
+        <label class="block text-sm text-white/60 mb-2 font-medium">Work email</label>
         <input
           v-model="email"
           type="email"
@@ -243,9 +235,9 @@ async function handleSignup() {
         />
       </div>
 
-      <!-- Password with strength meter (Contraseña con medidor de fortaleza) -->
+      <!-- Password with strength meter -->
       <div>
-        <label class="block text-sm text-white/70 mb-1.5">Password</label>
+        <label class="block text-sm text-white/60 mb-2 font-medium">Password</label>
         <div class="relative">
           <input
             v-model="password"
@@ -257,19 +249,11 @@ async function handleSignup() {
           />
           <button
             type="button"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
             @click="showPassword = !showPassword"
           >
-            <svg
-              class="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 :d="showPassword
                   ? 'M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21'
                   : 'M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'"
@@ -278,29 +262,22 @@ async function handleSignup() {
           </button>
         </div>
 
-        <!-- Password strength bar (Barra de fortaleza de contraseña) -->
-        <div
-          v-if="password"
-          class="mt-2"
-        >
+        <!-- Password strength bar -->
+        <div v-if="password" class="mt-2.5">
           <div class="flex gap-1">
             <div
               v-for="i in 4"
               :key="i"
               class="h-1 flex-1 rounded-full transition-all duration-300"
-              :class="i <= passwordStrength ? strengthColor : 'bg-white/10'"
+              :class="i <= passwordStrength ? strengthColor : 'bg-white/[0.06]'"
             />
           </div>
-          <p class="text-xs mt-1 transition-colors" :class="`text-${strengthColor.replace('bg-', '').replace('-500', '')}-400`">
-            {{ strengthLabel }}
-          </p>
+          <p class="text-xs mt-1.5 text-white/40">{{ strengthLabel }}</p>
         </div>
       </div>
 
       <div>
-        <label class="block text-sm text-white/70 mb-1.5">
-          Confirm password
-        </label>
+        <label class="block text-sm text-white/60 mb-2 font-medium">Confirm password</label>
         <input
           v-model="confirmPassword"
           type="password"
@@ -311,34 +288,26 @@ async function handleSignup() {
         />
       </div>
 
-      <!-- Error message (Mensaje de error) -->
-      <div
-        v-if="error"
-        class="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-300 text-sm"
-      >
+      <!-- Error -->
+      <div v-if="error" class="flex items-start gap-2.5 p-3.5 bg-red-500/[0.08] border border-red-500/15 rounded-xl text-red-300 text-sm animate-fade-in">
         <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         {{ error }}
       </div>
 
-      <!-- Terms note (Nota de términos) -->
-      <p class="text-white/40 text-xs leading-relaxed">
+      <!-- Terms -->
+      <p class="text-white/30 text-xs leading-relaxed">
         By creating an account you agree to our Terms of Service and Privacy Policy.
       </p>
 
-      <!-- Submit button (Botón de envío) -->
+      <!-- Submit -->
       <button
         type="submit"
         :disabled="isLoading || !email || !password || !fullName || !organizationName"
-        class="btn-primary w-full flex items-center justify-center gap-2"
+        class="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 rounded-xl text-white font-semibold transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-indigo-500/25 flex items-center justify-center gap-2"
       >
-        <svg
-          v-if="isLoading"
-          class="animate-spin w-4 h-4"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
+        <svg v-if="isLoading" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
@@ -346,15 +315,12 @@ async function handleSignup() {
       </button>
     </form>
 
-    <!-- Login link (Enlace de login) -->
-    <p class="text-center text-white/50 text-sm mt-6">
+    <!-- Login link -->
+    <p class="text-center text-white/40 text-sm mt-8">
       Already have an account?
-      <NuxtLink
-        to="/login"
-        class="text-indigo-400 hover:text-indigo-300 font-medium transition-colors ml-1"
-      >
+      <NuxtLink to="/login" class="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors ml-1">
         Sign in
       </NuxtLink>
     </p>
-  </UiGlassCard>
+  </div>
 </template>

@@ -147,47 +147,58 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UiGlassCard padding="lg" class="text-center">
-    <!-- Loading state (Estado de carga) -->
+  <div class="text-center">
+    <!-- Loading state -->
     <div v-if="status === 'loading'" class="animate-fade-in">
-      <div class="w-16 h-16 mx-auto mb-6 relative">
-        <!-- Animated spinner ring (Anillo giratorio animado) -->
-        <div class="absolute inset-0 rounded-full border-4 border-white/10" />
-        <div class="absolute inset-0 rounded-full border-4 border-t-indigo-500 animate-spin" />
-        <!-- Inner icon (Ícono interior) -->
-        <div class="absolute inset-2 rounded-full bg-indigo-500/20 flex items-center justify-center">
-          <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="w-20 h-20 mx-auto mb-8 relative">
+        <div class="absolute inset-0 rounded-full border-[3px] border-white/[0.06]" />
+        <div class="absolute inset-0 rounded-full border-[3px] border-t-indigo-500 border-r-purple-500 animate-spin" />
+        <div class="absolute inset-3 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center backdrop-blur-sm">
+          <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
         </div>
       </div>
-      <h2 class="text-xl font-bold text-white mb-2">Authenticating</h2>
-      <p class="text-white/60 text-sm">{{ message }}</p>
+      <h2 class="text-2xl font-extrabold text-white mb-2">Authenticating</h2>
+      <p class="text-white/50 text-sm">{{ message }}</p>
     </div>
 
-    <!-- Success state (Estado de éxito) -->
+    <!-- Success state -->
     <div v-else-if="status === 'success'" class="animate-fade-in">
-      <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-green-500/20 flex items-center justify-center">
-        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="w-20 h-20 mx-auto mb-8 rounded-full bg-emerald-500/[0.12] border border-emerald-500/20 flex items-center justify-center">
+        <svg class="w-9 h-9 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
       </div>
-      <h2 class="text-xl font-bold text-white mb-2">You're in!</h2>
-      <p class="text-white/60 text-sm">{{ message }}</p>
+      <h2 class="text-2xl font-extrabold text-white mb-2">You're in!</h2>
+      <p class="text-white/50 text-sm">{{ message }}</p>
+      <div class="mt-6 flex justify-center">
+        <div class="flex gap-1.5">
+          <div class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" style="animation-delay: 0s" />
+          <div class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" style="animation-delay: 0.2s" />
+          <div class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" style="animation-delay: 0.4s" />
+        </div>
+      </div>
     </div>
 
-    <!-- Error state (Estado de error) -->
+    <!-- Error state -->
     <div v-else class="animate-fade-in">
-      <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
-        <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="w-20 h-20 mx-auto mb-8 rounded-full bg-red-500/[0.12] border border-red-500/20 flex items-center justify-center">
+        <svg class="w-9 h-9 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </div>
-      <h2 class="text-xl font-bold text-white mb-2">Something went wrong</h2>
-      <p class="text-white/60 text-sm mb-6">{{ message }}</p>
-      <NuxtLink to="/login" class="btn-primary inline-flex">
+      <h2 class="text-2xl font-extrabold text-white mb-2">Something went wrong</h2>
+      <p class="text-white/50 text-sm mb-8">{{ message }}</p>
+      <NuxtLink
+        to="/login"
+        class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 rounded-xl text-white font-semibold transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
         Back to Login
       </NuxtLink>
     </div>
-  </UiGlassCard>
+  </div>
 </template>
