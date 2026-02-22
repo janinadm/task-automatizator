@@ -9,6 +9,15 @@ export default defineNuxtConfig({
   // (compatibilityDate asegura comportamiento consistente entre versiones de Nuxt)
   compatibilityDate: '2025-07-15',
 
+  // === Nitro Server Config ===
+  // preset: 'vercel' tells Nitro to output to .vercel/output (Vercel's expected format)
+  // Vercel auto-detects this and deploys serverless functions correctly.
+  // In local dev, Nuxt ignores this and uses its own dev server.
+  // (preset: 'vercel' le dice a Nitro que genere en .vercel/output — el formato que espera Vercel)
+  nitro: {
+    preset: 'vercel',
+  },
+
   // Enable Vue DevTools for debugging in development
   // (Habilitar Vue DevTools para depuración en desarrollo)
   devtools: { enabled: true },
