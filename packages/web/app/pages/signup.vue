@@ -33,11 +33,27 @@ definePageMeta({
 
 const supabase = useSupabaseClient()
 const router = useRouter()
+const route = useRoute()
 
-// --- Form State (Estado del formulario) ---
+// --- Invite token handling ---
+const inviteToken = computed(() => String(route.query.invite ?? ''))
+const inviteData = ref<{ email: string; role: string; orgName: string; invitedBy: string } | null>(null)
+const inviteError = ref<string | null>(null)
+
+// If there's an invite token in URL, validate it
+if (inviteToken.value) {
+  try {
+    const res = await $fetch<{ data: typeof inviteData.value }>(`/api/auth/invite?token=${inviteToken.value}`)
+    inviteData.value = res.data
+  } catch (e: any) {
+    inviteError.value = e?.data?.message ?? 'Invalid invitation link'
+  }
+}
+
+// --- Form State ---
 const fullName = ref('')
-const organizationName = ref('')
-const email = ref('')
+const organizationName = ref(inviteData.value?.orgName ?? '')
+const email = ref(inviteData.value?.email ?? '')
 const password = ref('')
 const confirmPassword = ref('')
 const showPassword = ref(false)
@@ -45,9 +61,7 @@ const isLoading = ref(false)
 const error = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 
-// Password strength indicator (Indicador de fortaleza de contraseña)
-// computed() is like a formula that auto-recalculates when its dependencies change
-// (computed() es como una fórmula que se recalcula automáticamente cuando sus dependencias cambian)
+// Password strength
 const passwordStrength = computed(() => {
   if (!password.value) return 0
   let score = 0
@@ -65,42 +79,30 @@ const strengthLabel = computed(() => {
 
 const strengthColor = computed(() => {
   const colors = ['', 'bg-red-500', 'bg-amber-500', 'bg-indigo-500', 'bg-green-500']
-  // ?? '' ensures we always return a string (never undefined)
-  // (??  '' asegura que siempre retornamos un string)
   return colors[passwordStrength.value] ?? ''
 })
 
 /**
- * Main signup handler (Manejador principal de registro)
- * 
- * Step 1: Validate form data with Zod
- * Step 2: Create Supabase Auth account
- * Step 3: Call our API /api/auth/setup to create Prisma Organization + User records
- * Step 4: Redirect to /dashboard (or show "check your email" if email verification enabled)
- *
- * (Paso 1: Validar datos del formulario con Zod
- *  Paso 2: Crear cuenta de Supabase Auth
- *  Paso 3: Llamar a nuestra API /api/auth/setup para crear registros Prisma
- *  Paso 4: Redirigir a /dashboard)
+ * Main signup handler — handles both regular signup and invite-based signup
  */
 async function handleSignup() {
   error.value = null
   successMessage.value = null
 
-  // Passwords must match (Las contraseñas deben coincidir)
   if (password.value !== confirmPassword.value) {
-    error.value = 'Passwords do not match. (Las contraseñas no coinciden.)'
+    error.value = 'Passwords do not match.'
     return
   }
 
-  // Validate with Zod schema (Validar con esquema Zod)
-  const result = SignUpSchema.safeParse({
+  // For invite flow, we only need email, password, fullName (org is from the invite)
+  const validationData = {
     fullName: fullName.value,
-    organizationName: organizationName.value,
-    email: email.value,
+    organizationName: inviteData.value ? inviteData.value.orgName : organizationName.value,
+    email: inviteData.value ? inviteData.value.email : email.value,
     password: password.value,
-  })
+  }
 
+  const result = SignUpSchema.safeParse(validationData)
   if (!result.success) {
     error.value = result.error.errors[0]?.message ?? 'Validation error'
     return
@@ -109,13 +111,11 @@ async function handleSignup() {
   isLoading.value = true
 
   try {
-    // --- STEP 1: Create Supabase Auth account (PASO 1: Crear cuenta Supabase Auth) ---
+    // STEP 1: Create Supabase Auth account
     const { data: authData, error: signUpError } = await supabase.auth.signUp({
       email: result.data.email,
       password: result.data.password,
       options: {
-        // Store extra data in Supabase's auth.users metadata column
-        // (Guardar datos extra en la columna de metadatos de auth.users de Supabase)
         data: {
           full_name: result.data.fullName,
           organization_name: result.data.organizationName,
@@ -132,37 +132,47 @@ async function handleSignup() {
       return
     }
 
-    // If no user returned, email confirmation is required
-    // (Si no se devuelve usuario, se requiere confirmación de email)
     if (!authData.user) {
       successMessage.value = '✉️ Check your email to confirm your account before logging in.'
       return
     }
 
-    // --- STEP 2: Create Prisma records (PASO 2: Crear registros Prisma) ---
-    // We call our server API to create: Organization + User in PostgreSQL
-    // ($fetch is Nuxt's built-in HTTP client — auto-handles CSRF and base URL)
-    // (Llamamos a nuestra API de servidor para crear: Organization + User en PostgreSQL)
-    // ($fetch es el cliente HTTP integrado de Nuxt — maneja CSRF y URL base automáticamente)
-    const setupResponse = await $fetch('/api/auth/setup', {
-      method: 'POST',
-      body: {
-        userId: authData.user.id,
-        email: result.data.email,
-        fullName: result.data.fullName,
-        organizationName: result.data.organizationName,
-      },
-    })
+    // STEP 2: Create Prisma records — different path for invites vs new orgs
+    if (inviteData.value && inviteToken.value) {
+      // Accept invite: join existing org
+      const setupResponse = await $fetch<{ success: boolean }>('/api/auth/accept-invite', {
+        method: 'POST',
+        body: {
+          userId: authData.user.id,
+          email: result.data.email,
+          fullName: result.data.fullName,
+          token: inviteToken.value,
+        },
+      })
 
-    if (!setupResponse.success) {
-      throw new Error('Failed to set up your account. Please contact support.')
+      if (!setupResponse.success) {
+        throw new Error('Failed to accept invitation.')
+      }
+    } else {
+      // Regular signup: create new org
+      const setupResponse = await $fetch<{ success: boolean }>('/api/auth/setup', {
+        method: 'POST',
+        body: {
+          userId: authData.user.id,
+          email: result.data.email,
+          fullName: result.data.fullName,
+          organizationName: result.data.organizationName,
+        },
+      })
+
+      if (!setupResponse.success) {
+        throw new Error('Failed to set up your account.')
+      }
     }
 
-    // --- STEP 3: Navigate to dashboard (PASO 3: Navegar al dashboard) ---
+    // STEP 3: Navigate to dashboard
     await router.push('/dashboard')
   } catch (e: any) {
-    // $fetch throws an error if the server returns a non-2xx status
-    // ($fetch lanza un error si el servidor devuelve un estado no-2xx)
     error.value = e?.data?.message ?? e?.message ?? 'An unexpected error occurred.'
   } finally {
     isLoading.value = false
@@ -175,11 +185,40 @@ async function handleSignup() {
     <!-- Header -->
     <div class="mb-8">
       <h2 class="text-2xl font-extrabold text-white">
-        Create your workspace
+        {{ inviteData ? 'Join your team' : 'Create your workspace' }}
       </h2>
       <p class="text-white/50 text-sm mt-2">
-        Set up your agency's AI-powered support hub
+        {{ inviteData ? `You've been invited to join ${inviteData.orgName}` : 'Set up your agency\'s AI-powered support hub' }}
       </p>
+    </div>
+
+    <!-- Invite error -->
+    <div
+      v-if="inviteError"
+      class="mb-6 p-4 bg-red-500/[0.08] border border-red-500/15 rounded-2xl text-red-300 text-sm text-center animate-fade-in"
+    >
+      {{ inviteError }}
+      <NuxtLink to="/signup" class="block mt-3 text-white font-semibold underline">
+        Sign up without invitation
+      </NuxtLink>
+    </div>
+
+    <!-- Invite banner -->
+    <div
+      v-if="inviteData && !inviteError"
+      class="mb-6 p-4 bg-indigo-500/[0.08] border border-indigo-500/15 rounded-2xl animate-fade-in"
+    >
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-indigo-300 text-sm font-medium">Joining {{ inviteData.orgName }}</p>
+          <p class="text-white/40 text-xs">Invited by {{ inviteData.invitedBy }} as {{ inviteData.role }}</p>
+        </div>
+      </div>
     </div>
 
     <!-- Success message — shown when email confirmation needed -->
@@ -201,7 +240,7 @@ async function handleSignup() {
     >
       <!-- Org + Full Name -->
       <div class="grid grid-cols-1 gap-4">
-        <div>
+        <div v-if="!inviteData">
           <label class="block text-sm text-white/60 mb-2 font-medium">Agency / Company name</label>
           <input
             v-model="organizationName"
@@ -231,7 +270,8 @@ async function handleSignup() {
           autocomplete="email"
           placeholder="you@company.com"
           class="input-glass"
-          :disabled="isLoading"
+          :disabled="isLoading || !!inviteData"
+          :class="{ 'opacity-60': inviteData }"
         />
       </div>
 
@@ -304,14 +344,14 @@ async function handleSignup() {
       <!-- Submit -->
       <button
         type="submit"
-        :disabled="isLoading || !email || !password || !fullName || !organizationName"
+        :disabled="isLoading || !email || !password || !fullName || (!inviteData && !organizationName)"
         class="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 rounded-xl text-white font-semibold transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-indigo-500/25 flex items-center justify-center gap-2"
       >
         <svg v-if="isLoading" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
-        {{ isLoading ? 'Setting up workspace...' : 'Create free workspace' }}
+        {{ isLoading ? 'Setting up workspace...' : (inviteData ? 'Join team' : 'Create free workspace') }}
       </button>
     </form>
 

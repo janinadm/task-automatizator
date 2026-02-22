@@ -121,6 +121,8 @@ model Organization {
   users      User[]
   tickets    Ticket[]
   slaConfigs SlaConfig[]
+  invitations Invitation[]
+  integrations Integration[]
 
   // === Index (Índice) ===
   // Speeds up lookups by slug (Acelera búsquedas por slug)
@@ -155,8 +157,9 @@ model User {
   updatedAt DateTime @updatedAt
 
   // === Reverse Relations (Relaciones inversas) ===
-  assignedTickets Ticket[]       @relation("AssignedAgent")
-  messages        TicketMessage[]
+  assignedTickets  Ticket[]       @relation("AssignedAgent")
+  messages         TicketMessage[]
+  sentInvitations  Invitation[]   @relation("SentInvitations")
 
   @@index([orgId])
   @@index([email])
@@ -293,4 +296,75 @@ model SlaConfig {
   @@unique([orgId, priority])
   @@index([orgId])
   @@map("sla_configs")
+}
+
+// ============================================================================
+// INVITATION — Team member invitations
+// ============================================================================
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+model Invitation {
+  id        String           @id @default(cuid())
+  email     String                                    // Invited person's email
+  role      Role             @default(AGENT)          // Role they'll get on accept
+  status    InvitationStatus @default(PENDING)
+  token     String           @unique                  // Unique accept token (URL-safe)
+  expiresAt DateTime                                  // Invitation expiry (7 days default)
+
+  // Who sent the invitation
+  invitedById String
+  invitedBy   User @relation("SentInvitations", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  // Which organization
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orgId, email])                            // One pending invite per email per org
+  @@index([token])
+  @@index([orgId])
+  @@index([email])
+  @@map("invitations")
+}
+
+// ============================================================================
+// INTEGRATION — Channel integration configs (Email, WhatsApp, Slack, etc.)
+// ============================================================================
+
+enum IntegrationType {
+  EMAIL_IMAP
+  EMAIL_SMTP
+  WHATSAPP
+  SLACK
+  WEBHOOK
+}
+
+model Integration {
+  id          String          @id @default(cuid())
+  type        IntegrationType
+  name        String                                  // Display name: "Support Email", "Sales WhatsApp"
+  isActive    Boolean         @default(true)
+  config      Json            @default("{}")          // Encrypted connection config (host, port, keys, etc.)
+  webhookUrl  String?         @unique                 // Auto-generated inbound webhook URL
+  lastSyncAt  DateTime?                               // Last successful sync/poll timestamp
+
+  // Which organization owns this integration
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orgId, type, name])                       // Unique name per type per org
+  @@index([orgId])
+  @@index([webhookUrl])
+  @@map("integrations")
 }

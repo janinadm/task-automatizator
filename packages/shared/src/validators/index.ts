@@ -167,3 +167,44 @@ export type AuthSetupInput = z.infer<typeof AuthSetupSchema>
 // TicketFilters is defined in types/api.ts to avoid duplicate exports from the barrel
 // (TicketFilters está definido en types/api.ts para evitar exportaciones duplicadas del barrel)
 export type SlaConfigInput = z.infer<typeof SlaConfigSchema>
+
+// === Invitation Validators (Validadores de Invitación) ===
+
+export const CreateInvitationSchema = z.object({
+  email: z
+    .string()
+    .email('Please enter a valid email')
+    .trim()
+    .toLowerCase(),
+  role: RoleSchema.default('AGENT'),
+})
+
+export const AcceptInvitationSchema = z.object({
+  token: z.string().min(1, 'Invitation token is required'),
+})
+
+// === Integration Validators (Validadores de Integración) ===
+
+export const IntegrationTypeSchema = z.enum(['EMAIL_IMAP', 'EMAIL_SMTP', 'WHATSAPP', 'SLACK', 'WEBHOOK'])
+
+export const CreateIntegrationSchema = z.object({
+  type: IntegrationTypeSchema,
+  name: z
+    .string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(100)
+    .trim(),
+  config: z.record(z.unknown()).default({}),
+})
+
+export const UpdateIntegrationSchema = z.object({
+  name: z.string().min(2).max(100).trim().optional(),
+  isActive: z.boolean().optional(),
+  config: z.record(z.unknown()).optional(),
+})
+
+// === Inferred Types ===
+export type CreateInvitationInput = z.infer<typeof CreateInvitationSchema>
+export type AcceptInvitationInput = z.infer<typeof AcceptInvitationSchema>
+export type CreateIntegrationInput = z.infer<typeof CreateIntegrationSchema>
+export type UpdateIntegrationInput = z.infer<typeof UpdateIntegrationSchema>
