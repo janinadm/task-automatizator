@@ -44,7 +44,7 @@ type TicketListResponse = {
 
 // Type for a single ticket with relations (Tipo para un ticket con relaciones)
 type TicketWithRelations = Ticket & {
-  assignedTo?: { id: string; fullName: string; avatarUrl: string | null } | null
+  assignedTo?: { id: string; fullName: string; avatarUrl: string | null; email?: string } | null
   isBreachingSla?: boolean
   _count?: { messages: number; aiSuggestions: number }
 }

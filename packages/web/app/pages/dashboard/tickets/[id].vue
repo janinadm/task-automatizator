@@ -110,19 +110,17 @@ function timeAgo(date: string | Date) {
   return `${Math.floor(h / 24)}d ago`
 }
 
-// SLA status (Estado de SLA)
+// SLA status — based on isBreachingSla flag returned by the API
+// (Estado de SLA — basado en el flag isBreachingSla retornado por la API)
 const slaStatus = computed(() => {
-  if (!ticket.value?.slaDeadline) return null
-  const deadline = new Date(ticket.value.slaDeadline)
-  const now = new Date()
-  const diff = deadline.getTime() - now.getTime()
-  const mins = Math.floor(diff / 60000)
-
-  if (mins < 0) return { label: 'Breached', class: 'text-red-400', bgClass: 'bg-red-500/10 border-red-500/20' }
-  if (mins < 60) return { label: `${mins}m left`, class: 'text-amber-400', bgClass: 'bg-amber-500/10 border-amber-500/20' }
-  const h = Math.floor(mins / 60)
-  if (h < 24) return { label: `${h}h left`, class: 'text-indigo-400', bgClass: 'bg-indigo-500/10 border-indigo-500/20' }
-  return { label: `${Math.floor(h / 24)}d left`, class: 'text-green-400', bgClass: 'bg-green-500/10 border-green-500/20' }
+  if (!ticket.value) return null
+  if (ticket.value.isBreachingSla) {
+    return { label: 'Breached', class: 'text-red-400', bgClass: 'bg-red-500/10 border-red-500/20' }
+  }
+  if (ticket.value.priority === 'URGENT' && ['OPEN', 'IN_PROGRESS'].includes(ticket.value.status)) {
+    return { label: 'At risk', class: 'text-amber-400', bgClass: 'bg-amber-500/10 border-amber-500/20' }
+  }
+  return null
 })
 </script>
 
@@ -224,7 +222,7 @@ const slaStatus = computed(() => {
                   <!-- Message body (Cuerpo del mensaje) -->
                   <!-- whitespace-pre-wrap preserves line breaks in the message -->
                   <!-- (whitespace-pre-wrap preserva los saltos de línea del mensaje) -->
-                  <p class="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">{{ msg.content }}</p>
+                  <p class="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">{{ msg.body }}</p>
                 </div>
               </div>
             </div>
@@ -391,7 +389,7 @@ const slaStatus = computed(() => {
             </div>
             <div>
               <p class="text-white text-sm font-medium">{{ ticket.assignedTo.fullName }}</p>
-              <p class="text-white/40 text-xs">{{ ticket.assignedTo.email }}</p>
+              <p class="text-white/40 text-xs">Agent</p>
             </div>
           </div>
           <div v-else class="text-white/40 text-sm text-center py-3">

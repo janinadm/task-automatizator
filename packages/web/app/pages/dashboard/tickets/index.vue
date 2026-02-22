@@ -73,7 +73,7 @@ function clearFilters() {
 }
 
 // Toggle sort (Alternar orden)
-function toggleSort(field: 'createdAt' | 'updatedAt' | 'priority' | 'slaDeadline') {
+function toggleSort(field: 'createdAt' | 'updatedAt' | 'priority' | 'subject') {
   const current = ticketsStore.filters.sortBy
   const currentOrder = ticketsStore.filters.sortOrder
   if (current === field) {
