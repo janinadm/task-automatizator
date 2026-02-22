@@ -36,10 +36,6 @@ datasource db {
 //  Después de modificar este esquema, ejecuta `prisma generate` para regenerar el cliente.)
 generator client {
   provider = "prisma-client-js"
-  // Output relative to this schema file: packages/db/prisma/ → packages/db/node_modules/.prisma/client
-  // This ensures @prisma/client can resolve the generated types in pnpm workspaces
-  // (Salida relativa al archivo schema: asegura que @prisma/client pueda resolver los tipos generados en workspaces de pnpm)
-  output   = "../../node_modules/.prisma/client"
 }
 
 // ============================================================================

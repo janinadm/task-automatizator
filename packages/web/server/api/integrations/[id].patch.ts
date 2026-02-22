@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
 
   const updated = await prisma.integration.update({
     where: { id: integrationId },
-    data: updates,
+    data: updates as any,
     select: {
       id: true,
       type: true,

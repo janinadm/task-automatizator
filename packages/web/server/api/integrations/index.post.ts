@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
       data: {
         type,
         name,
-        config: config ?? {},
+        config: (config ?? {}) as any,
         webhookUrl,
         orgId: dbUser.orgId,
       },
