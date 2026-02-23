@@ -119,6 +119,8 @@ model Organization {
   invitations Invitation[]
   integrations Integration[]
   cannedResponses CannedResponse[]
+  tags        Tag[]
+  articles    Article[]
 
   // === Index (Índice) ===
   // Speeds up lookups by slug (Acelera búsquedas por slug)
@@ -209,6 +211,7 @@ model Ticket {
   // === Relations (Relaciones) ===
   messages      TicketMessage[]
   aiSuggestions AiSuggestion[]
+  tags          TicketTag[]
 
   // === Indexes (Índices) ===
   // These speed up the most common queries (Estos aceleran las consultas más comunes)
@@ -232,6 +235,7 @@ model TicketMessage {
   body       String                                  // Message content (Contenido del mensaje)
   senderType SenderType
   senderName String?                                 // Display name of sender (Nombre del remitente)
+  isInternal Boolean    @default(false)               // Internal notes visible only to agents
 
   // === Relations (Relaciones) ===
   ticketId String
@@ -390,4 +394,76 @@ model CannedResponse {
   @@index([orgId])
   @@index([orgId, category])
   @@map("canned_responses")
+}
+
+// ============================================================================
+// TAG — Ticket labeling system for organization
+// (Etiquetas — Sistema de etiquetado de tickets para la organización)
+// ============================================================================
+model Tag {
+  id    String @id @default(cuid())
+  name  String                                       // Tag name: "bug", "feature-request"
+  color String @default("#6366f1")                    // Hex color for badge display
+
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  tickets TicketTag[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([orgId, name])                             // Unique tag name per org
+  @@index([orgId])
+  @@map("tags")
+}
+
+// === Join table for Ticket ↔ Tag many-to-many ===
+model TicketTag {
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  tagId String
+  tag   Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([ticketId, tagId])
+  @@index([tagId])
+  @@map("ticket_tags")
+}
+
+// ============================================================================
+// ARTICLE — Knowledge Base articles
+// (Artículos de la Base de Conocimiento)
+// ============================================================================
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Article {
+  id       String        @id @default(cuid())
+  title    String                                    // Article title
+  slug     String                                    // URL-friendly slug
+  body     String                                    // Markdown content
+  category String?                                   // Grouping: "Getting Started", "Billing"
+  status   ArticleStatus @default(DRAFT)
+  views    Int           @default(0)                  // View counter
+
+  // Author
+  authorId String?
+
+  // Organization
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orgId, slug])                             // Unique slug per org
+  @@index([orgId])
+  @@index([orgId, status])
+  @@index([orgId, category])
+  @@map("articles")
 }

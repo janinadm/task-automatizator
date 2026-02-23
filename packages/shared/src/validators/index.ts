@@ -260,3 +260,50 @@ export const BulkTicketActionSchema = z.object({
 export type CreateCannedResponseInput = z.infer<typeof CreateCannedResponseSchema>
 export type UpdateCannedResponseInput = z.infer<typeof UpdateCannedResponseSchema>
 export type BulkTicketActionInput = z.infer<typeof BulkTicketActionSchema>
+
+// ============================================================================
+// Phase 8 — Tags, Knowledge Base Articles, Internal Notes
+// ============================================================================
+
+// === Tag Validators ===
+export const CreateTagSchema = z.object({
+  name: z.string().min(1).max(30).trim(),
+  color: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color')
+    .optional()
+    .default('#6366f1'),
+})
+
+export const AddTagToTicketSchema = z.object({
+  tagId: z.string().cuid(),
+})
+
+// === Article Validators ===
+export const ArticleStatusSchema = z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED'])
+
+export const CreateArticleSchema = z.object({
+  title: z.string().min(1).max(200).trim(),
+  body: z.string().min(1),
+  category: z.string().max(50).trim().optional(),
+  status: ArticleStatusSchema.optional().default('DRAFT'),
+})
+
+export const UpdateArticleSchema = z.object({
+  title: z.string().min(1).max(200).trim().optional(),
+  body: z.string().min(1).optional(),
+  category: z.string().max(50).trim().nullable().optional(),
+  status: ArticleStatusSchema.optional(),
+})
+
+// === Internal Note Validator ===
+export const CreateInternalNoteSchema = z.object({
+  body: z.string().min(1).max(5000).trim(),
+})
+
+// === Inferred Types ===
+export type CreateTagInput = z.infer<typeof CreateTagSchema>
+export type AddTagToTicketInput = z.infer<typeof AddTagToTicketSchema>
+export type CreateArticleInput = z.infer<typeof CreateArticleSchema>
+export type UpdateArticleInput = z.infer<typeof UpdateArticleSchema>
+export type CreateInternalNoteInput = z.infer<typeof CreateInternalNoteSchema>

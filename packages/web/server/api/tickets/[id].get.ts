@@ -50,6 +50,9 @@ export default defineEventHandler(async (event) => {
       assignedTo: {
         select: { id: true, fullName: true, avatarUrl: true, email: true },
       },
+      tags: {
+        include: { tag: true },
+      },
       org: {
         select: { id: true, name: true, plan: true },
       },

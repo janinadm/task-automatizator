@@ -103,6 +103,9 @@ export default defineEventHandler(async (event) => {
         assignedTo: {         // 'assignedTo' is the relation name in Prisma schema
           select: { id: true, fullName: true, avatarUrl: true }, // 'fullName' (not 'name')
         },
+        tags: {
+          include: { tag: true },
+        },
         _count: {
           select: { messages: true, aiSuggestions: true },
         },

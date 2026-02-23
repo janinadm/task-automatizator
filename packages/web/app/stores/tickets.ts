@@ -47,6 +47,7 @@ type TicketWithRelations = Ticket & {
   assignedTo?: { id: string; fullName: string; avatarUrl: string | null; email?: string } | null
   isBreachingSla?: boolean
   _count?: { messages: number; aiSuggestions: number }
+  tags?: Array<{ tag: { id: string; name: string; color: string } }>
 }
 
 // Type for ticket detail page (full with messages + AI)
@@ -56,6 +57,7 @@ type TicketDetail = TicketWithRelations & {
     id: string
     body: string
     senderType: string
+    isInternal?: boolean
     createdAt: string
     sender?: { id: string; fullName: string; avatarUrl: string | null; role: string } | null
   }>

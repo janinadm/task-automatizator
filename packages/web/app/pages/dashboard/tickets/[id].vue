@@ -143,6 +143,64 @@ function useCannedResponse(response: any) {
 
 onMounted(() => fetchCannedResponses())
 
+// --- TAGS ---
+const allTags = ref<any[]>([])
+const ticketTags = computed(() => ticket.value?.tags?.map((tt: any) => tt.tag ?? tt) ?? [])
+const showTagPicker = ref(false)
+const availableTags = computed(() =>
+  allTags.value.filter((t) => !ticketTags.value.some((tt: any) => tt.id === t.id))
+)
+
+async function fetchTags() {
+  try {
+    const res = await $fetch<{ data: any[] }>('/api/tags')
+    allTags.value = res.data
+  } catch { /* ignore */ }
+}
+
+async function addTagToTicket(tagId: string) {
+  try {
+    await $fetch(`/api/tickets/${ticketId.value}/tags`, {
+      method: 'POST',
+      body: { tagId },
+    })
+    await ticketsStore.fetchTicket(ticketId.value)
+    showTagPicker.value = false
+  } catch { /* ignore */ }
+}
+
+async function removeTagFromTicket(tagId: string) {
+  try {
+    await $fetch(`/api/tickets/${ticketId.value}/tags/${tagId}`, { method: 'DELETE' })
+    await ticketsStore.fetchTicket(ticketId.value)
+  } catch { /* ignore */ }
+}
+
+onMounted(() => fetchTags())
+
+// --- INTERNAL NOTES ---
+const showNoteForm = ref(false)
+const noteText = ref('')
+const isSendingNote = ref(false)
+
+async function sendInternalNote() {
+  if (!noteText.value.trim()) return
+  isSendingNote.value = true
+  try {
+    await $fetch(`/api/tickets/${ticketId.value}/notes`, {
+      method: 'POST',
+      body: { body: noteText.value },
+    })
+    noteText.value = ''
+    showNoteForm.value = false
+    await ticketsStore.fetchTicket(ticketId.value)
+  } catch (e: any) {
+    console.error('Failed to send note:', e)
+  } finally {
+    isSendingNote.value = false
+  }
+}
+
 // --- SLA TIMER ---
 const slaData = ref<any>(null)
 const slaTimer = ref<ReturnType<typeof setInterval> | null>(null)
@@ -349,8 +407,9 @@ const slaStatus = computed(() => {
               :key="msg.id"
               class="px-5 py-4"
               :class="{
-                'bg-indigo-500/5': msg.senderType === 'AGENT',
+                'bg-indigo-500/5': msg.senderType === 'AGENT' && !msg.isInternal,
                 'bg-purple-500/5': msg.senderType === 'AI',
+                'bg-amber-500/5 border-l-2 border-amber-500/40': msg.isInternal,
               }"
             >
               <div class="flex items-start gap-3">
@@ -358,7 +417,8 @@ const slaStatus = computed(() => {
                 <div
                   class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5"
                   :class="{
-                    'bg-gradient-to-br from-indigo-400 to-purple-500 text-white': msg.senderType === 'AGENT',
+                    'bg-gradient-to-br from-amber-400 to-orange-500 text-white': msg.isInternal,
+                    'bg-gradient-to-br from-indigo-400 to-purple-500 text-white': msg.senderType === 'AGENT' && !msg.isInternal,
                     'bg-gradient-to-br from-purple-500 to-pink-500 text-white': msg.senderType === 'AI',
                     'bg-white/10 text-white/60': msg.senderType === 'CUSTOMER',
                   }"
@@ -373,10 +433,16 @@ const slaStatus = computed(() => {
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 mb-1">
                     <span class="text-white text-sm font-medium">
-                      {{ msg.senderType === 'AI' ? '⚡ AI Assistant' : (msg.sender?.fullName ?? 'Customer') }}
+                      {{ msg.isInternal ? '🔒 ' : '' }}{{ msg.senderType === 'AI' ? '⚡ AI Assistant' : (msg.sender?.fullName ?? 'Customer') }}
                     </span>
                     <span
-                      v-if="msg.senderType !== 'CUSTOMER'"
+                      v-if="msg.isInternal"
+                      class="text-xs px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300"
+                    >
+                      internal note
+                    </span>
+                    <span
+                      v-else-if="msg.senderType !== 'CUSTOMER'"
                       class="text-xs px-1.5 py-0.5 rounded-full"
                       :class="msg.senderType === 'AI' ? 'bg-purple-500/20 text-purple-300' : 'bg-indigo-500/20 text-indigo-300'"
                     >
@@ -453,18 +519,62 @@ const slaStatus = computed(() => {
                   </Transition>
                 </div>
               </div>
-              <button
-                class="btn-primary text-sm flex items-center gap-2"
-                :disabled="!replyText.trim() || isSendingReply"
-                @click="sendReply"
-              >
-                <svg v-if="isSendingReply" class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                {{ isSendingReply ? 'Sending...' : 'Send Reply' }}
-              </button>
+              <div class="flex items-center gap-2">
+                <!-- Internal Note button -->
+                <button
+                  class="text-xs flex items-center gap-1 border rounded-lg px-2 py-1 transition-colors"
+                  :class="showNoteForm
+                    ? 'text-amber-400 border-amber-500/30 bg-amber-500/10'
+                    : 'text-white/40 hover:text-amber-400 border-white/10 hover:border-amber-500/30 hover:bg-amber-500/5'"
+                  @click="showNoteForm = !showNoteForm"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  Note
+                </button>
+                <button
+                  class="btn-primary text-sm flex items-center gap-2"
+                  :disabled="!replyText.trim() || isSendingReply"
+                  @click="sendReply"
+                >
+                  <svg v-if="isSendingReply" class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  {{ isSendingReply ? 'Sending...' : 'Send Reply' }}
+                </button>
+              </div>
             </div>
+
+            <!-- Internal Note Form -->
+            <Transition name="fade">
+              <div v-if="showNoteForm" class="mt-3 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
+                <p class="text-amber-400/70 text-xs mb-2 flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  Internal note — only visible to your team, never to customers
+                </p>
+                <textarea
+                  v-model="noteText"
+                  rows="2"
+                  placeholder="Write an internal note..."
+                  class="input-glass w-full resize-none text-sm"
+                  @keydown.enter.exact.prevent="sendInternalNote"
+                />
+                <div class="flex justify-end gap-2 mt-2">
+                  <button @click="showNoteForm = false" class="btn-ghost text-xs">Cancel</button>
+                  <button
+                    class="text-xs px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors"
+                    :disabled="!noteText.trim() || isSendingNote"
+                    @click="sendInternalNote"
+                  >
+                    {{ isSendingNote ? 'Saving...' : 'Add Note' }}
+                  </button>
+                </div>
+              </div>
+            </Transition>
           </div>
         </UiGlassCard>
 
@@ -627,6 +737,54 @@ const slaStatus = computed(() => {
           </div>
           <div v-else class="text-white/40 text-sm text-center py-3">
             Unassigned
+          </div>
+        </UiGlassCard>
+
+        <!-- Tags -->
+        <UiGlassCard padding="md">
+          <h3 class="text-white/60 text-xs font-medium uppercase tracking-wider mb-3">Tags</h3>
+          <div class="flex flex-wrap gap-1.5 mb-2">
+            <span
+              v-for="tag in ticketTags"
+              :key="tag.id"
+              class="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full border"
+              :style="{ backgroundColor: tag.color + '15', borderColor: tag.color + '30', color: tag.color }"
+            >
+              {{ tag.name }}
+              <button @click="removeTagFromTicket(tag.id)" class="opacity-60 hover:opacity-100 transition-opacity">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </span>
+            <div v-if="!ticketTags.length" class="text-white/30 text-xs">No tags</div>
+          </div>
+          <div class="relative">
+            <button
+              class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1"
+              @click="showTagPicker = !showTagPicker"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Add tag
+            </button>
+            <Transition name="fade">
+              <div
+                v-if="showTagPicker && availableTags.length"
+                class="absolute left-0 top-full mt-1 w-48 bg-[#12101f] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
+              >
+                <button
+                  v-for="tag in availableTags"
+                  :key="tag.id"
+                  class="w-full text-left px-3 py-2 hover:bg-white/[0.04] transition-colors flex items-center gap-2"
+                  @click="addTagToTicket(tag.id)"
+                >
+                  <div class="w-2.5 h-2.5 rounded-full" :style="{ backgroundColor: tag.color }" />
+                  <span class="text-white/70 text-sm">{{ tag.name }}</span>
+                </button>
+              </div>
+            </Transition>
           </div>
         </UiGlassCard>
 
