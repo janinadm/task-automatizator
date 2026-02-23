@@ -32,10 +32,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     const isSubmitting = ref(false);
     const error = ref(null);
     const channels = [
-      { value: "WEB", label: "🌐 Web", description: "Web form or chat" },
-      { value: "EMAIL", label: "✉️ Email", description: "Email message" },
-      { value: "WHATSAPP", label: "💬 WhatsApp", description: "WhatsApp message" },
-      { value: "SLACK", label: "⚡ Slack", description: "Slack message" }
+      { value: "WEB", label: "\u{1F310} Web", description: "Web form or chat" },
+      { value: "EMAIL", label: "\u2709\uFE0F Email", description: "Email message" },
+      { value: "WHATSAPP", label: "\u{1F4AC} WhatsApp", description: "WhatsApp message" },
+      { value: "SLACK", label: "\u26A1 Slack", description: "Slack message" }
     ];
     const isFormValid = computed(
       () => form.subject.trim().length > 0 && form.body.trim().length > 0

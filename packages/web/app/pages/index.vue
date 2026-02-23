@@ -112,13 +112,9 @@ const plans = [
       <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <!-- Logo -->
         <NuxtLink to="/" class="flex items-center gap-3 group">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:shadow-indigo-500/50 transition-shadow">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
+          <img src="/logo.svg" alt="AuraDesk" class="w-10 h-10" />
           <span class="text-lg font-bold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-            Agency Task Automator
+            AuraDesk
           </span>
         </NuxtLink>
 
@@ -484,14 +480,10 @@ const plans = [
       <div class="max-w-7xl mx-auto px-6 py-12">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <span class="text-sm text-white/40">Agency Task Automator</span>
+            <img src="/logo.svg" alt="AuraDesk" class="w-8 h-8" />
+            <span class="text-sm text-white/40">AuraDesk</span>
           </div>
-          <p class="text-xs text-white/25">&copy; 2026 Agency Task Automator. All rights reserved.</p>
+          <p class="text-xs text-white/25">&copy; 2026 Janina Dorobantu. All rights reserved.</p>
         </div>
       </div>
     </footer>

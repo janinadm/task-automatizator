@@ -5,6 +5,7 @@ import { f as fetchDefaults, u as useNuxtApp, c as asyncDataDefaults, e as useRe
 import { debounce } from 'perfect-debounce';
 
 function useAsyncData(...args) {
+  var _a, _b, _c, _d, _e, _f, _g;
   const autoKey = typeof args[args.length - 1] === "string" ? args.pop() : void 0;
   if (_isAutoKeyNeeded(args[0], args[1])) {
     args.unshift(autoKey);
@@ -18,18 +19,19 @@ function useAsyncData(...args) {
     throw new TypeError("[nuxt] [useAsyncData] handler must be a function.");
   }
   const nuxtApp = useNuxtApp();
-  options.server ??= true;
-  options.default ??= getDefault;
-  options.getCachedData ??= getDefaultCachedData;
-  options.lazy ??= false;
-  options.immediate ??= true;
-  options.deep ??= asyncDataDefaults.deep;
-  options.dedupe ??= "cancel";
+  (_a = options.server) != null ? _a : options.server = true;
+  (_b = options.default) != null ? _b : options.default = getDefault;
+  (_c = options.getCachedData) != null ? _c : options.getCachedData = getDefaultCachedData;
+  (_d = options.lazy) != null ? _d : options.lazy = false;
+  (_e = options.immediate) != null ? _e : options.immediate = true;
+  (_f = options.deep) != null ? _f : options.deep = asyncDataDefaults.deep;
+  (_g = options.dedupe) != null ? _g : options.dedupe = "cancel";
   options._functionName || "useAsyncData";
   nuxtApp._asyncData[key.value];
   function createInitialFetch() {
+    var _a2;
     const initialFetchOptions = { cause: "initial", dedupe: options.dedupe };
-    if (!nuxtApp._asyncData[key.value]?._init) {
+    if (!((_a2 = nuxtApp._asyncData[key.value]) == null ? void 0 : _a2._init)) {
       initialFetchOptions.cachedData = options.getCachedData(key.value, nuxtApp, { cause: "initial" });
       nuxtApp._asyncData[key.value] = createAsyncData(nuxtApp, key.value, _handler, options, initialFetchOptions.cachedData);
     }
@@ -50,12 +52,25 @@ function useAsyncData(...args) {
     }
   }
   const asyncReturn = {
-    data: writableComputedRef(() => nuxtApp._asyncData[key.value]?.data),
-    pending: writableComputedRef(() => nuxtApp._asyncData[key.value]?.pending),
-    status: writableComputedRef(() => nuxtApp._asyncData[key.value]?.status),
-    error: writableComputedRef(() => nuxtApp._asyncData[key.value]?.error),
+    data: writableComputedRef(() => {
+      var _a2;
+      return (_a2 = nuxtApp._asyncData[key.value]) == null ? void 0 : _a2.data;
+    }),
+    pending: writableComputedRef(() => {
+      var _a2;
+      return (_a2 = nuxtApp._asyncData[key.value]) == null ? void 0 : _a2.pending;
+    }),
+    status: writableComputedRef(() => {
+      var _a2;
+      return (_a2 = nuxtApp._asyncData[key.value]) == null ? void 0 : _a2.status;
+    }),
+    error: writableComputedRef(() => {
+      var _a2;
+      return (_a2 = nuxtApp._asyncData[key.value]) == null ? void 0 : _a2.error;
+    }),
     refresh: (...args2) => {
-      if (!nuxtApp._asyncData[key.value]?._init) {
+      var _a2;
+      if (!((_a2 = nuxtApp._asyncData[key.value]) == null ? void 0 : _a2._init)) {
         const initialFetch2 = createInitialFetch();
         return initialFetch2();
       }
@@ -64,7 +79,7 @@ function useAsyncData(...args) {
     execute: (...args2) => asyncReturn.refresh(...args2),
     clear: () => {
       const entry = nuxtApp._asyncData[key.value];
-      if (entry?._abortController) {
+      if (entry == null ? void 0 : entry._abortController) {
         try {
           entry._abortController.abort(new DOMException("AsyncData aborted by user.", "AbortError"));
         } finally {
@@ -81,7 +96,8 @@ function useAsyncData(...args) {
 function writableComputedRef(getter) {
   return computed({
     get() {
-      return getter()?.value;
+      var _a;
+      return (_a = getter()) == null ? void 0 : _a.value;
     },
     set(value) {
       const ref2 = getter();
@@ -127,7 +143,8 @@ function pick(obj, keys) {
   return newObj;
 }
 function createAsyncData(nuxtApp, key, _handler, options, initialCachedData) {
-  nuxtApp.payload._errors[key] ??= void 0;
+  var _a, _b;
+  (_b = (_a = nuxtApp.payload._errors)[key]) != null ? _b : _a[key] = void 0;
   const hasCustomGetCachedData = options.getCachedData !== getDefaultCachedData;
   const handler = _handler ;
   const _ref = options.deep ? ref : shallowRef;
@@ -143,15 +160,16 @@ function createAsyncData(nuxtApp, key, _handler, options, initialCachedData) {
     error: toRef(nuxtApp.payload._errors, key),
     status: shallowRef("idle"),
     execute: (...args) => {
+      var _a2, _b2;
       const [_opts, newValue = void 0] = args;
       const opts = _opts && newValue === void 0 && typeof _opts === "object" ? _opts : {};
       if (nuxtApp._asyncDataPromises[key]) {
-        if ((opts.dedupe ?? options.dedupe) === "defer") {
+        if (((_a2 = opts.dedupe) != null ? _a2 : options.dedupe) === "defer") {
           return nuxtApp._asyncDataPromises[key];
         }
       }
       {
-        const cachedData = "cachedData" in opts ? opts.cachedData : options.getCachedData(key, nuxtApp, { cause: opts.cause ?? "refresh:manual" });
+        const cachedData = "cachedData" in opts ? opts.cachedData : options.getCachedData(key, nuxtApp, { cause: (_b2 = opts.cause) != null ? _b2 : "refresh:manual" });
         if (cachedData !== void 0) {
           nuxtApp.payload.data[key] = asyncData.data.value = cachedData;
           asyncData.error.value = void 0;
@@ -167,17 +185,18 @@ function createAsyncData(nuxtApp, key, _handler, options, initialCachedData) {
       const cleanupController = new AbortController();
       const promise = new Promise(
         (resolve, reject) => {
+          var _a3, _b3;
           try {
-            const timeout = opts.timeout ?? options.timeout;
-            const mergedSignal = mergeAbortSignals([asyncData._abortController?.signal, opts?.signal], cleanupController.signal, timeout);
+            const timeout = (_a3 = opts.timeout) != null ? _a3 : options.timeout;
+            const mergedSignal = mergeAbortSignals([(_b3 = asyncData._abortController) == null ? void 0 : _b3.signal, opts == null ? void 0 : opts.signal], cleanupController.signal, timeout);
             if (mergedSignal.aborted) {
               const reason = mergedSignal.reason;
-              reject(reason instanceof Error ? reason : new DOMException(String(reason ?? "Aborted"), "AbortError"));
+              reject(reason instanceof Error ? reason : new DOMException(String(reason != null ? reason : "Aborted"), "AbortError"));
               return;
             }
             mergedSignal.addEventListener("abort", () => {
               const reason = mergedSignal.reason;
-              reject(reason instanceof Error ? reason : new DOMException(String(reason ?? "Aborted"), "AbortError"));
+              reject(reason instanceof Error ? reason : new DOMException(String(reason != null ? reason : "Aborted"), "AbortError"));
             }, { once: true, signal: cleanupController.signal });
             return Promise.resolve(handler(nuxtApp, { signal: mergedSignal })).then(resolve, reject);
           } catch (err) {
@@ -197,10 +216,11 @@ function createAsyncData(nuxtApp, key, _handler, options, initialCachedData) {
         asyncData.error.value = void 0;
         asyncData.status.value = "success";
       }).catch((error) => {
+        var _a3;
         if (nuxtApp._asyncDataPromises[key] && nuxtApp._asyncDataPromises[key] !== promise) {
           return nuxtApp._asyncDataPromises[key];
         }
-        if (asyncData._abortController?.signal.aborted) {
+        if ((_a3 = asyncData._abortController) == null ? void 0 : _a3.signal.aborted) {
           return nuxtApp._asyncDataPromises[key];
         }
         if (typeof DOMException !== "undefined" && error instanceof DOMException && error.name === "AbortError") {
@@ -223,13 +243,15 @@ function createAsyncData(nuxtApp, key, _handler, options, initialCachedData) {
     _init: true,
     _hash: void 0,
     _off: () => {
+      var _a2;
       unsubRefreshAsyncData();
-      if (nuxtApp._asyncData[key]?._init) {
+      if ((_a2 = nuxtApp._asyncData[key]) == null ? void 0 : _a2._init) {
         nuxtApp._asyncData[key]._init = false;
       }
       if (!hasCustomGetCachedData) {
         nextTick(() => {
-          if (!nuxtApp._asyncData[key]?._init) {
+          var _a3;
+          if (!((_a3 = nuxtApp._asyncData[key]) == null ? void 0 : _a3._init)) {
             clearNuxtDataByKey(nuxtApp, key);
             asyncData.execute = () => Promise.resolve();
           }
@@ -249,9 +271,10 @@ const getDefaultCachedData = (key, nuxtApp, ctx) => {
   }
 };
 function mergeAbortSignals(signals, cleanupSignal, timeout) {
+  var _a, _b, _c;
   const list = signals.filter((s) => !!s);
   if (typeof timeout === "number" && timeout >= 0) {
-    const timeoutSignal = AbortSignal.timeout?.(timeout);
+    const timeoutSignal = (_a = AbortSignal.timeout) == null ? void 0 : _a.call(AbortSignal, timeout);
     if (timeoutSignal) {
       list.push(timeoutSignal);
     }
@@ -262,7 +285,7 @@ function mergeAbortSignals(signals, cleanupSignal, timeout) {
   const controller = new AbortController();
   for (const sig of list) {
     if (sig.aborted) {
-      const reason = sig.reason ?? new DOMException("Aborted", "AbortError");
+      const reason = (_b = sig.reason) != null ? _b : new DOMException("Aborted", "AbortError");
       try {
         controller.abort(reason);
       } catch {
@@ -272,8 +295,9 @@ function mergeAbortSignals(signals, cleanupSignal, timeout) {
     }
   }
   const onAbort = () => {
+    var _a2;
     const abortedSignal = list.find((s) => s.aborted);
-    const reason = abortedSignal?.reason ?? new DOMException("Aborted", "AbortError");
+    const reason = (_a2 = abortedSignal == null ? void 0 : abortedSignal.reason) != null ? _a2 : new DOMException("Aborted", "AbortError");
     try {
       controller.abort(reason);
     } catch {
@@ -281,7 +305,7 @@ function mergeAbortSignals(signals, cleanupSignal, timeout) {
     }
   };
   for (const sig of list) {
-    sig.addEventListener?.("abort", onAbort, { once: true, signal: cleanupSignal });
+    (_c = sig.addEventListener) == null ? void 0 : _c.call(sig, "abort", onAbort, { once: true, signal: cleanupSignal });
   }
   return controller.signal;
 }
@@ -337,8 +361,9 @@ function useFetch(request, arg1, arg2) {
   return asyncData;
 }
 function generateOptionSegments(opts) {
+  var _a;
   const segments = [
-    toValue(opts.method)?.toUpperCase() || "GET",
+    ((_a = toValue(opts.method)) == null ? void 0 : _a.toUpperCase()) || "GET",
     toValue(opts.baseURL)
   ];
   for (const _obj of [opts.query || opts.params]) {

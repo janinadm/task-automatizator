@@ -75,7 +75,7 @@ function createHead(options = {}) {
 
 const NUXT_RUNTIME_PAYLOAD_EXTRACTION = false;
 
-const appHead = {"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"name":"description","content":"AI-powered customer service triage platform. Reduce response time by 60% with automated sentiment analysis and intelligent routing."}],"link":[{"rel":"preconnect","href":"https://fonts.googleapis.com"},{"rel":"preconnect","href":"https://fonts.gstatic.com","crossorigin":""},{"rel":"stylesheet","href":"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"}],"style":[],"script":[],"noscript":[],"title":"Agency Task Automator — Intelligent Customer Triage"};
+const appHead = {"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"name":"description","content":"AI-powered customer service triage platform. Reduce response time by 60% with automated sentiment analysis and intelligent routing."}],"link":[{"rel":"icon","type":"image/svg+xml","href":"/favicon.svg"},{"rel":"preconnect","href":"https://fonts.googleapis.com"},{"rel":"preconnect","href":"https://fonts.gstatic.com","crossorigin":""},{"rel":"stylesheet","href":"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"}],"style":[],"script":[],"noscript":[],"title":"AuraDesk — Intelligent Customer Triage"};
 
 const appRootTag = "div";
 

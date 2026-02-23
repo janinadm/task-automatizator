@@ -184,11 +184,7 @@ const planColors: Record<string, string> = {
       <div class="flex flex-col h-full bg-[#0d0b24]/90 backdrop-blur-xl border-r border-white/[0.06]">
           <!-- Logo / Brand (Logo / Marca) -->
           <div class="flex items-center gap-3 p-6 border-b border-white/10">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-glow flex-shrink-0">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
+            <img src="/logo.svg" alt="AuraDesk" class="w-9 h-9 flex-shrink-0" />
             <div class="min-w-0">
               <p class="text-white font-semibold text-sm truncate">
                 {{ authStore.organization?.name || 'Agency' }}

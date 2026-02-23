@@ -30,9 +30,13 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       "$fQIe7nZWbn"
       /* nuxt-injected */
     )), __temp = await __temp, __restore(), __temp);
-    const stats = computed(() => analytics.value?.data);
+    const stats = computed(() => {
+      var _a;
+      return (_a = analytics.value) == null ? void 0 : _a.data;
+    });
     const overviewCards = computed(() => {
-      const o = stats.value?.overview;
+      var _a;
+      const o = (_a = stats.value) == null ? void 0 : _a.overview;
       if (!o) return [];
       return [
         {
@@ -51,7 +55,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         },
         {
           label: "Avg. Resolution",
-          value: o.avgResolutionHours > 0 ? `${o.avgResolutionHours}h` : "—",
+          value: o.avgResolutionHours > 0 ? `${o.avgResolutionHours}h` : "\u2014",
           icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
           color: "text-amber-400",
           bg: "bg-amber-500/10"
@@ -66,7 +70,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       ];
     });
     const maxVolume = computed(() => {
-      if (!stats.value?.dailyVolume) return 1;
+      var _a;
+      if (!((_a = stats.value) == null ? void 0 : _a.dailyVolume)) return 1;
       return Math.max(1, ...stats.value.dailyVolume.map((d) => d.count));
     });
     const channelConfig = {
@@ -148,7 +153,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         _push(ssrRenderComponent(_component_UiGlassCard, { padding: "md" }, {
           default: withCtx((_, _push2, _parent2, _scopeId) => {
             if (_push2) {
-              _push2(`<h3 class="text-white font-semibold text-sm mb-4 flex items-center gap-2"${_scopeId}><svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"${_scopeId}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"${_scopeId}></path></svg> Ticket Volume — Last 30 Days </h3>`);
+              _push2(`<h3 class="text-white font-semibold text-sm mb-4 flex items-center gap-2"${_scopeId}><svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"${_scopeId}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"${_scopeId}></path></svg> Ticket Volume \u2014 Last 30 Days </h3>`);
               if (unref(stats).dailyVolume.length) {
                 _push2(`<div class="flex items-end gap-[2px] h-32"${_scopeId}><!--[-->`);
                 ssrRenderList(unref(stats).dailyVolume, (day) => {
@@ -183,7 +188,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       d: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                     })
                   ])),
-                  createTextVNode(" Ticket Volume — Last 30 Days ")
+                  createTextVNode(" Ticket Volume \u2014 Last 30 Days ")
                 ]),
                 unref(stats).dailyVolume.length ? (openBlock(), createBlock("div", {
                   key: 0,
@@ -228,7 +233,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             if (_push2) {
               _push2(`<h3 class="text-white font-semibold text-sm mb-4"${_scopeId}>By Channel</h3><div class="space-y-3"${_scopeId}><!--[-->`);
               ssrRenderList(channelConfig, (cfg, key) => {
-                _push2(`<div${_scopeId}><div class="flex items-center justify-between text-xs mb-1"${_scopeId}><span class="text-white/70"${_scopeId}>${ssrInterpolate(cfg.label)}</span><span class="text-white/40"${_scopeId}>${ssrInterpolate(unref(stats).channels[key] ?? 0)}</span></div><div class="h-2 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="${ssrRenderClass([cfg.color, "h-full rounded-full transition-all duration-500"])}" style="${ssrRenderStyle({ width: `${(unref(stats).channels[key] ?? 0) / totalOf(unref(stats).channels) * 100}%` })}"${_scopeId}></div></div></div>`);
+                var _a, _b;
+                _push2(`<div${_scopeId}><div class="flex items-center justify-between text-xs mb-1"${_scopeId}><span class="text-white/70"${_scopeId}>${ssrInterpolate(cfg.label)}</span><span class="text-white/40"${_scopeId}>${ssrInterpolate((_a = unref(stats).channels[key]) != null ? _a : 0)}</span></div><div class="h-2 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="${ssrRenderClass([cfg.color, "h-full rounded-full transition-all duration-500"])}" style="${ssrRenderStyle({ width: `${((_b = unref(stats).channels[key]) != null ? _b : 0) / totalOf(unref(stats).channels) * 100}%` })}"${_scopeId}></div></div></div>`);
               });
               _push2(`<!--]--></div>`);
             } else {
@@ -236,15 +242,16 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 createVNode("h3", { class: "text-white font-semibold text-sm mb-4" }, "By Channel"),
                 createVNode("div", { class: "space-y-3" }, [
                   (openBlock(), createBlock(Fragment, null, renderList(channelConfig, (cfg, key) => {
+                    var _a, _b;
                     return createVNode("div", { key }, [
                       createVNode("div", { class: "flex items-center justify-between text-xs mb-1" }, [
                         createVNode("span", { class: "text-white/70" }, toDisplayString(cfg.label), 1),
-                        createVNode("span", { class: "text-white/40" }, toDisplayString(unref(stats).channels[key] ?? 0), 1)
+                        createVNode("span", { class: "text-white/40" }, toDisplayString((_a = unref(stats).channels[key]) != null ? _a : 0), 1)
                       ]),
                       createVNode("div", { class: "h-2 bg-white/[0.06] rounded-full overflow-hidden" }, [
                         createVNode("div", {
                           class: [cfg.color, "h-full rounded-full transition-all duration-500"],
-                          style: { width: `${(unref(stats).channels[key] ?? 0) / totalOf(unref(stats).channels) * 100}%` }
+                          style: { width: `${((_b = unref(stats).channels[key]) != null ? _b : 0) / totalOf(unref(stats).channels) * 100}%` }
                         }, null, 6)
                       ])
                     ]);
@@ -260,7 +267,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             if (_push2) {
               _push2(`<h3 class="text-white font-semibold text-sm mb-4"${_scopeId}>By Status</h3><div class="space-y-3"${_scopeId}><!--[-->`);
               ssrRenderList(statusConfig, (cfg, key) => {
-                _push2(`<div${_scopeId}><div class="flex items-center justify-between text-xs mb-1"${_scopeId}><span class="text-white/70"${_scopeId}>${ssrInterpolate(cfg.label)}</span><span class="text-white/40"${_scopeId}>${ssrInterpolate(unref(stats).statuses[key] ?? 0)}</span></div><div class="h-2 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="${ssrRenderClass([cfg.color, "h-full rounded-full transition-all duration-500"])}" style="${ssrRenderStyle({ width: `${(unref(stats).statuses[key] ?? 0) / totalOf(unref(stats).statuses) * 100}%` })}"${_scopeId}></div></div></div>`);
+                var _a, _b;
+                _push2(`<div${_scopeId}><div class="flex items-center justify-between text-xs mb-1"${_scopeId}><span class="text-white/70"${_scopeId}>${ssrInterpolate(cfg.label)}</span><span class="text-white/40"${_scopeId}>${ssrInterpolate((_a = unref(stats).statuses[key]) != null ? _a : 0)}</span></div><div class="h-2 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="${ssrRenderClass([cfg.color, "h-full rounded-full transition-all duration-500"])}" style="${ssrRenderStyle({ width: `${((_b = unref(stats).statuses[key]) != null ? _b : 0) / totalOf(unref(stats).statuses) * 100}%` })}"${_scopeId}></div></div></div>`);
               });
               _push2(`<!--]--></div>`);
             } else {
@@ -268,15 +276,16 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 createVNode("h3", { class: "text-white font-semibold text-sm mb-4" }, "By Status"),
                 createVNode("div", { class: "space-y-3" }, [
                   (openBlock(), createBlock(Fragment, null, renderList(statusConfig, (cfg, key) => {
+                    var _a, _b;
                     return createVNode("div", { key }, [
                       createVNode("div", { class: "flex items-center justify-between text-xs mb-1" }, [
                         createVNode("span", { class: "text-white/70" }, toDisplayString(cfg.label), 1),
-                        createVNode("span", { class: "text-white/40" }, toDisplayString(unref(stats).statuses[key] ?? 0), 1)
+                        createVNode("span", { class: "text-white/40" }, toDisplayString((_a = unref(stats).statuses[key]) != null ? _a : 0), 1)
                       ]),
                       createVNode("div", { class: "h-2 bg-white/[0.06] rounded-full overflow-hidden" }, [
                         createVNode("div", {
                           class: [cfg.color, "h-full rounded-full transition-all duration-500"],
-                          style: { width: `${(unref(stats).statuses[key] ?? 0) / totalOf(unref(stats).statuses) * 100}%` }
+                          style: { width: `${((_b = unref(stats).statuses[key]) != null ? _b : 0) / totalOf(unref(stats).statuses) * 100}%` }
                         }, null, 6)
                       ])
                     ]);
@@ -292,7 +301,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             if (_push2) {
               _push2(`<h3 class="text-white font-semibold text-sm mb-4"${_scopeId}>By Priority</h3><div class="space-y-3"${_scopeId}><!--[-->`);
               ssrRenderList(priorityConfig, (cfg, key) => {
-                _push2(`<div${_scopeId}><div class="flex items-center justify-between text-xs mb-1"${_scopeId}><span class="text-white/70"${_scopeId}>${ssrInterpolate(cfg.label)}</span><span class="text-white/40"${_scopeId}>${ssrInterpolate(unref(stats).priorities[key] ?? 0)}</span></div><div class="h-2 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="${ssrRenderClass([cfg.color, "h-full rounded-full transition-all duration-500"])}" style="${ssrRenderStyle({ width: `${(unref(stats).priorities[key] ?? 0) / totalOf(unref(stats).priorities) * 100}%` })}"${_scopeId}></div></div></div>`);
+                var _a, _b;
+                _push2(`<div${_scopeId}><div class="flex items-center justify-between text-xs mb-1"${_scopeId}><span class="text-white/70"${_scopeId}>${ssrInterpolate(cfg.label)}</span><span class="text-white/40"${_scopeId}>${ssrInterpolate((_a = unref(stats).priorities[key]) != null ? _a : 0)}</span></div><div class="h-2 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="${ssrRenderClass([cfg.color, "h-full rounded-full transition-all duration-500"])}" style="${ssrRenderStyle({ width: `${((_b = unref(stats).priorities[key]) != null ? _b : 0) / totalOf(unref(stats).priorities) * 100}%` })}"${_scopeId}></div></div></div>`);
               });
               _push2(`<!--]--></div>`);
             } else {
@@ -300,15 +310,16 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 createVNode("h3", { class: "text-white font-semibold text-sm mb-4" }, "By Priority"),
                 createVNode("div", { class: "space-y-3" }, [
                   (openBlock(), createBlock(Fragment, null, renderList(priorityConfig, (cfg, key) => {
+                    var _a, _b;
                     return createVNode("div", { key }, [
                       createVNode("div", { class: "flex items-center justify-between text-xs mb-1" }, [
                         createVNode("span", { class: "text-white/70" }, toDisplayString(cfg.label), 1),
-                        createVNode("span", { class: "text-white/40" }, toDisplayString(unref(stats).priorities[key] ?? 0), 1)
+                        createVNode("span", { class: "text-white/40" }, toDisplayString((_a = unref(stats).priorities[key]) != null ? _a : 0), 1)
                       ]),
                       createVNode("div", { class: "h-2 bg-white/[0.06] rounded-full overflow-hidden" }, [
                         createVNode("div", {
                           class: [cfg.color, "h-full rounded-full transition-all duration-500"],
-                          style: { width: `${(unref(stats).priorities[key] ?? 0) / totalOf(unref(stats).priorities) * 100}%` }
+                          style: { width: `${((_b = unref(stats).priorities[key]) != null ? _b : 0) / totalOf(unref(stats).priorities) * 100}%` }
                         }, null, 6)
                       ])
                     ]);
@@ -323,7 +334,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         _push(ssrRenderComponent(_component_UiGlassCard, { padding: "md" }, {
           default: withCtx((_, _push2, _parent2, _scopeId) => {
             if (_push2) {
-              _push2(`<h3 class="text-white font-semibold text-sm mb-4 flex items-center gap-2"${_scopeId}><svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"${_scopeId}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"${_scopeId}></path></svg> Sentiment Analysis </h3><div class="space-y-4"${_scopeId}><div${_scopeId}><div class="flex items-center justify-between text-sm mb-1.5"${_scopeId}><span class="text-emerald-400 flex items-center gap-1.5"${_scopeId}>😊 Positive</span><span class="text-white/50"${_scopeId}>${ssrInterpolate(unref(stats).sentiment.positive)}</span></div><div class="h-3 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="${ssrRenderStyle({ width: `${unref(stats).sentiment.positive / Math.max(1, unref(stats).sentiment.positive + unref(stats).sentiment.neutral + unref(stats).sentiment.negative) * 100}%` })}"${_scopeId}></div></div></div><div${_scopeId}><div class="flex items-center justify-between text-sm mb-1.5"${_scopeId}><span class="text-amber-400 flex items-center gap-1.5"${_scopeId}>😐 Neutral</span><span class="text-white/50"${_scopeId}>${ssrInterpolate(unref(stats).sentiment.neutral)}</span></div><div class="h-3 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="h-full bg-amber-500 rounded-full transition-all duration-500" style="${ssrRenderStyle({ width: `${unref(stats).sentiment.neutral / Math.max(1, unref(stats).sentiment.positive + unref(stats).sentiment.neutral + unref(stats).sentiment.negative) * 100}%` })}"${_scopeId}></div></div></div><div${_scopeId}><div class="flex items-center justify-between text-sm mb-1.5"${_scopeId}><span class="text-red-400 flex items-center gap-1.5"${_scopeId}>😠 Negative</span><span class="text-white/50"${_scopeId}>${ssrInterpolate(unref(stats).sentiment.negative)}</span></div><div class="h-3 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="h-full bg-red-500 rounded-full transition-all duration-500" style="${ssrRenderStyle({ width: `${unref(stats).sentiment.negative / Math.max(1, unref(stats).sentiment.positive + unref(stats).sentiment.neutral + unref(stats).sentiment.negative) * 100}%` })}"${_scopeId}></div></div></div></div>`);
+              _push2(`<h3 class="text-white font-semibold text-sm mb-4 flex items-center gap-2"${_scopeId}><svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"${_scopeId}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"${_scopeId}></path></svg> Sentiment Analysis </h3><div class="space-y-4"${_scopeId}><div${_scopeId}><div class="flex items-center justify-between text-sm mb-1.5"${_scopeId}><span class="text-emerald-400 flex items-center gap-1.5"${_scopeId}>\u{1F60A} Positive</span><span class="text-white/50"${_scopeId}>${ssrInterpolate(unref(stats).sentiment.positive)}</span></div><div class="h-3 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="${ssrRenderStyle({ width: `${unref(stats).sentiment.positive / Math.max(1, unref(stats).sentiment.positive + unref(stats).sentiment.neutral + unref(stats).sentiment.negative) * 100}%` })}"${_scopeId}></div></div></div><div${_scopeId}><div class="flex items-center justify-between text-sm mb-1.5"${_scopeId}><span class="text-amber-400 flex items-center gap-1.5"${_scopeId}>\u{1F610} Neutral</span><span class="text-white/50"${_scopeId}>${ssrInterpolate(unref(stats).sentiment.neutral)}</span></div><div class="h-3 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="h-full bg-amber-500 rounded-full transition-all duration-500" style="${ssrRenderStyle({ width: `${unref(stats).sentiment.neutral / Math.max(1, unref(stats).sentiment.positive + unref(stats).sentiment.neutral + unref(stats).sentiment.negative) * 100}%` })}"${_scopeId}></div></div></div><div${_scopeId}><div class="flex items-center justify-between text-sm mb-1.5"${_scopeId}><span class="text-red-400 flex items-center gap-1.5"${_scopeId}>\u{1F620} Negative</span><span class="text-white/50"${_scopeId}>${ssrInterpolate(unref(stats).sentiment.negative)}</span></div><div class="h-3 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="h-full bg-red-500 rounded-full transition-all duration-500" style="${ssrRenderStyle({ width: `${unref(stats).sentiment.negative / Math.max(1, unref(stats).sentiment.positive + unref(stats).sentiment.neutral + unref(stats).sentiment.negative) * 100}%` })}"${_scopeId}></div></div></div></div>`);
             } else {
               return [
                 createVNode("h3", { class: "text-white font-semibold text-sm mb-4 flex items-center gap-2" }, [
@@ -345,7 +356,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 createVNode("div", { class: "space-y-4" }, [
                   createVNode("div", null, [
                     createVNode("div", { class: "flex items-center justify-between text-sm mb-1.5" }, [
-                      createVNode("span", { class: "text-emerald-400 flex items-center gap-1.5" }, "😊 Positive"),
+                      createVNode("span", { class: "text-emerald-400 flex items-center gap-1.5" }, "\u{1F60A} Positive"),
                       createVNode("span", { class: "text-white/50" }, toDisplayString(unref(stats).sentiment.positive), 1)
                     ]),
                     createVNode("div", { class: "h-3 bg-white/[0.06] rounded-full overflow-hidden" }, [
@@ -357,7 +368,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   ]),
                   createVNode("div", null, [
                     createVNode("div", { class: "flex items-center justify-between text-sm mb-1.5" }, [
-                      createVNode("span", { class: "text-amber-400 flex items-center gap-1.5" }, "😐 Neutral"),
+                      createVNode("span", { class: "text-amber-400 flex items-center gap-1.5" }, "\u{1F610} Neutral"),
                       createVNode("span", { class: "text-white/50" }, toDisplayString(unref(stats).sentiment.neutral), 1)
                     ]),
                     createVNode("div", { class: "h-3 bg-white/[0.06] rounded-full overflow-hidden" }, [
@@ -369,7 +380,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   ]),
                   createVNode("div", null, [
                     createVNode("div", { class: "flex items-center justify-between text-sm mb-1.5" }, [
-                      createVNode("span", { class: "text-red-400 flex items-center gap-1.5" }, "😠 Negative"),
+                      createVNode("span", { class: "text-red-400 flex items-center gap-1.5" }, "\u{1F620} Negative"),
                       createVNode("span", { class: "text-white/50" }, toDisplayString(unref(stats).sentiment.negative), 1)
                     ]),
                     createVNode("div", { class: "h-3 bg-white/[0.06] rounded-full overflow-hidden" }, [
@@ -392,7 +403,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               if (unref(stats).categories.length) {
                 _push2(`<div class="space-y-3"${_scopeId}><!--[-->`);
                 ssrRenderList(unref(stats).categories, (cat) => {
-                  _push2(`<div${_scopeId}><div class="flex items-center justify-between text-xs mb-1"${_scopeId}><span class="text-white/70 capitalize"${_scopeId}>${ssrInterpolate(cat.name.toLowerCase().replace(/_/g, " "))}</span><span class="text-white/40"${_scopeId}>${ssrInterpolate(cat.count)}</span></div><div class="h-2 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="h-full bg-indigo-500 rounded-full transition-all duration-500" style="${ssrRenderStyle({ width: `${cat.count / Math.max(1, unref(stats).categories[0]?.count ?? 1) * 100}%` })}"${_scopeId}></div></div></div>`);
+                  var _a, _b;
+                  _push2(`<div${_scopeId}><div class="flex items-center justify-between text-xs mb-1"${_scopeId}><span class="text-white/70 capitalize"${_scopeId}>${ssrInterpolate(cat.name.toLowerCase().replace(/_/g, " "))}</span><span class="text-white/40"${_scopeId}>${ssrInterpolate(cat.count)}</span></div><div class="h-2 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="h-full bg-indigo-500 rounded-full transition-all duration-500" style="${ssrRenderStyle({ width: `${cat.count / Math.max(1, (_b = (_a = unref(stats).categories[0]) == null ? void 0 : _a.count) != null ? _b : 1) * 100}%` })}"${_scopeId}></div></div></div>`);
                 });
                 _push2(`<!--]--></div>`);
               } else {
@@ -421,6 +433,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   class: "space-y-3"
                 }, [
                   (openBlock(true), createBlock(Fragment, null, renderList(unref(stats).categories, (cat) => {
+                    var _a, _b;
                     return openBlock(), createBlock("div", {
                       key: cat.name
                     }, [
@@ -431,7 +444,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       createVNode("div", { class: "h-2 bg-white/[0.06] rounded-full overflow-hidden" }, [
                         createVNode("div", {
                           class: "h-full bg-indigo-500 rounded-full transition-all duration-500",
-                          style: { width: `${cat.count / Math.max(1, unref(stats).categories[0]?.count ?? 1) * 100}%` }
+                          style: { width: `${cat.count / Math.max(1, (_b = (_a = unref(stats).categories[0]) == null ? void 0 : _a.count) != null ? _b : 1) * 100}%` }
                         }, null, 4)
                       ])
                     ]);
@@ -449,11 +462,12 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         _push(ssrRenderComponent(_component_UiGlassCard, { padding: "md" }, {
           default: withCtx((_, _push2, _parent2, _scopeId) => {
             if (_push2) {
-              _push2(`<h3 class="text-white font-semibold text-sm mb-4 flex items-center gap-2"${_scopeId}><svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"${_scopeId}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"${_scopeId}></path></svg> Agent Performance — Resolved Tickets </h3>`);
+              _push2(`<h3 class="text-white font-semibold text-sm mb-4 flex items-center gap-2"${_scopeId}><svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"${_scopeId}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"${_scopeId}></path></svg> Agent Performance \u2014 Resolved Tickets </h3>`);
               if (unref(stats).agentPerformance.length) {
                 _push2(`<div class="space-y-3"${_scopeId}><!--[-->`);
                 ssrRenderList(unref(stats).agentPerformance, (agent, index) => {
-                  _push2(`<div class="flex items-center gap-3"${_scopeId}><span class="text-white/30 text-xs w-5 text-right"${_scopeId}>#${ssrInterpolate(index + 1)}</span><div class="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-sm text-indigo-300 font-semibold flex-shrink-0"${_scopeId}>${ssrInterpolate(agent.name.charAt(0).toUpperCase())}</div><div class="flex-1 min-w-0"${_scopeId}><div class="flex items-center justify-between mb-1"${_scopeId}><span class="text-white/80 text-sm truncate"${_scopeId}>${ssrInterpolate(agent.name)}</span><span class="text-white/40 text-xs"${_scopeId}>${ssrInterpolate(agent.resolved)} resolved</span></div><div class="h-1.5 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="h-full bg-indigo-500 rounded-full transition-all duration-500" style="${ssrRenderStyle({ width: `${agent.resolved / Math.max(1, unref(stats).agentPerformance[0]?.resolved ?? 1) * 100}%` })}"${_scopeId}></div></div></div></div>`);
+                  var _a, _b;
+                  _push2(`<div class="flex items-center gap-3"${_scopeId}><span class="text-white/30 text-xs w-5 text-right"${_scopeId}>#${ssrInterpolate(index + 1)}</span><div class="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-sm text-indigo-300 font-semibold flex-shrink-0"${_scopeId}>${ssrInterpolate(agent.name.charAt(0).toUpperCase())}</div><div class="flex-1 min-w-0"${_scopeId}><div class="flex items-center justify-between mb-1"${_scopeId}><span class="text-white/80 text-sm truncate"${_scopeId}>${ssrInterpolate(agent.name)}</span><span class="text-white/40 text-xs"${_scopeId}>${ssrInterpolate(agent.resolved)} resolved</span></div><div class="h-1.5 bg-white/[0.06] rounded-full overflow-hidden"${_scopeId}><div class="h-full bg-indigo-500 rounded-full transition-all duration-500" style="${ssrRenderStyle({ width: `${agent.resolved / Math.max(1, (_b = (_a = unref(stats).agentPerformance[0]) == null ? void 0 : _a.resolved) != null ? _b : 1) * 100}%` })}"${_scopeId}></div></div></div></div>`);
                 });
                 _push2(`<!--]--></div>`);
               } else {
@@ -475,13 +489,14 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       d: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
                     })
                   ])),
-                  createTextVNode(" Agent Performance — Resolved Tickets ")
+                  createTextVNode(" Agent Performance \u2014 Resolved Tickets ")
                 ]),
                 unref(stats).agentPerformance.length ? (openBlock(), createBlock("div", {
                   key: 0,
                   class: "space-y-3"
                 }, [
                   (openBlock(true), createBlock(Fragment, null, renderList(unref(stats).agentPerformance, (agent, index) => {
+                    var _a, _b;
                     return openBlock(), createBlock("div", {
                       key: agent.id,
                       class: "flex items-center gap-3"
@@ -496,7 +511,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                         createVNode("div", { class: "h-1.5 bg-white/[0.06] rounded-full overflow-hidden" }, [
                           createVNode("div", {
                             class: "h-full bg-indigo-500 rounded-full transition-all duration-500",
-                            style: { width: `${agent.resolved / Math.max(1, unref(stats).agentPerformance[0]?.resolved ?? 1) * 100}%` }
+                            style: { width: `${agent.resolved / Math.max(1, (_b = (_a = unref(stats).agentPerformance[0]) == null ? void 0 : _a.resolved) != null ? _b : 1) * 100}%` }
                           }, null, 4)
                         ])
                       ])

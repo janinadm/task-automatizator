@@ -20,11 +20,24 @@ const useTicketsStore = defineStore("tickets", () => {
   const isLoadingDetail = ref(false);
   const isUpdating = ref(false);
   const error = ref(null);
-  const totalPages = computed(() => meta.value?.totalPages ?? 1);
-  const hasNextPage = computed(() => meta.value?.hasNextPage ?? false);
-  const hasPrevPage = computed(() => meta.value?.hasPrevPage ?? false);
-  const currentPage = computed(() => filters.value.page ?? 1);
+  const totalPages = computed(() => {
+    var _a, _b;
+    return (_b = (_a = meta.value) == null ? void 0 : _a.totalPages) != null ? _b : 1;
+  });
+  const hasNextPage = computed(() => {
+    var _a, _b;
+    return (_b = (_a = meta.value) == null ? void 0 : _a.hasNextPage) != null ? _b : false;
+  });
+  const hasPrevPage = computed(() => {
+    var _a, _b;
+    return (_b = (_a = meta.value) == null ? void 0 : _a.hasPrevPage) != null ? _b : false;
+  });
+  const currentPage = computed(() => {
+    var _a;
+    return (_a = filters.value.page) != null ? _a : 1;
+  });
   async function fetchTickets(overrideFilters) {
+    var _a, _b;
     isLoadingList.value = true;
     error.value = null;
     if (overrideFilters) {
@@ -38,32 +51,34 @@ const useTicketsStore = defineStore("tickets", () => {
       tickets.value = response.data;
       meta.value = response.meta;
     } catch (e) {
-      error.value = e?.data?.message ?? "Failed to load tickets";
+      error.value = (_b = (_a = e == null ? void 0 : e.data) == null ? void 0 : _a.message) != null ? _b : "Failed to load tickets";
       tickets.value = [];
     } finally {
       isLoadingList.value = false;
     }
   }
   async function fetchTicket(id) {
+    var _a, _b;
     isLoadingDetail.value = true;
     error.value = null;
     try {
       const response = await $fetch(`/api/tickets/${id}`);
       currentTicket.value = response.data;
     } catch (e) {
-      error.value = e?.data?.message ?? "Failed to load ticket";
+      error.value = (_b = (_a = e == null ? void 0 : e.data) == null ? void 0 : _a.message) != null ? _b : "Failed to load ticket";
       currentTicket.value = null;
     } finally {
       isLoadingDetail.value = false;
     }
   }
   async function updateTicket(id, data) {
+    var _a, _b, _c, _d;
     isUpdating.value = true;
     error.value = null;
     const previousTicket = currentTicket.value;
     const listIndex = tickets.value.findIndex((t) => t.id === id);
     const previousListItem = listIndex >= 0 ? { ...tickets.value[listIndex] } : null;
-    if (currentTicket.value?.id === id) {
+    if (((_a = currentTicket.value) == null ? void 0 : _a.id) === id) {
       currentTicket.value = { ...currentTicket.value, ...data };
     }
     if (listIndex >= 0) {
@@ -74,7 +89,7 @@ const useTicketsStore = defineStore("tickets", () => {
         method: "PATCH",
         body: data
       });
-      if (currentTicket.value?.id === id) {
+      if (((_b = currentTicket.value) == null ? void 0 : _b.id) === id) {
         currentTicket.value = { ...currentTicket.value, ...response.data };
       }
       if (listIndex >= 0) {
@@ -86,7 +101,7 @@ const useTicketsStore = defineStore("tickets", () => {
       if (listIndex >= 0 && previousListItem) {
         tickets.value[listIndex] = previousListItem;
       }
-      error.value = e?.data?.message ?? "Failed to update ticket";
+      error.value = (_d = (_c = e == null ? void 0 : e.data) == null ? void 0 : _c.message) != null ? _d : "Failed to update ticket";
       throw e;
     } finally {
       isUpdating.value = false;
@@ -149,7 +164,7 @@ const useRealtimeTickets = () => {
         filter: `orgId=eq.${orgId}`
       },
       async () => {
-        toast.info("🎫 New ticket received");
+        toast.info("\u{1F3AB} New ticket received");
         await ticketsStore.fetchTickets();
       }
     ).on(
@@ -161,6 +176,7 @@ const useRealtimeTickets = () => {
         filter: `orgId=eq.${orgId}`
       },
       (payload) => {
+        var _a;
         const updated = payload.new;
         const idx = ticketsStore.tickets.findIndex((t) => t.id === updated.id);
         if (idx >= 0) {
@@ -176,7 +192,7 @@ const useRealtimeTickets = () => {
             });
           }
         }
-        if (ticketsStore.currentTicket?.id === updated.id) {
+        if (((_a = ticketsStore.currentTicket) == null ? void 0 : _a.id) === updated.id) {
           ticketsStore.fetchTicket(updated.id);
         }
       }

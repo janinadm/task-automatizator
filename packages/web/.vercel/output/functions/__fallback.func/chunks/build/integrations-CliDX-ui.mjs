@@ -32,24 +32,29 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       "$uw9_dKDzf-"
       /* nuxt-injected */
     )), __temp = await __temp, __restore(), __temp);
-    const integrations = computed(() => integrationsData.value?.data ?? []);
+    const integrations = computed(() => {
+      var _a, _b;
+      return (_b = (_a = integrationsData.value) == null ? void 0 : _a.data) != null ? _b : [];
+    });
     const showCreateModal = ref(false);
     const newName = ref("");
     const newType = ref("WEBHOOK");
     const creating = ref(false);
     ref({});
     const typeOptions = [
-      { value: "EMAIL_IMAP", label: "Email (IMAP)", description: "Receive emails as tickets", icon: "📧" },
-      { value: "EMAIL_SMTP", label: "Email (SMTP)", description: "Send replies via email", icon: "📤" },
-      { value: "WHATSAPP", label: "WhatsApp", description: "WhatsApp Business API messages", icon: "💬" },
-      { value: "SLACK", label: "Slack", description: "Slack workspace messages", icon: "💼" },
-      { value: "WEBHOOK", label: "Custom Webhook", description: "Generic HTTP webhook integration", icon: "🔗" }
+      { value: "EMAIL_IMAP", label: "Email (IMAP)", description: "Receive emails as tickets", icon: "\u{1F4E7}" },
+      { value: "EMAIL_SMTP", label: "Email (SMTP)", description: "Send replies via email", icon: "\u{1F4E4}" },
+      { value: "WHATSAPP", label: "WhatsApp", description: "WhatsApp Business API messages", icon: "\u{1F4AC}" },
+      { value: "SLACK", label: "Slack", description: "Slack workspace messages", icon: "\u{1F4BC}" },
+      { value: "WEBHOOK", label: "Custom Webhook", description: "Generic HTTP webhook integration", icon: "\u{1F517}" }
     ];
     function getTypeInfo(type) {
-      return typeOptions.find((t) => t.value === type) ?? { label: type, description: "", icon: "🔧" };
+      var _a;
+      return (_a = typeOptions.find((t) => t.value === type)) != null ? _a : { label: type, description: "", icon: "\u{1F527}" };
     }
     const togglingId = ref(null);
     async function toggleActive(integration) {
+      var _a, _b;
       togglingId.value = integration.id;
       try {
         await $fetch(`/api/integrations/${integration.id}`, {
@@ -59,13 +64,14 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         toast.success(`${integration.name} ${integration.isActive ? "disabled" : "enabled"}`);
         await refresh();
       } catch (e) {
-        toast.error(e?.data?.message ?? "Failed to update integration");
+        toast.error((_b = (_a = e == null ? void 0 : e.data) == null ? void 0 : _a.message) != null ? _b : "Failed to update integration");
       } finally {
         togglingId.value = null;
       }
     }
     const deletingId = ref(null);
     async function deleteIntegration(integration) {
+      var _a, _b;
       if (!confirm(`Delete "${integration.name}"? This cannot be undone.`)) return;
       deletingId.value = integration.id;
       try {
@@ -73,7 +79,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         toast.success(`${integration.name} deleted`);
         await refresh();
       } catch (e) {
-        toast.error(e?.data?.message ?? "Failed to delete integration");
+        toast.error((_b = (_a = e == null ? void 0 : e.data) == null ? void 0 : _a.message) != null ? _b : "Failed to delete integration");
       } finally {
         deletingId.value = null;
       }
@@ -154,7 +160,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   }
                   _push2(`<div class="flex items-center gap-3 mt-2 text-xs text-white/30"${_scopeId}><span${_scopeId}>Created ${ssrInterpolate(fmtDate(integration.createdAt))}</span>`);
                   if (integration.lastSyncAt) {
-                    _push2(`<span${_scopeId}> · Last activity ${ssrInterpolate(fmtRelative(integration.lastSyncAt))}</span>`);
+                    _push2(`<span${_scopeId}> \xB7 Last activity ${ssrInterpolate(fmtRelative(integration.lastSyncAt))}</span>`);
                   } else {
                     _push2(`<!---->`);
                   }
@@ -214,7 +220,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                         ])) : createCommentVNode("", true),
                         createVNode("div", { class: "flex items-center gap-3 mt-2 text-xs text-white/30" }, [
                           createVNode("span", null, "Created " + toDisplayString(fmtDate(integration.createdAt)), 1),
-                          integration.lastSyncAt ? (openBlock(), createBlock("span", { key: 0 }, " · Last activity " + toDisplayString(fmtRelative(integration.lastSyncAt)), 1)) : createCommentVNode("", true)
+                          integration.lastSyncAt ? (openBlock(), createBlock("span", { key: 0 }, " \xB7 Last activity " + toDisplayString(fmtRelative(integration.lastSyncAt)), 1)) : createCommentVNode("", true)
                         ])
                       ]),
                       createVNode("div", { class: "flex items-center gap-2 flex-shrink-0" }, [

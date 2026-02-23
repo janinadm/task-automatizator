@@ -54,10 +54,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               }, {
                 default: withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
-                    _push3(` ← Back to Login `);
+                    _push3(` \u2190 Back to Login `);
                   } else {
                     return [
-                      createTextVNode(" ← Back to Login ")
+                      createTextVNode(" \u2190 Back to Login ")
                     ];
                   }
                 }),
@@ -84,10 +84,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               }, {
                 default: withCtx((_2, _push3, _parent3, _scopeId2) => {
                   if (_push3) {
-                    _push3(` ← Back to Login `);
+                    _push3(` \u2190 Back to Login `);
                   } else {
                     return [
-                      createTextVNode(" ← Back to Login ")
+                      createTextVNode(" \u2190 Back to Login ")
                     ];
                   }
                 }),
@@ -128,7 +128,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   class: "block mt-5 text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
                 }, {
                   default: withCtx(() => [
-                    createTextVNode(" ← Back to Login ")
+                    createTextVNode(" \u2190 Back to Login ")
                   ]),
                   _: 1
                 })
@@ -185,7 +185,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   class: "block text-center text-white/40 hover:text-white/60 text-sm transition-colors"
                 }, {
                   default: withCtx(() => [
-                    createTextVNode(" ← Back to Login ")
+                    createTextVNode(" \u2190 Back to Login ")
                   ]),
                   _: 1
                 })

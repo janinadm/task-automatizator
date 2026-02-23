@@ -32,16 +32,24 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       "$NcOXUh9bJI"
       /* nuxt-injected */
     )), __temp = await __temp, __restore(), __temp);
-    const settings = computed(() => settingsData.value?.data);
-    const isAdmin = computed(() => settings.value?.currentUserRole === "ADMIN");
+    const settings = computed(() => {
+      var _a;
+      return (_a = settingsData.value) == null ? void 0 : _a.data;
+    });
+    const isAdmin = computed(() => {
+      var _a;
+      return ((_a = settings.value) == null ? void 0 : _a.currentUserRole) === "ADMIN";
+    });
     const editingName = ref(false);
     const orgName = ref("");
     const savingName = ref(false);
     function startEditName() {
-      orgName.value = settings.value?.organization.name ?? "";
+      var _a, _b;
+      orgName.value = (_b = (_a = settings.value) == null ? void 0 : _a.organization.name) != null ? _b : "";
       editingName.value = true;
     }
     async function saveName() {
+      var _a, _b;
       if (!orgName.value.trim()) return;
       savingName.value = true;
       try {
@@ -53,7 +61,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         editingName.value = false;
         await refresh();
       } catch (e) {
-        toast.error(e?.data?.message ?? "Failed to update name");
+        toast.error((_b = (_a = e == null ? void 0 : e.data) == null ? void 0 : _a.message) != null ? _b : "Failed to update name");
       } finally {
         savingName.value = false;
       }
@@ -69,15 +77,17 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     ];
     function startEditSla() {
       slaValues.value = defaultSla.map((d) => {
-        const existing = settings.value?.slaConfigs.find((c) => c.priority === d.priority);
+        var _a, _b;
+        const existing = (_a = settings.value) == null ? void 0 : _a.slaConfigs.find((c) => c.priority === d.priority);
         return {
           priority: d.priority,
-          maxResponseMinutes: existing?.maxResponseMinutes ?? d.maxResponseMinutes
+          maxResponseMinutes: (_b = existing == null ? void 0 : existing.maxResponseMinutes) != null ? _b : d.maxResponseMinutes
         };
       });
       slaEditing.value = true;
     }
     async function saveSla() {
+      var _a, _b;
       savingSla.value = true;
       try {
         await $fetch("/api/settings", {
@@ -88,7 +98,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         slaEditing.value = false;
         await refresh();
       } catch (e) {
-        toast.error(e?.data?.message ?? "Failed to update SLA");
+        toast.error((_b = (_a = e == null ? void 0 : e.data) == null ? void 0 : _a.message) != null ? _b : "Failed to update SLA");
       } finally {
         savingSla.value = false;
       }
@@ -110,6 +120,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     };
     const togglingAutoAssign = ref(false);
     async function toggleAutoAssign() {
+      var _a, _b;
       if (!isAdmin.value || !settings.value) return;
       togglingAutoAssign.value = true;
       try {
@@ -120,17 +131,18 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         toast.success(settings.value.organization.autoAssign ? "Auto-assign disabled" : "Auto-assign enabled");
         await refresh();
       } catch (e) {
-        toast.error(e?.data?.message ?? "Failed to toggle auto-assign");
+        toast.error((_b = (_a = e == null ? void 0 : e.data) == null ? void 0 : _a.message) != null ? _b : "Failed to toggle auto-assign");
       } finally {
         togglingAutoAssign.value = false;
       }
     }
     async function triggerAutoAssign() {
+      var _a, _b;
       try {
         const res = await $fetch("/api/tickets/auto-assign", { method: "POST" });
         toast.success(`Auto-assigned ${res.data.assignedCount} ticket(s)`);
       } catch (e) {
-        toast.error(e?.data?.message ?? "Auto-assign failed");
+        toast.error((_b = (_a = e == null ? void 0 : e.data) == null ? void 0 : _a.message) != null ? _b : "Auto-assign failed");
       }
     }
     const cannedResponses = ref([]);
@@ -149,6 +161,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       }
     }
     async function createCannedResponse() {
+      var _a, _b;
       if (!cannedForm.value.title.trim() || !cannedForm.value.body.trim()) return;
       savingCanned.value = true;
       try {
@@ -166,18 +179,19 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         showCannedForm.value = false;
         await fetchCannedResponses();
       } catch (e) {
-        toast.error(e?.data?.message ?? "Failed to create canned response");
+        toast.error((_b = (_a = e == null ? void 0 : e.data) == null ? void 0 : _a.message) != null ? _b : "Failed to create canned response");
       } finally {
         savingCanned.value = false;
       }
     }
     async function deleteCannedResponse(id) {
+      var _a, _b;
       try {
         await $fetch(`/api/canned-responses/${id}`, { method: "DELETE" });
         toast.success("Canned response deleted");
         await fetchCannedResponses();
       } catch (e) {
-        toast.error(e?.data?.message ?? "Failed to delete");
+        toast.error((_b = (_a = e == null ? void 0 : e.data) == null ? void 0 : _a.message) != null ? _b : "Failed to delete");
       }
     }
     return (_ctx, _push, _parent, _attrs) => {
@@ -191,6 +205,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         _push(`<!--[-->`);
         _push(ssrRenderComponent(_component_UiGlassCard, { padding: "md" }, {
           default: withCtx((_, _push2, _parent2, _scopeId) => {
+            var _a, _b;
             if (_push2) {
               _push2(`<h3 class="text-white font-semibold text-sm mb-4 flex items-center gap-2"${_scopeId}><svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"${_scopeId}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"${_scopeId}></path></svg> Organization </h3><div class="space-y-4"${_scopeId}><div${_scopeId}><label class="block text-xs text-white/50 uppercase tracking-wider mb-1.5"${_scopeId}>Name</label>`);
               if (!unref(editingName)) {
@@ -204,7 +219,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               } else {
                 _push2(`<div class="flex items-center gap-2"${_scopeId}><input${ssrRenderAttr("value", unref(orgName))} type="text" class="input-glass flex-1" maxlength="100"${ssrIncludeBooleanAttr(unref(savingName)) ? " disabled" : ""}${_scopeId}><button${ssrIncludeBooleanAttr(unref(savingName) || !unref(orgName).trim()) ? " disabled" : ""} class="btn-primary text-sm"${_scopeId}>${ssrInterpolate(unref(savingName) ? "Saving..." : "Save")}</button><button class="btn-ghost text-sm"${_scopeId}>Cancel</button></div>`);
               }
-              _push2(`</div><div${_scopeId}><label class="block text-xs text-white/50 uppercase tracking-wider mb-1.5"${_scopeId}>Plan</label><span class="${ssrRenderClass([planBadgeClass[unref(settings).organization.plan] ?? planBadgeClass.FREE, "inline-block px-3 py-1 rounded-full text-xs font-semibold border"])}"${_scopeId}>${ssrInterpolate(unref(settings).organization.plan)}</span></div><div class="grid grid-cols-3 gap-4 pt-2 border-t border-white/[0.06]"${_scopeId}><div${_scopeId}><p class="text-white font-semibold"${_scopeId}>${ssrInterpolate(unref(settings).memberCount)}</p><p class="text-white/30 text-xs"${_scopeId}>Team Members</p></div><div${_scopeId}><p class="text-white font-semibold"${_scopeId}>${ssrInterpolate(unref(settings).ticketCount)}</p><p class="text-white/30 text-xs"${_scopeId}>Total Tickets</p></div><div${_scopeId}><p class="text-white/50 text-sm"${_scopeId}>${ssrInterpolate(fmtDate(unref(settings).organization.createdAt))}</p><p class="text-white/30 text-xs"${_scopeId}>Created</p></div></div></div>`);
+              _push2(`</div><div${_scopeId}><label class="block text-xs text-white/50 uppercase tracking-wider mb-1.5"${_scopeId}>Plan</label><span class="${ssrRenderClass([(_a = planBadgeClass[unref(settings).organization.plan]) != null ? _a : planBadgeClass.FREE, "inline-block px-3 py-1 rounded-full text-xs font-semibold border"])}"${_scopeId}>${ssrInterpolate(unref(settings).organization.plan)}</span></div><div class="grid grid-cols-3 gap-4 pt-2 border-t border-white/[0.06]"${_scopeId}><div${_scopeId}><p class="text-white font-semibold"${_scopeId}>${ssrInterpolate(unref(settings).memberCount)}</p><p class="text-white/30 text-xs"${_scopeId}>Team Members</p></div><div${_scopeId}><p class="text-white font-semibold"${_scopeId}>${ssrInterpolate(unref(settings).ticketCount)}</p><p class="text-white/30 text-xs"${_scopeId}>Total Tickets</p></div><div${_scopeId}><p class="text-white/50 text-sm"${_scopeId}>${ssrInterpolate(fmtDate(unref(settings).organization.createdAt))}</p><p class="text-white/30 text-xs"${_scopeId}>Created</p></div></div></div>`);
             } else {
               return [
                 createVNode("h3", { class: "text-white font-semibold text-sm mb-4 flex items-center gap-2" }, [
@@ -279,7 +294,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   createVNode("div", null, [
                     createVNode("label", { class: "block text-xs text-white/50 uppercase tracking-wider mb-1.5" }, "Plan"),
                     createVNode("span", {
-                      class: ["inline-block px-3 py-1 rounded-full text-xs font-semibold border", planBadgeClass[unref(settings).organization.plan] ?? planBadgeClass.FREE]
+                      class: ["inline-block px-3 py-1 rounded-full text-xs font-semibold border", (_b = planBadgeClass[unref(settings).organization.plan]) != null ? _b : planBadgeClass.FREE]
                     }, toDisplayString(unref(settings).organization.plan), 3)
                   ]),
                   createVNode("div", { class: "grid grid-cols-3 gap-4 pt-2 border-t border-white/[0.06]" }, [
@@ -315,23 +330,25 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               if (!unref(slaEditing)) {
                 _push2(`<div class="space-y-3"${_scopeId}><!--[-->`);
                 ssrRenderList(defaultSla, (d) => {
+                  var _a, _b;
                   _push2(`<div class="flex items-center justify-between py-2 px-3 rounded-xl bg-white/[0.03]"${_scopeId}><div class="flex items-center gap-2"${_scopeId}><span class="${ssrRenderClass([{
                     "bg-red-400": d.priority === "URGENT",
                     "bg-orange-400": d.priority === "HIGH",
                     "bg-amber-400": d.priority === "MEDIUM",
                     "bg-emerald-400": d.priority === "LOW"
-                  }, "w-2 h-2 rounded-full"])}"${_scopeId}></span><span class="text-white/70 text-sm"${_scopeId}>${ssrInterpolate(d.label)}</span></div><span class="text-white/50 text-sm font-mono"${_scopeId}>${ssrInterpolate(formatMinutes(unref(settings).slaConfigs.find((c) => c.priority === d.priority)?.maxResponseMinutes ?? d.maxResponseMinutes))}</span></div>`);
+                  }, "w-2 h-2 rounded-full"])}"${_scopeId}></span><span class="text-white/70 text-sm"${_scopeId}>${ssrInterpolate(d.label)}</span></div><span class="text-white/50 text-sm font-mono"${_scopeId}>${ssrInterpolate(formatMinutes((_b = (_a = unref(settings).slaConfigs.find((c) => c.priority === d.priority)) == null ? void 0 : _a.maxResponseMinutes) != null ? _b : d.maxResponseMinutes))}</span></div>`);
                 });
                 _push2(`<!--]--></div>`);
               } else {
                 _push2(`<div class="space-y-3"${_scopeId}><!--[-->`);
                 ssrRenderList(unref(slaValues), (sla, i) => {
+                  var _a;
                   _push2(`<div class="flex items-center justify-between py-2 px-3 rounded-xl bg-white/[0.03]"${_scopeId}><div class="flex items-center gap-2"${_scopeId}><span class="${ssrRenderClass([{
                     "bg-red-400": sla.priority === "URGENT",
                     "bg-orange-400": sla.priority === "HIGH",
                     "bg-amber-400": sla.priority === "MEDIUM",
                     "bg-emerald-400": sla.priority === "LOW"
-                  }, "w-2 h-2 rounded-full"])}"${_scopeId}></span><span class="text-white/70 text-sm"${_scopeId}>${ssrInterpolate(defaultSla[i]?.label)}</span></div><div class="flex items-center gap-2"${_scopeId}><input${ssrRenderAttr("value", sla.maxResponseMinutes)} type="number" min="1" max="10080" class="input-glass w-24 text-right text-sm"${ssrIncludeBooleanAttr(unref(savingSla)) ? " disabled" : ""}${_scopeId}><span class="text-white/30 text-xs w-8"${_scopeId}>min</span></div></div>`);
+                  }, "w-2 h-2 rounded-full"])}"${_scopeId}></span><span class="text-white/70 text-sm"${_scopeId}>${ssrInterpolate((_a = defaultSla[i]) == null ? void 0 : _a.label)}</span></div><div class="flex items-center gap-2"${_scopeId}><input${ssrRenderAttr("value", sla.maxResponseMinutes)} type="number" min="1" max="10080" class="input-glass w-24 text-right text-sm"${ssrIncludeBooleanAttr(unref(savingSla)) ? " disabled" : ""}${_scopeId}><span class="text-white/30 text-xs w-8"${_scopeId}>min</span></div></div>`);
                 });
                 _push2(`<!--]--><div class="flex items-center justify-end gap-2 pt-2"${_scopeId}><button class="btn-ghost text-sm"${_scopeId}>Cancel</button><button${ssrIncludeBooleanAttr(unref(savingSla)) ? " disabled" : ""} class="btn-primary text-sm"${_scopeId}>${ssrInterpolate(unref(savingSla) ? "Saving..." : "Save SLA")}</button></div></div>`);
               }
@@ -366,6 +383,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   class: "space-y-3"
                 }, [
                   (openBlock(), createBlock(Fragment, null, renderList(defaultSla, (d) => {
+                    var _a, _b;
                     return createVNode("div", {
                       key: d.priority,
                       class: "flex items-center justify-between py-2 px-3 rounded-xl bg-white/[0.03]"
@@ -381,7 +399,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                         }, null, 2),
                         createVNode("span", { class: "text-white/70 text-sm" }, toDisplayString(d.label), 1)
                       ]),
-                      createVNode("span", { class: "text-white/50 text-sm font-mono" }, toDisplayString(formatMinutes(unref(settings).slaConfigs.find((c) => c.priority === d.priority)?.maxResponseMinutes ?? d.maxResponseMinutes)), 1)
+                      createVNode("span", { class: "text-white/50 text-sm font-mono" }, toDisplayString(formatMinutes((_b = (_a = unref(settings).slaConfigs.find((c) => c.priority === d.priority)) == null ? void 0 : _a.maxResponseMinutes) != null ? _b : d.maxResponseMinutes)), 1)
                     ]);
                   }), 64))
                 ])) : (openBlock(), createBlock("div", {
@@ -389,6 +407,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   class: "space-y-3"
                 }, [
                   (openBlock(true), createBlock(Fragment, null, renderList(unref(slaValues), (sla, i) => {
+                    var _a;
                     return openBlock(), createBlock("div", {
                       key: sla.priority,
                       class: "flex items-center justify-between py-2 px-3 rounded-xl bg-white/[0.03]"
@@ -402,7 +421,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                             "bg-emerald-400": sla.priority === "LOW"
                           }]
                         }, null, 2),
-                        createVNode("span", { class: "text-white/70 text-sm" }, toDisplayString(defaultSla[i]?.label), 1)
+                        createVNode("span", { class: "text-white/70 text-sm" }, toDisplayString((_a = defaultSla[i]) == null ? void 0 : _a.label), 1)
                       ]),
                       createVNode("div", { class: "flex items-center gap-2" }, [
                         withDirectives(createVNode("input", {

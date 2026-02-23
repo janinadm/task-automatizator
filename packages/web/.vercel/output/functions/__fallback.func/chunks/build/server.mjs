@@ -461,7 +461,7 @@ const _routes = [
     name: "index",
     path: "/",
     meta: __nuxt_page_meta$c || {},
-    component: () => import('./index-1WOIijPg.mjs')
+    component: () => import('./index-CQtSzOxj.mjs')
   },
   {
     name: "login",
@@ -1124,7 +1124,7 @@ const plugin = /* @__PURE__ */ defineNuxtPlugin({
     };
   }
 });
-const components_plugin_4kY4pyzJIYX99vmMAAIorFf3CnAaptHitJgf7JxiED8 = /* @__PURE__ */ defineNuxtPlugin({
+const components_plugin_z4hgvsiddfKkfXTP6M8M4zG5Cb7sGnDhcryKVM45Di4 = /* @__PURE__ */ defineNuxtPlugin({
   name: "nuxt:global-components"
 });
 const useSupabaseCookieRedirect = () => {
@@ -1188,12 +1188,12 @@ const plugins = [
   supabase_server_OPtlcO2RM5rtAYRQfuxKpsz5Ue3NGGOAhAwI9JvZOMc,
   revive_payload_server_23ElmvPSQj2WN0866mc7dDjLalAV58f3uEPbf_7n2Yk,
   plugin,
-  components_plugin_4kY4pyzJIYX99vmMAAIorFf3CnAaptHitJgf7JxiED8,
+  components_plugin_z4hgvsiddfKkfXTP6M8M4zG5Cb7sGnDhcryKVM45Di4,
   auth_redirect_TrakekO1yfJ8tPCJjztFV2PzDMPxDmd4B9iHQrBq4ms
 ];
 const layouts = {
-  auth: defineAsyncComponent(() => import('./auth-EFm3KSg3.mjs').then((m) => m.default || m)),
-  dashboard: defineAsyncComponent(() => import('./dashboard-BIT_AJcn.mjs').then((m) => m.default || m)),
+  auth: defineAsyncComponent(() => import('./auth-D20lOVd3.mjs').then((m) => m.default || m)),
+  dashboard: defineAsyncComponent(() => import('./dashboard-BbH_7hc4.mjs').then((m) => m.default || m)),
   default: defineAsyncComponent(() => import('./default-BPFaWnNh.mjs').then((m) => m.default || m))
 };
 const routeRulesMatcher = _routeRulesMatcher;

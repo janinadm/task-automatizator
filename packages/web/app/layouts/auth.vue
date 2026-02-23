@@ -27,13 +27,9 @@
       <!-- Content -->
       <div class="relative z-10 max-w-md text-center">
         <!-- Logo -->
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl mb-8 shadow-xl shadow-indigo-500/30">
-          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        </div>
+        <img src="/logo.svg" alt="AuraDesk" class="w-16 h-16 mb-8" />
 
-        <h1 class="text-3xl font-extrabold text-white mb-3">Agency Task Automator</h1>
+        <h1 class="text-3xl font-extrabold text-white mb-3">AuraDesk</h1>
         <p class="text-white/50 leading-relaxed mb-12">
           AI-powered customer support triage. Classify, prioritize, and reply to tickets in seconds.
         </p>
@@ -120,12 +116,8 @@
 
       <!-- Mobile-only compact header -->
       <div class="lg:hidden text-center mb-8">
-        <div class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl mb-4 shadow-lg shadow-indigo-500/30">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        </div>
-        <h1 class="text-xl font-bold text-white">Agency Task Automator</h1>
+        <img src="/logo.svg" alt="AuraDesk" class="w-12 h-12 mb-4" />
+        <h1 class="text-xl font-bold text-white">AuraDesk</h1>
         <p class="text-white/50 text-sm mt-1">AI-powered customer triage</p>
       </div>
 

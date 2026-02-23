@@ -4345,7 +4345,7 @@ function _expandFromEnv(value) {
 const _inlineRuntimeConfig = {
   "app": {
     "baseURL": "/",
-    "buildId": "01f68cd4-5611-4426-90c9-7cb8c412003d",
+    "buildId": "529cd6d3-dea5-43af-afba-62d6ada6d70a",
     "buildAssetsDir": "/_nuxt/",
     "cdnURL": ""
   },
@@ -4377,7 +4377,7 @@ const _inlineRuntimeConfig = {
     }
   },
   "public": {
-    "appName": "Agency Task Automator",
+    "appName": "AuraDesk",
     "supabaseUrl": "https://xizrczjhnrcxbsbnvoli.supabase.co",
     "supabase": {
       "url": "https://xizrczjhnrcxbsbnvoli.supabase.co",

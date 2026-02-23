@@ -1,0 +1,1 @@
+import{_ as s,o as t,c as a,a2 as n}from"./BQ0Yrhh0.js";const o={},c={class:"min-h-screen font-sans antialiased"};function r(e,_){return t(),a("div",c,[n(e.$slots,"default")])}const d=s(o,[["render",r]]);export{d as default};

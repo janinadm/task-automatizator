@@ -69,7 +69,7 @@ export default defineNuxtConfig({
     cronSecret: '',            // NUXT_CRON_SECRET — to validate cron job requests
     public: {
       // Client-accessible (Accesible desde el cliente) — safe to expose
-      appName: 'Agency Task Automator',
+      appName: 'AuraDesk',
       // Supabase URL is public (it's in the Supabase dashboard, not a secret)
       // We need it on the server too for creating admin clients
       // (La URL de Supabase es pública — también la necesitamos en el servidor para clientes admin)
@@ -86,7 +86,7 @@ export default defineNuxtConfig({
   // === App Metadata (Metadatos de la aplicación) ===
   app: {
     head: {
-      title: 'Agency Task Automator — Intelligent Customer Triage',
+      title: 'AuraDesk — Intelligent Customer Triage',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -96,6 +96,8 @@ export default defineNuxtConfig({
         },
       ],
       link: [
+        // Favicon
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         // Google Fonts — Inter for UI, clean and modern
         // (Google Fonts — Inter para la interfaz, limpia y moderna)
         {

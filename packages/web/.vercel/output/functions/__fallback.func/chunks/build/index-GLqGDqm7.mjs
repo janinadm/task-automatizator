@@ -41,11 +41,12 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       return "Good evening";
     });
     const kpis = computed(() => {
-      const s = stats.value?.data;
+      var _a, _b, _c, _d, _e, _f, _g;
+      const s = (_a = stats.value) == null ? void 0 : _a.data;
       return [
         {
           label: "Open Tickets",
-          value: s?.openTickets ?? "—",
+          value: (_b = s == null ? void 0 : s.openTickets) != null ? _b : "\u2014",
           icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2",
           color: "bg-blue-500/[0.08] border-blue-500/20 hover:border-blue-400/40",
           iconColor: "text-blue-400",
@@ -53,7 +54,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         },
         {
           label: "Resolved Today",
-          value: s?.resolvedToday ?? "—",
+          value: (_c = s == null ? void 0 : s.resolvedToday) != null ? _c : "\u2014",
           icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
           color: "bg-emerald-500/[0.08] border-emerald-500/20 hover:border-emerald-400/40",
           iconColor: "text-emerald-400",
@@ -61,15 +62,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         },
         {
           label: "SLA Breaching",
-          value: s?.slaBreaching ?? "—",
+          value: (_d = s == null ? void 0 : s.slaBreaching) != null ? _d : "\u2014",
           icon: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z",
-          color: (s?.slaBreaching ?? 0) > 0 ? "bg-red-500/[0.1] border-red-500/30 hover:border-red-400/50" : "bg-white/[0.03] border-white/[0.06] hover:border-white/10",
-          iconColor: (s?.slaBreaching ?? 0) > 0 ? "text-red-400" : "text-white/40",
+          color: ((_e = s == null ? void 0 : s.slaBreaching) != null ? _e : 0) > 0 ? "bg-red-500/[0.1] border-red-500/30 hover:border-red-400/50" : "bg-white/[0.03] border-white/[0.06] hover:border-white/10",
+          iconColor: ((_f = s == null ? void 0 : s.slaBreaching) != null ? _f : 0) > 0 ? "text-red-400" : "text-white/40",
           link: "/dashboard/tickets"
         },
         {
           label: "AI Suggestions",
-          value: s?.aiSuggestionsGenerated ?? "—",
+          value: (_g = s == null ? void 0 : s.aiSuggestionsGenerated) != null ? _g : "\u2014",
           icon: "M13 10V3L4 14h7v7l9-11h-7z",
           color: "bg-purple-500/[0.08] border-purple-500/20 hover:border-purple-400/40",
           iconColor: "text-purple-400",
@@ -78,7 +79,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       ];
     });
     const sentimentTotal = computed(() => {
-      const s = stats.value?.data?.sentiment;
+      var _a, _b;
+      const s = (_b = (_a = stats.value) == null ? void 0 : _a.data) == null ? void 0 : _b.sentiment;
       return s ? s.positive + s.neutral + s.negative || 1 : 1;
     });
     const statusConfig = {
@@ -104,9 +106,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       return `${Math.floor(hours / 24)}d ago`;
     }
     return (_ctx, _push, _parent, _attrs) => {
+      var _a, _b;
       const _component_NuxtLink = __nuxt_component_0;
       const _component_UiGlassCard = __nuxt_component_1;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "space-y-6 animate-fade-in" }, _attrs))}><div class="flex items-start justify-between"><div><h2 class="text-2xl font-bold text-white">${ssrInterpolate(unref(greeting))}, ${ssrInterpolate(unref(authStore).currentUser?.fullName?.split(" ")[0] || "there")} 👋 </h2><p class="text-white/50 mt-1 text-sm">Here&#39;s what&#39;s happening with your tickets today.</p></div><button class="flex items-center gap-2 px-3 py-2 text-white/40 hover:text-white/70 hover:bg-white/5 rounded-lg transition-all text-sm"><svg class="${ssrRenderClass([{ "animate-spin": unref(pending) }, "w-4 h-4"])}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Refresh </button></div>`);
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "space-y-6 animate-fade-in" }, _attrs))}><div class="flex items-start justify-between"><div><h2 class="text-2xl font-bold text-white">${ssrInterpolate(unref(greeting))}, ${ssrInterpolate(((_b = (_a = unref(authStore).currentUser) == null ? void 0 : _a.fullName) == null ? void 0 : _b.split(" ")[0]) || "there")} \u{1F44B} </h2><p class="text-white/50 mt-1 text-sm">Here&#39;s what&#39;s happening with your tickets today.</p></div><button class="flex items-center gap-2 px-3 py-2 text-white/40 hover:text-white/70 hover:bg-white/5 rounded-lg transition-all text-sm"><svg class="${ssrRenderClass([{ "animate-spin": unref(pending) }, "w-4 h-4"])}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Refresh </button></div>`);
       if (unref(error)) {
         _push(`<div class="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-300 text-sm"> Could not load dashboard data. Check your connection and try refreshing. </div>`);
       } else {
@@ -163,6 +166,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         class: "xl:col-span-2"
       }, {
         default: withCtx((_, _push2, _parent2, _scopeId) => {
+          var _a2, _b2, _c, _d, _e, _f, _g, _h, _i, _j;
           if (_push2) {
             _push2(`<div class="flex items-center justify-between px-5 py-4 border-b border-white/10"${_scopeId}><h3 class="text-white font-semibold text-sm"${_scopeId}>Recent Tickets</h3>`);
             _push2(ssrRenderComponent(_component_NuxtLink, {
@@ -171,10 +175,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             }, {
               default: withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
-                  _push3(` View all → `);
+                  _push3(` View all \u2192 `);
                 } else {
                   return [
-                    createTextVNode(" View all → ")
+                    createTextVNode(" View all \u2192 ")
                   ];
                 }
               }),
@@ -189,25 +193,26 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               _push2(`<!--]--></div>`);
             } else {
               _push2(`<!--[-->`);
-              if (!unref(stats)?.data?.recentTickets?.length) {
-                _push2(`<div class="py-12 text-center text-white/30 text-sm"${_scopeId}> No tickets yet — they&#39;ll appear here once created. </div>`);
+              if (!((_c = (_b2 = (_a2 = unref(stats)) == null ? void 0 : _a2.data) == null ? void 0 : _b2.recentTickets) == null ? void 0 : _c.length)) {
+                _push2(`<div class="py-12 text-center text-white/30 text-sm"${_scopeId}> No tickets yet \u2014 they&#39;ll appear here once created. </div>`);
               } else {
                 _push2(`<div class="divide-y divide-white/5"${_scopeId}><!--[-->`);
-                ssrRenderList(unref(stats)?.data?.recentTickets, (ticket) => {
+                ssrRenderList((_e = (_d = unref(stats)) == null ? void 0 : _d.data) == null ? void 0 : _e.recentTickets, (ticket) => {
                   _push2(ssrRenderComponent(_component_NuxtLink, {
                     key: ticket.id,
                     to: `/dashboard/tickets/${ticket.id}`,
                     class: "flex items-center gap-3 px-5 py-3.5 hover:bg-white/5 transition-colors group"
                   }, {
                     default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                      var _a3, _b3, _c2, _d2, _e2, _f2, _g2, _h2;
                       if (_push3) {
-                        _push3(`<div class="${ssrRenderClass([priorityConfig[ticket.priority]?.dot ?? "bg-white/20", "w-2 h-2 rounded-full flex-shrink-0"])}"${_scopeId2}></div><div class="flex-1 min-w-0"${_scopeId2}><p class="text-white text-sm font-medium truncate group-hover:text-indigo-300 transition-colors"${_scopeId2}>${ssrInterpolate(ticket.subject)}</p>`);
+                        _push3(`<div class="${ssrRenderClass([(_b3 = (_a3 = priorityConfig[ticket.priority]) == null ? void 0 : _a3.dot) != null ? _b3 : "bg-white/20", "w-2 h-2 rounded-full flex-shrink-0"])}"${_scopeId2}></div><div class="flex-1 min-w-0"${_scopeId2}><p class="text-white text-sm font-medium truncate group-hover:text-indigo-300 transition-colors"${_scopeId2}>${ssrInterpolate(ticket.subject)}</p>`);
                         if (ticket.category) {
                           _push3(`<p class="text-white/40 text-xs"${_scopeId2}>${ssrInterpolate(ticket.category)}</p>`);
                         } else {
                           _push3(`<!---->`);
                         }
-                        _push3(`</div><span class="${ssrRenderClass([statusConfig[ticket.status]?.class, "flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-medium"])}"${_scopeId2}>${ssrInterpolate(statusConfig[ticket.status]?.label)}</span>`);
+                        _push3(`</div><span class="${ssrRenderClass([(_c2 = statusConfig[ticket.status]) == null ? void 0 : _c2.class, "flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-medium"])}"${_scopeId2}>${ssrInterpolate((_d2 = statusConfig[ticket.status]) == null ? void 0 : _d2.label)}</span>`);
                         if (ticket.isBreachingSla) {
                           _push3(`<span class="flex-shrink-0 text-red-400" title="SLA Breaching"${_scopeId2}><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"${_scopeId2}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"${_scopeId2}></path></svg></span>`);
                         } else {
@@ -217,7 +222,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       } else {
                         return [
                           createVNode("div", {
-                            class: ["w-2 h-2 rounded-full flex-shrink-0", priorityConfig[ticket.priority]?.dot ?? "bg-white/20"]
+                            class: ["w-2 h-2 rounded-full flex-shrink-0", (_f2 = (_e2 = priorityConfig[ticket.priority]) == null ? void 0 : _e2.dot) != null ? _f2 : "bg-white/20"]
                           }, null, 2),
                           createVNode("div", { class: "flex-1 min-w-0" }, [
                             createVNode("p", { class: "text-white text-sm font-medium truncate group-hover:text-indigo-300 transition-colors" }, toDisplayString(ticket.subject), 1),
@@ -227,8 +232,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                             }, toDisplayString(ticket.category), 1)) : createCommentVNode("", true)
                           ]),
                           createVNode("span", {
-                            class: ["flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-medium", statusConfig[ticket.status]?.class]
-                          }, toDisplayString(statusConfig[ticket.status]?.label), 3),
+                            class: ["flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-medium", (_g2 = statusConfig[ticket.status]) == null ? void 0 : _g2.class]
+                          }, toDisplayString((_h2 = statusConfig[ticket.status]) == null ? void 0 : _h2.label), 3),
                           ticket.isBreachingSla ? (openBlock(), createBlock("span", {
                             key: 0,
                             class: "flex-shrink-0 text-red-400",
@@ -268,7 +273,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   class: "text-indigo-400 hover:text-indigo-300 text-xs transition-colors"
                 }, {
                   default: withCtx(() => [
-                    createTextVNode(" View all → ")
+                    createTextVNode(" View all \u2192 ")
                   ]),
                   _: 1
                 })
@@ -285,54 +290,57 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   }, null, 4);
                 }), 64))
               ])) : (openBlock(), createBlock(Fragment, { key: 1 }, [
-                !unref(stats)?.data?.recentTickets?.length ? (openBlock(), createBlock("div", {
+                !((_h = (_g = (_f = unref(stats)) == null ? void 0 : _f.data) == null ? void 0 : _g.recentTickets) == null ? void 0 : _h.length) ? (openBlock(), createBlock("div", {
                   key: 0,
                   class: "py-12 text-center text-white/30 text-sm"
-                }, " No tickets yet — they'll appear here once created. ")) : (openBlock(), createBlock("div", {
+                }, " No tickets yet \u2014 they'll appear here once created. ")) : (openBlock(), createBlock("div", {
                   key: 1,
                   class: "divide-y divide-white/5"
                 }, [
-                  (openBlock(true), createBlock(Fragment, null, renderList(unref(stats)?.data?.recentTickets, (ticket) => {
+                  (openBlock(true), createBlock(Fragment, null, renderList((_j = (_i = unref(stats)) == null ? void 0 : _i.data) == null ? void 0 : _j.recentTickets, (ticket) => {
                     return openBlock(), createBlock(_component_NuxtLink, {
                       key: ticket.id,
                       to: `/dashboard/tickets/${ticket.id}`,
                       class: "flex items-center gap-3 px-5 py-3.5 hover:bg-white/5 transition-colors group"
                     }, {
-                      default: withCtx(() => [
-                        createVNode("div", {
-                          class: ["w-2 h-2 rounded-full flex-shrink-0", priorityConfig[ticket.priority]?.dot ?? "bg-white/20"]
-                        }, null, 2),
-                        createVNode("div", { class: "flex-1 min-w-0" }, [
-                          createVNode("p", { class: "text-white text-sm font-medium truncate group-hover:text-indigo-300 transition-colors" }, toDisplayString(ticket.subject), 1),
-                          ticket.category ? (openBlock(), createBlock("p", {
+                      default: withCtx(() => {
+                        var _a3, _b3, _c2, _d2;
+                        return [
+                          createVNode("div", {
+                            class: ["w-2 h-2 rounded-full flex-shrink-0", (_b3 = (_a3 = priorityConfig[ticket.priority]) == null ? void 0 : _a3.dot) != null ? _b3 : "bg-white/20"]
+                          }, null, 2),
+                          createVNode("div", { class: "flex-1 min-w-0" }, [
+                            createVNode("p", { class: "text-white text-sm font-medium truncate group-hover:text-indigo-300 transition-colors" }, toDisplayString(ticket.subject), 1),
+                            ticket.category ? (openBlock(), createBlock("p", {
+                              key: 0,
+                              class: "text-white/40 text-xs"
+                            }, toDisplayString(ticket.category), 1)) : createCommentVNode("", true)
+                          ]),
+                          createVNode("span", {
+                            class: ["flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-medium", (_c2 = statusConfig[ticket.status]) == null ? void 0 : _c2.class]
+                          }, toDisplayString((_d2 = statusConfig[ticket.status]) == null ? void 0 : _d2.label), 3),
+                          ticket.isBreachingSla ? (openBlock(), createBlock("span", {
                             key: 0,
-                            class: "text-white/40 text-xs"
-                          }, toDisplayString(ticket.category), 1)) : createCommentVNode("", true)
-                        ]),
-                        createVNode("span", {
-                          class: ["flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-medium", statusConfig[ticket.status]?.class]
-                        }, toDisplayString(statusConfig[ticket.status]?.label), 3),
-                        ticket.isBreachingSla ? (openBlock(), createBlock("span", {
-                          key: 0,
-                          class: "flex-shrink-0 text-red-400",
-                          title: "SLA Breaching"
-                        }, [
-                          (openBlock(), createBlock("svg", {
-                            class: "w-4 h-4",
-                            fill: "none",
-                            stroke: "currentColor",
-                            viewBox: "0 0 24 24"
+                            class: "flex-shrink-0 text-red-400",
+                            title: "SLA Breaching"
                           }, [
-                            createVNode("path", {
-                              "stroke-linecap": "round",
-                              "stroke-linejoin": "round",
-                              "stroke-width": "2",
-                              d: "M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            })
-                          ]))
-                        ])) : createCommentVNode("", true),
-                        createVNode("span", { class: "flex-shrink-0 text-white/30 text-xs" }, toDisplayString(timeAgo(ticket.createdAt)), 1)
-                      ]),
+                            (openBlock(), createBlock("svg", {
+                              class: "w-4 h-4",
+                              fill: "none",
+                              stroke: "currentColor",
+                              viewBox: "0 0 24 24"
+                            }, [
+                              createVNode("path", {
+                                "stroke-linecap": "round",
+                                "stroke-linejoin": "round",
+                                "stroke-width": "2",
+                                d: "M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              })
+                            ]))
+                          ])) : createCommentVNode("", true),
+                          createVNode("span", { class: "flex-shrink-0 text-white/30 text-xs" }, toDisplayString(timeAgo(ticket.createdAt)), 1)
+                        ];
+                      }),
                       _: 2
                     }, 1032, ["to"]);
                   }), 128))
@@ -346,6 +354,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       _push(`<div class="space-y-4">`);
       _push(ssrRenderComponent(_component_UiGlassCard, { padding: "md" }, {
         default: withCtx((_, _push2, _parent2, _scopeId) => {
+          var _a2, _b2, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P, _Q, _R, _S, _T, _U, _V;
           if (_push2) {
             _push2(`<h3 class="text-white font-semibold text-sm mb-4"${_scopeId}>Sentiment Overview</h3>`);
             if (unref(pending)) {
@@ -355,7 +364,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               });
               _push2(`<!--]--></div>`);
             } else {
-              _push2(`<div class="space-y-3"${_scopeId}><div${_scopeId}><div class="flex justify-between text-xs mb-1"${_scopeId}><span class="text-green-400"${_scopeId}>😊 Positive</span><span class="text-white/50 tabular-nums"${_scopeId}>${ssrInterpolate(unref(stats)?.data?.sentiment?.positive ?? 0)}</span></div><div class="h-1.5 rounded-full bg-white/10 overflow-hidden"${_scopeId}><div class="h-full rounded-full bg-green-500 transition-all duration-700" style="${ssrRenderStyle({ width: `${(unref(stats)?.data?.sentiment?.positive ?? 0) / unref(sentimentTotal) * 100}%` })}"${_scopeId}></div></div></div><div${_scopeId}><div class="flex justify-between text-xs mb-1"${_scopeId}><span class="text-white/60"${_scopeId}>😐 Neutral</span><span class="text-white/50 tabular-nums"${_scopeId}>${ssrInterpolate(unref(stats)?.data?.sentiment?.neutral ?? 0)}</span></div><div class="h-1.5 rounded-full bg-white/10 overflow-hidden"${_scopeId}><div class="h-full rounded-full bg-white/40 transition-all duration-700" style="${ssrRenderStyle({ width: `${(unref(stats)?.data?.sentiment?.neutral ?? 0) / unref(sentimentTotal) * 100}%` })}"${_scopeId}></div></div></div><div${_scopeId}><div class="flex justify-between text-xs mb-1"${_scopeId}><span class="text-red-400"${_scopeId}>😡 Negative</span><span class="text-white/50 tabular-nums"${_scopeId}>${ssrInterpolate(unref(stats)?.data?.sentiment?.negative ?? 0)}</span></div><div class="h-1.5 rounded-full bg-white/10 overflow-hidden"${_scopeId}><div class="h-full rounded-full bg-red-500 transition-all duration-700" style="${ssrRenderStyle({ width: `${(unref(stats)?.data?.sentiment?.negative ?? 0) / unref(sentimentTotal) * 100}%` })}"${_scopeId}></div></div></div></div>`);
+              _push2(`<div class="space-y-3"${_scopeId}><div${_scopeId}><div class="flex justify-between text-xs mb-1"${_scopeId}><span class="text-green-400"${_scopeId}>\u{1F60A} Positive</span><span class="text-white/50 tabular-nums"${_scopeId}>${ssrInterpolate((_d = (_c = (_b2 = (_a2 = unref(stats)) == null ? void 0 : _a2.data) == null ? void 0 : _b2.sentiment) == null ? void 0 : _c.positive) != null ? _d : 0)}</span></div><div class="h-1.5 rounded-full bg-white/10 overflow-hidden"${_scopeId}><div class="h-full rounded-full bg-green-500 transition-all duration-700" style="${ssrRenderStyle({ width: `${((_h = (_g = (_f = (_e = unref(stats)) == null ? void 0 : _e.data) == null ? void 0 : _f.sentiment) == null ? void 0 : _g.positive) != null ? _h : 0) / unref(sentimentTotal) * 100}%` })}"${_scopeId}></div></div></div><div${_scopeId}><div class="flex justify-between text-xs mb-1"${_scopeId}><span class="text-white/60"${_scopeId}>\u{1F610} Neutral</span><span class="text-white/50 tabular-nums"${_scopeId}>${ssrInterpolate((_l = (_k = (_j = (_i = unref(stats)) == null ? void 0 : _i.data) == null ? void 0 : _j.sentiment) == null ? void 0 : _k.neutral) != null ? _l : 0)}</span></div><div class="h-1.5 rounded-full bg-white/10 overflow-hidden"${_scopeId}><div class="h-full rounded-full bg-white/40 transition-all duration-700" style="${ssrRenderStyle({ width: `${((_p = (_o = (_n = (_m = unref(stats)) == null ? void 0 : _m.data) == null ? void 0 : _n.sentiment) == null ? void 0 : _o.neutral) != null ? _p : 0) / unref(sentimentTotal) * 100}%` })}"${_scopeId}></div></div></div><div${_scopeId}><div class="flex justify-between text-xs mb-1"${_scopeId}><span class="text-red-400"${_scopeId}>\u{1F621} Negative</span><span class="text-white/50 tabular-nums"${_scopeId}>${ssrInterpolate((_t = (_s = (_r = (_q = unref(stats)) == null ? void 0 : _q.data) == null ? void 0 : _r.sentiment) == null ? void 0 : _s.negative) != null ? _t : 0)}</span></div><div class="h-1.5 rounded-full bg-white/10 overflow-hidden"${_scopeId}><div class="h-full rounded-full bg-red-500 transition-all duration-700" style="${ssrRenderStyle({ width: `${((_x = (_w = (_v = (_u = unref(stats)) == null ? void 0 : _u.data) == null ? void 0 : _v.sentiment) == null ? void 0 : _w.negative) != null ? _x : 0) / unref(sentimentTotal) * 100}%` })}"${_scopeId}></div></div></div></div>`);
             }
           } else {
             return [
@@ -376,37 +385,37 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               }, [
                 createVNode("div", null, [
                   createVNode("div", { class: "flex justify-between text-xs mb-1" }, [
-                    createVNode("span", { class: "text-green-400" }, "😊 Positive"),
-                    createVNode("span", { class: "text-white/50 tabular-nums" }, toDisplayString(unref(stats)?.data?.sentiment?.positive ?? 0), 1)
+                    createVNode("span", { class: "text-green-400" }, "\u{1F60A} Positive"),
+                    createVNode("span", { class: "text-white/50 tabular-nums" }, toDisplayString((_B = (_A = (_z = (_y = unref(stats)) == null ? void 0 : _y.data) == null ? void 0 : _z.sentiment) == null ? void 0 : _A.positive) != null ? _B : 0), 1)
                   ]),
                   createVNode("div", { class: "h-1.5 rounded-full bg-white/10 overflow-hidden" }, [
                     createVNode("div", {
                       class: "h-full rounded-full bg-green-500 transition-all duration-700",
-                      style: { width: `${(unref(stats)?.data?.sentiment?.positive ?? 0) / unref(sentimentTotal) * 100}%` }
+                      style: { width: `${((_F = (_E = (_D = (_C = unref(stats)) == null ? void 0 : _C.data) == null ? void 0 : _D.sentiment) == null ? void 0 : _E.positive) != null ? _F : 0) / unref(sentimentTotal) * 100}%` }
                     }, null, 4)
                   ])
                 ]),
                 createVNode("div", null, [
                   createVNode("div", { class: "flex justify-between text-xs mb-1" }, [
-                    createVNode("span", { class: "text-white/60" }, "😐 Neutral"),
-                    createVNode("span", { class: "text-white/50 tabular-nums" }, toDisplayString(unref(stats)?.data?.sentiment?.neutral ?? 0), 1)
+                    createVNode("span", { class: "text-white/60" }, "\u{1F610} Neutral"),
+                    createVNode("span", { class: "text-white/50 tabular-nums" }, toDisplayString((_J = (_I = (_H = (_G = unref(stats)) == null ? void 0 : _G.data) == null ? void 0 : _H.sentiment) == null ? void 0 : _I.neutral) != null ? _J : 0), 1)
                   ]),
                   createVNode("div", { class: "h-1.5 rounded-full bg-white/10 overflow-hidden" }, [
                     createVNode("div", {
                       class: "h-full rounded-full bg-white/40 transition-all duration-700",
-                      style: { width: `${(unref(stats)?.data?.sentiment?.neutral ?? 0) / unref(sentimentTotal) * 100}%` }
+                      style: { width: `${((_N = (_M = (_L = (_K = unref(stats)) == null ? void 0 : _K.data) == null ? void 0 : _L.sentiment) == null ? void 0 : _M.neutral) != null ? _N : 0) / unref(sentimentTotal) * 100}%` }
                     }, null, 4)
                   ])
                 ]),
                 createVNode("div", null, [
                   createVNode("div", { class: "flex justify-between text-xs mb-1" }, [
-                    createVNode("span", { class: "text-red-400" }, "😡 Negative"),
-                    createVNode("span", { class: "text-white/50 tabular-nums" }, toDisplayString(unref(stats)?.data?.sentiment?.negative ?? 0), 1)
+                    createVNode("span", { class: "text-red-400" }, "\u{1F621} Negative"),
+                    createVNode("span", { class: "text-white/50 tabular-nums" }, toDisplayString((_R = (_Q = (_P = (_O = unref(stats)) == null ? void 0 : _O.data) == null ? void 0 : _P.sentiment) == null ? void 0 : _Q.negative) != null ? _R : 0), 1)
                   ]),
                   createVNode("div", { class: "h-1.5 rounded-full bg-white/10 overflow-hidden" }, [
                     createVNode("div", {
                       class: "h-full rounded-full bg-red-500 transition-all duration-700",
-                      style: { width: `${(unref(stats)?.data?.sentiment?.negative ?? 0) / unref(sentimentTotal) * 100}%` }
+                      style: { width: `${((_V = (_U = (_T = (_S = unref(stats)) == null ? void 0 : _S.data) == null ? void 0 : _T.sentiment) == null ? void 0 : _U.negative) != null ? _V : 0) / unref(sentimentTotal) * 100}%` }
                     }, null, 4)
                   ])
                 ])
@@ -429,7 +438,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             } else {
               _push2(`<div class="space-y-2"${_scopeId}><!--[-->`);
               ssrRenderList(priorityConfig, (config, key) => {
-                _push2(`<div class="flex items-center justify-between py-1"${_scopeId}><div class="flex items-center gap-2"${_scopeId}><div class="${ssrRenderClass([config.dot, "w-2 h-2 rounded-full"])}"${_scopeId}></div><span class="text-white/60 text-sm"${_scopeId}>${ssrInterpolate(config.label)}</span></div><span class="text-white font-semibold tabular-nums text-sm"${_scopeId}>${ssrInterpolate(unref(stats)?.data?.priority?.[key.toLowerCase()] ?? 0)}</span></div>`);
+                var _a2, _b2, _c, _d;
+                _push2(`<div class="flex items-center justify-between py-1"${_scopeId}><div class="flex items-center gap-2"${_scopeId}><div class="${ssrRenderClass([config.dot, "w-2 h-2 rounded-full"])}"${_scopeId}></div><span class="text-white/60 text-sm"${_scopeId}>${ssrInterpolate(config.label)}</span></div><span class="text-white font-semibold tabular-nums text-sm"${_scopeId}>${ssrInterpolate((_d = (_c = (_b2 = (_a2 = unref(stats)) == null ? void 0 : _a2.data) == null ? void 0 : _b2.priority) == null ? void 0 : _c[key.toLowerCase()]) != null ? _d : 0)}</span></div>`);
               });
               _push2(`<!--]--></div>`);
             }
@@ -451,6 +461,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 class: "space-y-2"
               }, [
                 (openBlock(), createBlock(Fragment, null, renderList(priorityConfig, (config, key) => {
+                  var _a2, _b2, _c, _d;
                   return createVNode("div", {
                     key,
                     class: "flex items-center justify-between py-1"
@@ -461,7 +472,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       }, null, 2),
                       createVNode("span", { class: "text-white/60 text-sm" }, toDisplayString(config.label), 1)
                     ]),
-                    createVNode("span", { class: "text-white font-semibold tabular-nums text-sm" }, toDisplayString(unref(stats)?.data?.priority?.[key.toLowerCase()] ?? 0), 1)
+                    createVNode("span", { class: "text-white font-semibold tabular-nums text-sm" }, toDisplayString((_d = (_c = (_b2 = (_a2 = unref(stats)) == null ? void 0 : _a2.data) == null ? void 0 : _b2.priority) == null ? void 0 : _c[key.toLowerCase()]) != null ? _d : 0), 1)
                   ]);
                 }), 64))
               ]))

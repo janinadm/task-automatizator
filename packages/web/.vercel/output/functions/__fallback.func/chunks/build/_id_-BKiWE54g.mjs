@@ -35,13 +35,14 @@ const useRealtimeMessages = () => {
         filter: `ticketId=eq.${ticketId}`
       },
       async (payload) => {
-        const newMsgId = payload.new?.id;
-        const alreadyInStore = ticketsStore.currentTicket?.messages?.some(
+        var _a, _b, _c;
+        const newMsgId = (_a = payload.new) == null ? void 0 : _a.id;
+        const alreadyInStore = (_c = (_b = ticketsStore.currentTicket) == null ? void 0 : _b.messages) == null ? void 0 : _c.some(
           (m) => m.id === newMsgId
         );
         if (!alreadyInStore) {
           await ticketsStore.fetchTicket(ticketId);
-          toast.info("💬 New message in this ticket");
+          toast.info("\u{1F4AC} New message in this ticket");
         }
       }
     ).subscribe((status) => {
@@ -78,14 +79,18 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       const q = cannedSearch.value.toLowerCase();
       if (!q) return cannedResponses.value;
       return cannedResponses.value.filter(
-        (r) => r.title.toLowerCase().includes(q) || r.shortcut?.toLowerCase().includes(q) || r.category?.toLowerCase().includes(q)
+        (r) => {
+          var _a, _b;
+          return r.title.toLowerCase().includes(q) || ((_a = r.shortcut) == null ? void 0 : _a.toLowerCase().includes(q)) || ((_b = r.category) == null ? void 0 : _b.toLowerCase().includes(q));
+        }
       );
     });
     function useCannedResponse(response) {
+      var _a, _b;
       let body = response.body;
       if (ticket.value) {
-        body = body.replace(/\{\{ticket\.customerName\}\}/g, ticket.value.customerName ?? "Customer");
-        body = body.replace(/\{\{ticket\.subject\}\}/g, ticket.value.subject ?? "");
+        body = body.replace(/\{\{ticket\.customerName\}\}/g, (_a = ticket.value.customerName) != null ? _a : "Customer");
+        body = body.replace(/\{\{ticket\.subject\}\}/g, (_b = ticket.value.subject) != null ? _b : "");
       }
       replyText.value = body;
       showCannedPicker.value = false;
@@ -112,7 +117,8 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     });
     const isUpdatingStatus = ref(false);
     async function updateStatus(newStatus) {
-      if (ticket.value?.status === newStatus) return;
+      var _a;
+      if (((_a = ticket.value) == null ? void 0 : _a.status) === newStatus) return;
       isUpdatingStatus.value = true;
       try {
         await ticketsStore.updateTicket(ticketId.value, { status: newStatus });
@@ -138,10 +144,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       }
     }
     const statusOptions = [
-      { value: "OPEN", label: "📬 Open", class: "text-blue-400" },
-      { value: "IN_PROGRESS", label: "⚙️ In Progress", class: "text-amber-400" },
-      { value: "RESOLVED", label: "✅ Resolved", class: "text-green-400" },
-      { value: "CLOSED", label: "🔒 Closed", class: "text-white/40" }
+      { value: "OPEN", label: "\u{1F4EC} Open", class: "text-blue-400" },
+      { value: "IN_PROGRESS", label: "\u2699\uFE0F In Progress", class: "text-amber-400" },
+      { value: "RESOLVED", label: "\u2705 Resolved", class: "text-green-400" },
+      { value: "CLOSED", label: "\u{1F512} Closed", class: "text-white/40" }
     ];
     const priorityConfig = {
       URGENT: { label: "Urgent", dot: "bg-red-500", text: "text-red-400" },
@@ -150,9 +156,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       LOW: { label: "Low", dot: "bg-green-400", text: "text-green-400" }
     };
     const sentimentConfig = {
-      POSITIVE: { emoji: "😊", text: "text-green-400" },
-      NEUTRAL: { emoji: "😐", text: "text-white/60" },
-      NEGATIVE: { emoji: "😡", text: "text-red-400" }
+      POSITIVE: { emoji: "\u{1F60A}", text: "text-green-400" },
+      NEUTRAL: { emoji: "\u{1F610}", text: "text-white/60" },
+      NEGATIVE: { emoji: "\u{1F621}", text: "text-red-400" }
     };
     function formatDate(date) {
       const d = typeof date === "string" ? new Date(date) : date;
@@ -172,6 +178,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
     const analysisError = ref(null);
     const toast = useToast();
     async function analyzeWithAI() {
+      var _a, _b;
       if (!ticketId.value) return;
       isAnalyzing.value = true;
       analysisError.value = null;
@@ -180,7 +187,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         await ticketsStore.fetchTicket(ticketId.value);
         toast.success("AI analysis complete");
       } catch (e) {
-        analysisError.value = e?.data?.message ?? "AI analysis failed";
+        analysisError.value = (_b = (_a = e == null ? void 0 : e.data) == null ? void 0 : _a.message) != null ? _b : "AI analysis failed";
         toast.error(analysisError.value);
       } finally {
         isAnalyzing.value = false;
@@ -197,6 +204,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       return null;
     });
     return (_ctx, _push, _parent, _attrs) => {
+      var _a, _b, _c;
       const _component_NuxtLink = __nuxt_component_0;
       const _component_UiGlassCard = __nuxt_component_1;
       _push(`<div${ssrRenderAttrs(mergeProps({ class: "animate-fade-in" }, _attrs))}><div class="flex items-center gap-3 mb-5">`);
@@ -227,7 +235,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         }),
         _: 1
       }, _parent));
-      _push(`<h2 class="text-lg font-semibold text-white truncate">${ssrInterpolate(unref(ticketsStore).isLoadingDetail ? "Loading ticket..." : unref(ticket)?.subject ?? "Ticket not found")}</h2></div>`);
+      _push(`<h2 class="text-lg font-semibold text-white truncate">${ssrInterpolate(unref(ticketsStore).isLoadingDetail ? "Loading ticket..." : (_b = (_a = unref(ticket)) == null ? void 0 : _a.subject) != null ? _b : "Ticket not found")}</h2></div>`);
       if (unref(ticketsStore).isLoadingDetail) {
         _push(`<div class="grid lg:grid-cols-3 gap-5"><div class="lg:col-span-2 space-y-3"><!--[-->`);
         ssrRenderList(4, (i) => {
@@ -242,10 +250,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         }, {
           default: withCtx((_, _push2, _parent2, _scopeId) => {
             if (_push2) {
-              _push2(` ← Back to tickets `);
+              _push2(` \u2190 Back to tickets `);
             } else {
               return [
-                createTextVNode(" ← Back to tickets ")
+                createTextVNode(" \u2190 Back to tickets ")
               ];
             }
           }),
@@ -256,15 +264,17 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         _push(`<div class="grid lg:grid-cols-3 gap-5"><div class="lg:col-span-2 flex flex-col gap-4">`);
         _push(ssrRenderComponent(_component_UiGlassCard, { padding: "none" }, {
           default: withCtx((_, _push2, _parent2, _scopeId) => {
+            var _a2, _b2, _c2, _d, _e, _f;
             if (_push2) {
-              _push2(`<div class="px-5 py-4 border-b border-white/10 flex items-center justify-between"${_scopeId}><h3 class="text-white font-semibold text-sm"${_scopeId}>Conversation</h3><span class="text-white/40 text-xs"${_scopeId}>${ssrInterpolate(unref(ticket).messages?.length ?? 0)} messages</span></div><div class="divide-y divide-white/5 max-h-[512px] overflow-y-auto"${_scopeId}>`);
-              if (!unref(ticket).messages?.length) {
-                _push2(`<div class="py-10 text-center text-white/30 text-sm"${_scopeId}> No messages yet — the conversation starts here. </div>`);
+              _push2(`<div class="px-5 py-4 border-b border-white/10 flex items-center justify-between"${_scopeId}><h3 class="text-white font-semibold text-sm"${_scopeId}>Conversation</h3><span class="text-white/40 text-xs"${_scopeId}>${ssrInterpolate((_b2 = (_a2 = unref(ticket).messages) == null ? void 0 : _a2.length) != null ? _b2 : 0)} messages</span></div><div class="divide-y divide-white/5 max-h-[512px] overflow-y-auto"${_scopeId}>`);
+              if (!((_c2 = unref(ticket).messages) == null ? void 0 : _c2.length)) {
+                _push2(`<div class="py-10 text-center text-white/30 text-sm"${_scopeId}> No messages yet \u2014 the conversation starts here. </div>`);
               } else {
                 _push2(`<!---->`);
               }
               _push2(`<!--[-->`);
               ssrRenderList(unref(ticket).messages, (msg) => {
+                var _a3, _b3, _c3, _d2, _e2, _f2;
                 _push2(`<div class="${ssrRenderClass([{
                   "bg-indigo-500/5": msg.senderType === "AGENT",
                   "bg-purple-500/5": msg.senderType === "AI"
@@ -276,17 +286,17 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                 if (msg.senderType === "AI") {
                   _push2(`<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"${_scopeId}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"${_scopeId}></path></svg>`);
                 } else {
-                  _push2(`<span${_scopeId}>${ssrInterpolate((msg.sender?.fullName ?? "C").charAt(0).toUpperCase())}</span>`);
+                  _push2(`<span${_scopeId}>${ssrInterpolate(((_b3 = (_a3 = msg.sender) == null ? void 0 : _a3.fullName) != null ? _b3 : "C").charAt(0).toUpperCase())}</span>`);
                 }
-                _push2(`</div><div class="flex-1 min-w-0"${_scopeId}><div class="flex items-center gap-2 mb-1"${_scopeId}><span class="text-white text-sm font-medium"${_scopeId}>${ssrInterpolate(msg.senderType === "AI" ? "⚡ AI Assistant" : msg.sender?.fullName ?? "Customer")}</span>`);
+                _push2(`</div><div class="flex-1 min-w-0"${_scopeId}><div class="flex items-center gap-2 mb-1"${_scopeId}><span class="text-white text-sm font-medium"${_scopeId}>${ssrInterpolate(msg.senderType === "AI" ? "\u26A1 AI Assistant" : (_d2 = (_c3 = msg.sender) == null ? void 0 : _c3.fullName) != null ? _d2 : "Customer")}</span>`);
                 if (msg.senderType !== "CUSTOMER") {
-                  _push2(`<span class="${ssrRenderClass([msg.senderType === "AI" ? "bg-purple-500/20 text-purple-300" : "bg-indigo-500/20 text-indigo-300", "text-xs px-1.5 py-0.5 rounded-full"])}"${_scopeId}>${ssrInterpolate(msg.senderType === "AI" ? "AI" : msg.sender?.role?.toLowerCase())}</span>`);
+                  _push2(`<span class="${ssrRenderClass([msg.senderType === "AI" ? "bg-purple-500/20 text-purple-300" : "bg-indigo-500/20 text-indigo-300", "text-xs px-1.5 py-0.5 rounded-full"])}"${_scopeId}>${ssrInterpolate(msg.senderType === "AI" ? "AI" : (_f2 = (_e2 = msg.sender) == null ? void 0 : _e2.role) == null ? void 0 : _f2.toLowerCase())}</span>`);
                 } else {
                   _push2(`<!---->`);
                 }
                 _push2(`<span class="text-white/30 text-xs ml-auto"${_scopeId}>${ssrInterpolate(timeAgo(msg.createdAt))}</span></div><p class="text-white/80 text-sm leading-relaxed whitespace-pre-wrap"${_scopeId}>${ssrInterpolate(msg.body)}</p></div></div></div>`);
               });
-              _push2(`<!--]--></div><div class="px-5 py-4 border-t border-white/10"${_scopeId}><textarea rows="3" placeholder="Type your reply... (press Shift+Enter for new line)" class="input-glass w-full resize-none text-sm"${_scopeId}>${ssrInterpolate(unref(replyText))}</textarea><div class="flex items-center justify-between mt-3"${_scopeId}><div class="flex items-center gap-2"${_scopeId}><p class="text-white/30 text-xs"${_scopeId}>Enter to send · Shift+Enter for new line</p><div class="relative"${_scopeId}><button class="text-white/40 hover:text-indigo-400 transition-colors text-xs flex items-center gap-1 border border-white/10 rounded-lg px-2 py-1 hover:border-indigo-500/30 hover:bg-indigo-500/5"${_scopeId}><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"${_scopeId}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"${_scopeId}></path></svg> Templates </button>`);
+              _push2(`<!--]--></div><div class="px-5 py-4 border-t border-white/10"${_scopeId}><textarea rows="3" placeholder="Type your reply... (press Shift+Enter for new line)" class="input-glass w-full resize-none text-sm"${_scopeId}>${ssrInterpolate(unref(replyText))}</textarea><div class="flex items-center justify-between mt-3"${_scopeId}><div class="flex items-center gap-2"${_scopeId}><p class="text-white/30 text-xs"${_scopeId}>Enter to send \xB7 Shift+Enter for new line</p><div class="relative"${_scopeId}><button class="text-white/40 hover:text-indigo-400 transition-colors text-xs flex items-center gap-1 border border-white/10 rounded-lg px-2 py-1 hover:border-indigo-500/30 hover:bg-indigo-500/5"${_scopeId}><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"${_scopeId}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"${_scopeId}></path></svg> Templates </button>`);
               if (unref(showCannedPicker)) {
                 _push2(`<div class="absolute left-0 bottom-full mb-2 w-80 max-h-72 bg-[#12101f] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"${_scopeId}><div class="px-3 py-2 border-b border-white/[0.06]"${_scopeId}><input${ssrRenderAttr("value", unref(cannedSearch))} type="text" placeholder="Search templates..." class="input-glass w-full text-xs py-1.5"${_scopeId}></div><div class="overflow-y-auto max-h-52 divide-y divide-white/[0.04]"${_scopeId}><!--[-->`);
                 ssrRenderList(unref(filteredCanned), (cr) => {
@@ -325,14 +335,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               return [
                 createVNode("div", { class: "px-5 py-4 border-b border-white/10 flex items-center justify-between" }, [
                   createVNode("h3", { class: "text-white font-semibold text-sm" }, "Conversation"),
-                  createVNode("span", { class: "text-white/40 text-xs" }, toDisplayString(unref(ticket).messages?.length ?? 0) + " messages", 1)
+                  createVNode("span", { class: "text-white/40 text-xs" }, toDisplayString((_e = (_d = unref(ticket).messages) == null ? void 0 : _d.length) != null ? _e : 0) + " messages", 1)
                 ]),
                 createVNode("div", { class: "divide-y divide-white/5 max-h-[512px] overflow-y-auto" }, [
-                  !unref(ticket).messages?.length ? (openBlock(), createBlock("div", {
+                  !((_f = unref(ticket).messages) == null ? void 0 : _f.length) ? (openBlock(), createBlock("div", {
                     key: 0,
                     class: "py-10 text-center text-white/30 text-sm"
-                  }, " No messages yet — the conversation starts here. ")) : createCommentVNode("", true),
+                  }, " No messages yet \u2014 the conversation starts here. ")) : createCommentVNode("", true),
                   (openBlock(true), createBlock(Fragment, null, renderList(unref(ticket).messages, (msg) => {
+                    var _a3, _b3, _c3, _d2, _e2, _f2;
                     return openBlock(), createBlock("div", {
                       key: msg.id,
                       class: ["px-5 py-4", {
@@ -361,15 +372,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                               "stroke-width": "2",
                               d: "M13 10V3L4 14h7v7l9-11h-7z"
                             })
-                          ])) : (openBlock(), createBlock("span", { key: 1 }, toDisplayString((msg.sender?.fullName ?? "C").charAt(0).toUpperCase()), 1))
+                          ])) : (openBlock(), createBlock("span", { key: 1 }, toDisplayString(((_b3 = (_a3 = msg.sender) == null ? void 0 : _a3.fullName) != null ? _b3 : "C").charAt(0).toUpperCase()), 1))
                         ], 2),
                         createVNode("div", { class: "flex-1 min-w-0" }, [
                           createVNode("div", { class: "flex items-center gap-2 mb-1" }, [
-                            createVNode("span", { class: "text-white text-sm font-medium" }, toDisplayString(msg.senderType === "AI" ? "⚡ AI Assistant" : msg.sender?.fullName ?? "Customer"), 1),
+                            createVNode("span", { class: "text-white text-sm font-medium" }, toDisplayString(msg.senderType === "AI" ? "\u26A1 AI Assistant" : (_d2 = (_c3 = msg.sender) == null ? void 0 : _c3.fullName) != null ? _d2 : "Customer"), 1),
                             msg.senderType !== "CUSTOMER" ? (openBlock(), createBlock("span", {
                               key: 0,
                               class: ["text-xs px-1.5 py-0.5 rounded-full", msg.senderType === "AI" ? "bg-purple-500/20 text-purple-300" : "bg-indigo-500/20 text-indigo-300"]
-                            }, toDisplayString(msg.senderType === "AI" ? "AI" : msg.sender?.role?.toLowerCase()), 3)) : createCommentVNode("", true),
+                            }, toDisplayString(msg.senderType === "AI" ? "AI" : (_f2 = (_e2 = msg.sender) == null ? void 0 : _e2.role) == null ? void 0 : _f2.toLowerCase()), 3)) : createCommentVNode("", true),
                             createVNode("span", { class: "text-white/30 text-xs ml-auto" }, toDisplayString(timeAgo(msg.createdAt)), 1)
                           ]),
                           createVNode("p", { class: "text-white/80 text-sm leading-relaxed whitespace-pre-wrap" }, toDisplayString(msg.body), 1)
@@ -390,7 +401,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   ]),
                   createVNode("div", { class: "flex items-center justify-between mt-3" }, [
                     createVNode("div", { class: "flex items-center gap-2" }, [
-                      createVNode("p", { class: "text-white/30 text-xs" }, "Enter to send · Shift+Enter for new line"),
+                      createVNode("p", { class: "text-white/30 text-xs" }, "Enter to send \xB7 Shift+Enter for new line"),
                       createVNode("div", { class: "relative" }, [
                         createVNode("button", {
                           class: "text-white/40 hover:text-indigo-400 transition-colors text-xs flex items-center gap-1 border border-white/10 rounded-lg px-2 py-1 hover:border-indigo-500/30 hover:bg-indigo-500/5",
@@ -493,7 +504,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
           }),
           _: 1
         }, _parent));
-        if (unref(ticket).aiSuggestions?.length) {
+        if ((_c = unref(ticket).aiSuggestions) == null ? void 0 : _c.length) {
           _push(ssrRenderComponent(_component_UiGlassCard, { padding: "md" }, {
             default: withCtx((_, _push2, _parent2, _scopeId) => {
               if (_push2) {
@@ -541,7 +552,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                           createVNode("p", { class: "text-white/80 text-sm leading-relaxed" }, toDisplayString(suggestion.suggestedReply), 1),
                           createVNode("button", {
                             class: "flex-shrink-0 text-purple-400 hover:text-purple-300 transition-colors text-xs border border-purple-500/30 rounded-lg px-2 py-1 hover:bg-purple-500/10",
-                            onClick: ($event) => replyText.value = suggestion.suggestedReply ?? ""
+                            onClick: ($event) => {
+                              var _a2;
+                              return replyText.value = (_a2 = suggestion.suggestedReply) != null ? _a2 : "";
+                            }
                           }, " Use ", 8, ["onClick"])
                         ]),
                         createVNode("div", { class: "flex items-center gap-3 text-xs text-white/30" }, [
@@ -620,14 +634,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         }, _parent));
         _push(ssrRenderComponent(_component_UiGlassCard, { padding: "md" }, {
           default: withCtx((_, _push2, _parent2, _scopeId) => {
+            var _a2, _b2, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
             if (_push2) {
-              _push2(`<h3 class="text-white/60 text-xs font-medium uppercase tracking-wider mb-3"${_scopeId}>Details</h3><dl class="space-y-3"${_scopeId}><div class="flex items-center justify-between"${_scopeId}><dt class="text-white/40 text-xs"${_scopeId}>Priority</dt><dd class="flex items-center gap-1.5"${_scopeId}><div class="${ssrRenderClass([priorityConfig[unref(ticket).priority]?.dot, "w-2 h-2 rounded-full"])}"${_scopeId}></div><span class="${ssrRenderClass([priorityConfig[unref(ticket).priority]?.text, "text-sm"])}"${_scopeId}>${ssrInterpolate(priorityConfig[unref(ticket).priority]?.label)}</span></dd></div>`);
+              _push2(`<h3 class="text-white/60 text-xs font-medium uppercase tracking-wider mb-3"${_scopeId}>Details</h3><dl class="space-y-3"${_scopeId}><div class="flex items-center justify-between"${_scopeId}><dt class="text-white/40 text-xs"${_scopeId}>Priority</dt><dd class="flex items-center gap-1.5"${_scopeId}><div class="${ssrRenderClass([(_a2 = priorityConfig[unref(ticket).priority]) == null ? void 0 : _a2.dot, "w-2 h-2 rounded-full"])}"${_scopeId}></div><span class="${ssrRenderClass([(_b2 = priorityConfig[unref(ticket).priority]) == null ? void 0 : _b2.text, "text-sm"])}"${_scopeId}>${ssrInterpolate((_c2 = priorityConfig[unref(ticket).priority]) == null ? void 0 : _c2.label)}</span></dd></div>`);
               if (unref(ticket).sentiment) {
-                _push2(`<div class="flex items-center justify-between"${_scopeId}><dt class="text-white/40 text-xs"${_scopeId}>Sentiment</dt><dd class="${ssrRenderClass([sentimentConfig[unref(ticket).sentiment]?.text, "flex items-center gap-1.5 text-sm"])}"${_scopeId}>${ssrInterpolate(sentimentConfig[unref(ticket).sentiment]?.emoji)} ${ssrInterpolate(unref(ticket).sentiment?.toLowerCase())}</dd></div>`);
+                _push2(`<div class="flex items-center justify-between"${_scopeId}><dt class="text-white/40 text-xs"${_scopeId}>Sentiment</dt><dd class="${ssrRenderClass([(_d = sentimentConfig[unref(ticket).sentiment]) == null ? void 0 : _d.text, "flex items-center gap-1.5 text-sm"])}"${_scopeId}>${ssrInterpolate((_e = sentimentConfig[unref(ticket).sentiment]) == null ? void 0 : _e.emoji)} ${ssrInterpolate((_f = unref(ticket).sentiment) == null ? void 0 : _f.toLowerCase())}</dd></div>`);
               } else {
                 _push2(`<!---->`);
               }
-              _push2(`<div class="flex items-center justify-between"${_scopeId}><dt class="text-white/40 text-xs"${_scopeId}>Channel</dt><dd class="text-white/70 text-sm"${_scopeId}>${ssrInterpolate(unref(ticket).channel?.toLowerCase())}</dd></div>`);
+              _push2(`<div class="flex items-center justify-between"${_scopeId}><dt class="text-white/40 text-xs"${_scopeId}>Channel</dt><dd class="text-white/70 text-sm"${_scopeId}>${ssrInterpolate((_g = unref(ticket).channel) == null ? void 0 : _g.toLowerCase())}</dd></div>`);
               if (unref(ticket).category) {
                 _push2(`<div class="flex items-center justify-between"${_scopeId}><dt class="text-white/40 text-xs"${_scopeId}>Category</dt><dd class="text-white/70 text-sm"${_scopeId}>${ssrInterpolate(unref(ticket).category)}</dd></div>`);
               } else {
@@ -641,7 +656,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
               if (unref(slaCountdown)) {
                 _push2(`<div class="flex items-center justify-between"${_scopeId}><dt class="text-white/40 text-xs"${_scopeId}>SLA</dt><dd${_scopeId}>`);
                 if (unref(slaCountdown).responded) {
-                  _push2(`<span class="px-2 py-0.5 rounded-full text-xs border bg-green-500/10 border-green-500/20 text-green-400"${_scopeId}> ✓ Responded </span>`);
+                  _push2(`<span class="px-2 py-0.5 rounded-full text-xs border bg-green-500/10 border-green-500/20 text-green-400"${_scopeId}> \u2713 Responded </span>`);
                 } else {
                   _push2(`<span class="${ssrRenderClass([{
                     "bg-red-500/10 border-red-500/20 text-red-400 animate-pulse": unref(slaCountdown).severity === "breached" || unref(slaCountdown).severity === "critical",
@@ -670,11 +685,11 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     createVNode("dt", { class: "text-white/40 text-xs" }, "Priority"),
                     createVNode("dd", { class: "flex items-center gap-1.5" }, [
                       createVNode("div", {
-                        class: ["w-2 h-2 rounded-full", priorityConfig[unref(ticket).priority]?.dot]
+                        class: ["w-2 h-2 rounded-full", (_h = priorityConfig[unref(ticket).priority]) == null ? void 0 : _h.dot]
                       }, null, 2),
                       createVNode("span", {
-                        class: ["text-sm", priorityConfig[unref(ticket).priority]?.text]
-                      }, toDisplayString(priorityConfig[unref(ticket).priority]?.label), 3)
+                        class: ["text-sm", (_i = priorityConfig[unref(ticket).priority]) == null ? void 0 : _i.text]
+                      }, toDisplayString((_j = priorityConfig[unref(ticket).priority]) == null ? void 0 : _j.label), 3)
                     ])
                   ]),
                   unref(ticket).sentiment ? (openBlock(), createBlock("div", {
@@ -683,12 +698,12 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   }, [
                     createVNode("dt", { class: "text-white/40 text-xs" }, "Sentiment"),
                     createVNode("dd", {
-                      class: ["flex items-center gap-1.5 text-sm", sentimentConfig[unref(ticket).sentiment]?.text]
-                    }, toDisplayString(sentimentConfig[unref(ticket).sentiment]?.emoji) + " " + toDisplayString(unref(ticket).sentiment?.toLowerCase()), 3)
+                      class: ["flex items-center gap-1.5 text-sm", (_k = sentimentConfig[unref(ticket).sentiment]) == null ? void 0 : _k.text]
+                    }, toDisplayString((_l = sentimentConfig[unref(ticket).sentiment]) == null ? void 0 : _l.emoji) + " " + toDisplayString((_m = unref(ticket).sentiment) == null ? void 0 : _m.toLowerCase()), 3)
                   ])) : createCommentVNode("", true),
                   createVNode("div", { class: "flex items-center justify-between" }, [
                     createVNode("dt", { class: "text-white/40 text-xs" }, "Channel"),
-                    createVNode("dd", { class: "text-white/70 text-sm" }, toDisplayString(unref(ticket).channel?.toLowerCase()), 1)
+                    createVNode("dd", { class: "text-white/70 text-sm" }, toDisplayString((_n = unref(ticket).channel) == null ? void 0 : _n.toLowerCase()), 1)
                   ]),
                   unref(ticket).category ? (openBlock(), createBlock("div", {
                     key: 1,
@@ -713,7 +728,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                       unref(slaCountdown).responded ? (openBlock(), createBlock("span", {
                         key: 0,
                         class: "px-2 py-0.5 rounded-full text-xs border bg-green-500/10 border-green-500/20 text-green-400"
-                      }, " ✓ Responded ")) : (openBlock(), createBlock("span", {
+                      }, " \u2713 Responded ")) : (openBlock(), createBlock("span", {
                         key: 1,
                         class: ["px-2 py-0.5 rounded-full text-xs border font-mono", {
                           "bg-red-500/10 border-red-500/20 text-red-400 animate-pulse": unref(slaCountdown).severity === "breached" || unref(slaCountdown).severity === "critical",

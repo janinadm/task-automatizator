@@ -8,17 +8,29 @@ const useAuthStore = defineStore("auth", () => {
   const isLoading = ref(false);
   const isInitialized = ref(false);
   const isAuthenticated = computed(() => !!currentUser.value);
-  const isAdmin = computed(() => currentUser.value?.role === "ADMIN");
-  const isAgent = computed(() => currentUser.value?.role === "AGENT");
-  const organization = computed(() => currentUser.value?.organization ?? null);
-  const plan = computed(() => currentUser.value?.organization?.plan ?? "FREE");
+  const isAdmin = computed(() => {
+    var _a;
+    return ((_a = currentUser.value) == null ? void 0 : _a.role) === "ADMIN";
+  });
+  const isAgent = computed(() => {
+    var _a;
+    return ((_a = currentUser.value) == null ? void 0 : _a.role) === "AGENT";
+  });
+  const organization = computed(() => {
+    var _a, _b;
+    return (_b = (_a = currentUser.value) == null ? void 0 : _a.organization) != null ? _b : null;
+  });
+  const plan = computed(() => {
+    var _a, _b, _c;
+    return (_c = (_b = (_a = currentUser.value) == null ? void 0 : _a.organization) == null ? void 0 : _b.plan) != null ? _c : "FREE";
+  });
   async function fetchCurrentUser() {
     isLoading.value = true;
     try {
       const response = await $fetch("/api/users/me");
       currentUser.value = response.data;
     } catch (error) {
-      if (error?.statusCode !== 401 && error?.statusCode !== 404) {
+      if ((error == null ? void 0 : error.statusCode) !== 401 && (error == null ? void 0 : error.statusCode) !== 404) {
         console.error("[authStore] Failed to fetch current user:", error);
       }
       currentUser.value = null;
