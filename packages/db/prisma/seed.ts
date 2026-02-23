@@ -28,7 +28,10 @@ async function main() {
   // (Eliminar en orden inverso de dependencias para evitar violaciones de clave foránea)
   await prisma.aiSuggestion.deleteMany()
   await prisma.ticketMessage.deleteMany()
+  await prisma.ticketTag.deleteMany()
   await prisma.ticket.deleteMany()
+  await prisma.tag.deleteMany()
+  await prisma.article.deleteMany()
   await prisma.slaConfig.deleteMany()
   await prisma.user.deleteMany()
   await prisma.organization.deleteMany()
@@ -277,11 +280,117 @@ async function main() {
     console.log(`🎫 Created ticket: "${ticket.subject.substring(0, 50)}..."`)
   }
 
+  // === Create Tags (Crear Etiquetas) ===
+  const tagsData = [
+    { name: 'Bug', color: '#ef4444' },
+    { name: 'Feature Request', color: '#8b5cf6' },
+    { name: 'Urgent', color: '#f97316' },
+    { name: 'VIP Client', color: '#eab308' },
+    { name: 'Billing', color: '#06b6d4' },
+    { name: 'Onboarding', color: '#10b981' },
+    { name: 'Follow-up', color: '#6366f1' },
+    { name: 'Escalated', color: '#dc2626' },
+  ]
+
+  for (const tag of tagsData) {
+    await prisma.tag.create({
+      data: { ...tag, orgId: org.id },
+    })
+  }
+  console.log(`🏷️  Created ${tagsData.length} tags`)
+
+  // === Create Knowledge Base Articles (Crear Artículos de Base de Conocimiento) ===
+  const articlesData = [
+    {
+      title: 'Getting Started with AuraDesk',
+      slug: 'getting-started-with-auradesk',
+      category: 'Getting Started',
+      status: 'PUBLISHED' as const,
+      body: `# Getting Started with AuraDesk\n\nWelcome to AuraDesk! This guide will help you set up your workspace and start managing customer support tickets efficiently.\n\n## 1. Setting Up Your Organization\n\nAfter signing up, you'll be prompted to create your organization. Choose a name and a URL-friendly slug (e.g., "acme-corp"). This slug is used for your customer portal.\n\n## 2. Inviting Your Team\n\nGo to **Dashboard → Team** to invite agents and admins. Each team member will receive an email with instructions to join.\n\n## 3. Creating Your First Ticket\n\nClick **New Ticket** in the sidebar to create a test ticket. Fill in the customer details, subject, and description.\n\n## 4. Exploring AI Features\n\nAuraDesk uses AI to:\n- Automatically categorize and prioritize tickets\n- Suggest replies based on ticket content\n- Analyze customer sentiment\n\n## Need Help?\n\nReach out to our support team at support@auradesk.io or visit the rest of our knowledge base for more guides.`,
+    },
+    {
+      title: 'How to Configure SLA Policies',
+      slug: 'how-to-configure-sla-policies',
+      category: 'Configuration',
+      status: 'PUBLISHED' as const,
+      body: `# How to Configure SLA Policies\n\nService Level Agreements (SLAs) help you set response and resolution time targets for your support team.\n\n## Accessing SLA Settings\n\nNavigate to **Dashboard → Settings → SLA Configuration** to manage your SLA policies.\n\n## Priority Levels\n\nAuraDesk supports four priority levels, each with customizable response and resolution times:\n\n| Priority | Default Response | Default Resolution |\n|----------|-----------------|-------------------|\n| Urgent   | 30 minutes      | 4 hours           |\n| High     | 2 hours         | 8 hours           |\n| Medium   | 8 hours         | 24 hours          |\n| Low      | 24 hours        | 72 hours          |\n\n## SLA Breach Notifications\n\nWhen a ticket is about to breach its SLA, the assigned agent and admins will receive a notification. Breached tickets are highlighted in red on the dashboard.\n\n## Best Practices\n\n- Set realistic SLA targets based on your team's capacity\n- Review SLA metrics weekly in the Analytics dashboard\n- Use auto-assignment to distribute tickets evenly across agents`,
+    },
+    {
+      title: 'Understanding the Analytics Dashboard',
+      slug: 'understanding-the-analytics-dashboard',
+      category: 'Features',
+      status: 'PUBLISHED' as const,
+      body: `# Understanding the Analytics Dashboard\n\nThe Analytics dashboard provides real-time insights into your support team's performance.\n\n## Key Metrics\n\n### Resolution Rate\nPercentage of tickets that have been resolved vs total tickets. Aim for 90%+ resolution rate.\n\n### Average Resolution Time\nHow long it takes on average to resolve a ticket from creation to closure.\n\n### Ticket Volume\nDaily ticket volume over the last 30 days, helping you identify trends and peak periods.\n\n## Breakdowns\n\n- **By Channel**: See which channels (Web, Email, WhatsApp, Slack) generate the most tickets\n- **By Priority**: Distribution of tickets across priority levels\n- **By Status**: Current tickets grouped by status (Open, In Progress, Resolved, Closed)\n- **By Sentiment**: AI-analyzed customer sentiment trends\n\n## Agent Performance\n\nThe leaderboard shows each agent's resolved ticket count, helping identify top performers and those who may need support.\n\n## Exporting Data\n\nClick the **Refresh** button to get the latest data. Export functionality coming soon!`,
+    },
+    {
+      title: 'Using Canned Responses',
+      slug: 'using-canned-responses',
+      category: 'Features',
+      status: 'PUBLISHED' as const,
+      body: `# Using Canned Responses\n\nCanned responses (templates) let you reply to common questions quickly and consistently.\n\n## Creating a Template\n\n1. Go to **Dashboard → Settings → Canned Responses**\n2. Click **New Template**\n3. Fill in the title, category, shortcut, and body\n4. Click **Save**\n\n## Using Templates in Tickets\n\nWhen replying to a ticket:\n1. Click the **Templates** button below the reply box\n2. Search or browse available templates\n3. Click on a template to insert it into your reply\n4. Customize the inserted text as needed before sending\n\n## Template Variables\n\nYou can use variables in your templates that get replaced automatically:\n- \`{{ticket.customerName}}\` — Customer's name\n- \`{{ticket.subject}}\` — Ticket subject\n- \`{{agent.name}}\` — Your name\n\n## Tips\n\n- Create templates for your most common ticket types\n- Use descriptive titles so agents can find them quickly\n- Review and update templates periodically to keep them current`,
+    },
+    {
+      title: 'Managing Team Members and Roles',
+      slug: 'managing-team-members-and-roles',
+      category: 'Configuration',
+      status: 'PUBLISHED' as const,
+      body: `# Managing Team Members and Roles\n\nAuraDesk offers two roles with different permission levels.\n\n## Roles\n\n### Admin\n- Full access to all features\n- Can invite/remove team members\n- Can configure SLAs, canned responses, and integrations\n- Can manage knowledge base articles\n- Can view analytics and all tickets\n\n### Agent\n- Can view and respond to tickets\n- Can use canned responses\n- Can add internal notes\n- Cannot manage team members or settings\n\n## Inviting Members\n\n1. Go to **Dashboard → Team**\n2. Click **Invite Member**\n3. Enter their email and select a role\n4. They'll receive an invitation email\n\n## Removing Members\n\nAdmins can remove team members from the Team page. The removed member will lose access immediately but their ticket history is preserved.`,
+    },
+    {
+      title: 'Setting Up Email Integration',
+      slug: 'setting-up-email-integration',
+      category: 'Integrations',
+      status: 'PUBLISHED' as const,
+      body: `# Setting Up Email Integration\n\nConnect your support email address to automatically create tickets from incoming emails.\n\n## Setup Steps\n\n1. Go to **Dashboard → Integrations**\n2. Find the **Email** card and click **Connect**\n3. Enter your support email address (e.g., support@yourcompany.com)\n4. Configure your email forwarding to point to your AuraDesk inbound address\n5. Send a test email to verify the connection\n\n## How It Works\n\n- Incoming emails create new tickets automatically\n- Customer replies update the existing ticket thread\n- Agent replies are sent back via email to the customer\n- Attachments are preserved\n\n## Email Processing\n\nAuraDesk processes incoming emails and:\n- Extracts the customer name and email\n- Sets the channel to EMAIL\n- Runs AI analysis for priority, category, and sentiment\n- Auto-assigns based on your assignment rules\n\n## Troubleshooting\n\n- Make sure your email forwarding is correctly configured\n- Check spam filters aren't blocking AuraDesk emails\n- Verify your DNS records (SPF, DKIM) for outgoing emails`,
+    },
+    {
+      title: 'Internal Notes: Collaborating on Tickets',
+      slug: 'internal-notes-collaborating-on-tickets',
+      category: 'Features',
+      status: 'PUBLISHED' as const,
+      body: `# Internal Notes: Collaborating on Tickets\n\nInternal notes let your team communicate about a ticket without the customer seeing the conversation.\n\n## Adding an Internal Note\n\n1. Open a ticket from the Tickets page\n2. Click the **Note** button next to the Send Reply button\n3. Write your note in the amber-colored panel\n4. Click **Add Note**\n\n## How Notes Appear\n\nInternal notes are displayed with:\n- An amber/orange background\n- A 🔒 lock icon prefix\n- An "internal note" badge\n- They're clearly distinguished from customer-facing messages\n\n## Use Cases\n\n- **Handoff context**: Leave notes when transferring a ticket to another agent\n- **Investigation updates**: Document your findings without notifying the customer\n- **Manager guidance**: Admins can leave instructions for agents\n- **Compliance notes**: Record internal decisions or approvals\n\n## Privacy\n\nInternal notes are **never** shown to customers, not even through the Customer Portal API. They're exclusively for your team.`,
+    },
+    {
+      title: 'Customer Portal Guide',
+      slug: 'customer-portal-guide',
+      category: 'Getting Started',
+      status: 'PUBLISHED' as const,
+      body: `# Customer Portal Guide\n\nThe Customer Portal allows your customers to check ticket status and browse help articles without needing to log in.\n\n## Accessing the Portal\n\nYour customers can access the portal at:\n\`/portal\`\n\nThey'll need:\n- Your organization ID (slug)\n- Their email address\n\n## Features\n\n### Ticket Lookup\nCustomers enter their email to see all their support tickets with:\n- Current status (Open, In Progress, Resolved, Closed)\n- Priority level\n- Last message preview\n- Time since last update\n\n### Knowledge Base\nCustomers can browse your published help articles by:\n- Searching by keyword\n- Filtering by category\n- Reading full article content\n\n## Privacy & Security\n\n- Only tickets matching the customer's email are shown\n- Internal notes are never exposed\n- Only PUBLISHED articles appear (not drafts or archived)\n- No authentication required — email lookup only`,
+    },
+    {
+      title: 'Bulk Actions: Managing Multiple Tickets',
+      slug: 'bulk-actions-managing-multiple-tickets',
+      category: 'Features',
+      status: 'DRAFT' as const,
+      body: `# Bulk Actions: Managing Multiple Tickets\n\nBulk actions let you update multiple tickets at once, saving time during high-volume periods.\n\n## Available Bulk Actions\n\n- **Change Status**: Move multiple tickets to Open, In Progress, Resolved, or Closed\n- **Change Priority**: Update priority for selected tickets\n- **Assign Agent**: Assign all selected tickets to a specific agent\n\n## How to Use\n\n1. Go to the Tickets list page\n2. Select tickets using the checkboxes\n3. The bulk action toolbar appears at the top\n4. Choose your action and confirm\n\n## Tips\n\n- Use filters first to narrow down the ticket list\n- Bulk actions are great for end-of-day cleanup\n- Combine with auto-assignment for optimal workflow`,
+    },
+    {
+      title: 'Ticket Tags and Organization',
+      slug: 'ticket-tags-and-organization',
+      category: 'Features',
+      status: 'PUBLISHED' as const,
+      body: `# Ticket Tags and Organization\n\nTags help you categorize and organize tickets beyond the standard priority and status fields.\n\n## Creating Tags\n\nAdmins can create tags from the ticket detail page:\n1. Open any ticket\n2. Find the **Tags** section in the right panel\n3. Click **Add tag**\n4. Enter a name and pick a color\n\n## Using Tags\n\n- Tags appear as colored badges on tickets\n- Each ticket can have multiple tags\n- Click the ✕ on a tag to remove it\n\n## Common Tag Examples\n\n- 🔴 **Bug** — Technical issues\n- 🟣 **Feature Request** — Customer suggestions\n- 🟡 **VIP Client** — High-value customer tickets\n- 🟢 **Onboarding** — New customer setup\n- 🔵 **Billing** — Payment-related issues\n- 🟠 **Escalated** — Needs attention from management\n\n## Best Practices\n\n- Keep tag names short and descriptive\n- Use consistent colors for similar categories\n- Don't create too many tags — 8-12 is usually enough\n- Review and clean up unused tags periodically`,
+    },
+  ]
+
+  for (const article of articlesData) {
+    await prisma.article.create({
+      data: {
+        ...article,
+        authorId: admin.id,
+        orgId: org.id,
+      },
+    })
+  }
+  console.log(`📚 Created ${articlesData.length} knowledge base articles`)
+
   console.log('\n✅ Seed completed successfully! (¡Seed completado exitosamente!)')
   console.log(`   📊 Organization: ${org.name}`)
   console.log(`   👥 Users: 2 (1 admin, 1 agent)`)
   console.log(`   🎫 Tickets: ${ticketsData.length}`)
   console.log(`   ⏱️  SLA Configs: ${slaData.length}`)
+  console.log(`   🏷️  Tags: ${tagsData.length}`)
+  console.log(`   📚 Articles: ${articlesData.length}`)
 }
 
 /**
