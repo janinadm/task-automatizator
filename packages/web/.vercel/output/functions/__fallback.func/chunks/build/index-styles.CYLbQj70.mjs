@@ -1,0 +1,8 @@
+const index_vue_vue_type_style_index_0_scoped_b5a88f46_lang = `.select-arrow[data-v-b5a88f46]{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='rgba(255,255,255,0.4)' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E");background-position:right 12px center;background-repeat:no-repeat;background-size:16px 16px}`;
+
+const indexStyles_CYLbQj70 = [
+  index_vue_vue_type_style_index_0_scoped_b5a88f46_lang
+];
+
+export { indexStyles_CYLbQj70 as default };
+//# sourceMappingURL=index-styles.CYLbQj70.mjs.map

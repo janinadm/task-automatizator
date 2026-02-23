@@ -447,7 +447,7 @@ onMounted(() => fetchCannedResponses())
         </div>
 
         <p class="text-white/30 text-xs mb-4">
-          Pre-written reply templates agents can insert with one click. Use <code class="text-indigo-400/60">{{ '{{ticket.customerName}}' }}</code> for dynamic values.
+          Pre-written reply templates agents can insert with one click. Use <code class="text-indigo-400/60" v-pre>{{ticket.customerName}}</code> for dynamic values.
         </p>
 
         <!-- Create form -->
@@ -463,7 +463,7 @@ onMounted(() => fetchCannedResponses())
             <textarea
               v-model="cannedForm.body"
               rows="3"
-              placeholder="Template body... (e.g., Hi {{ticket.customerName}}, thanks for reaching out!)"
+              :placeholder="'Template body... (e.g., Hi ' + '{{ticket.customerName}}' + ', thanks for reaching out!)'"
               class="input-glass w-full text-sm resize-none"
               :disabled="savingCanned"
             />
