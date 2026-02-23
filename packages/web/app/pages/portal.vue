@@ -163,6 +163,16 @@ watch(orgSlug, (val) => {
     fetchArticles()
   }
 })
+
+// Read org slug from URL query param on mount
+const route = useRoute()
+onMounted(() => {
+  const queryOrg = route.query.org as string | undefined
+  if (queryOrg) {
+    orgSlug.value = queryOrg
+    fetchArticles()
+  }
+})
 </script>
 
 <template>

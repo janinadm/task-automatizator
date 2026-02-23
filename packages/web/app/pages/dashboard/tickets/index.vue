@@ -251,7 +251,7 @@ async function bulkAction(action: string, value?: string) {
         <!-- Status filter (Filtro de estado) -->
         <select
           v-model="selectedStatus"
-          class="input-glass select-arrow text-sm min-w-[130px] cursor-pointer appearance-none pr-10"
+          class="input-glass text-sm min-w-[130px]"
           @change="onStatusChange"
         >
           <option value="">All statuses</option>
@@ -264,7 +264,7 @@ async function bulkAction(action: string, value?: string) {
         <!-- Priority filter (Filtro de prioridad) -->
         <select
           v-model="selectedPriority"
-          class="input-glass select-arrow text-sm min-w-[130px] cursor-pointer appearance-none pr-10"
+          class="input-glass text-sm min-w-[130px]"
           @change="onPriorityChange"
         >
           <option value="">All priorities</option>
@@ -521,11 +521,4 @@ async function bulkAction(action: string, value?: string) {
   </div>
 </template>
 
-<style scoped>
-.select-arrow {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.4)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
-  background-size: 16px 16px;
-  background-position: right 12px center;
-  background-repeat: no-repeat;
-}
-</style>
+

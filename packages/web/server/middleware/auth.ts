@@ -19,7 +19,7 @@ declare module 'h3' {
 
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event)
-  const publicRoutes = ['/api/auth/setup', '/api/auth/invite', '/api/auth/accept-invite', '/api/webhooks/', '/api/health']
+  const publicRoutes = ['/api/auth/setup', '/api/auth/invite', '/api/auth/accept-invite', '/api/webhooks/', '/api/health', '/api/portal/']
 
   if (publicRoutes.some(route => url.pathname.startsWith(route))) {
     return

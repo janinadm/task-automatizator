@@ -105,7 +105,8 @@
            transition-all duration-300;
   }
 
-  /* Custom arrow for select elements using input-glass */
+  /* Custom arrow for ALL select elements */
+  select,
   select.input-glass {
     appearance: none;
     -webkit-appearance: none;
@@ -114,6 +115,20 @@
     background-position: right 12px center;
     background-size: 12px;
     padding-right: 36px;
+    cursor: pointer;
+  }
+
+  /* Style dropdown option elements for dark theme */
+  select option {
+    background-color: #1a1a2e;
+    color: #e2e8f0;
+    padding: 8px 12px;
+  }
+
+  select option:hover,
+  select option:checked {
+    background-color: #2d2b55;
+    color: #fff;
   }
 
   /* --- Badge Styles (Estilos de badge) --- */
