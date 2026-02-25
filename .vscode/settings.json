@@ -35,5 +35,6 @@
     "**/.output": true,
     "**/node_modules": true,
     "**/.turbo": true
-  }
+  },
+  "prisma.pinToPrisma6": true
 }

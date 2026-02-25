@@ -27,17 +27,17 @@
 
 export interface TicketAnalysis {
   sentiment: 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE'
-  sentimentScore: number   // 0.0 – 1.0 intensity (Intensidad de sentimiento)
+  sentimentScore: number // 0.0 – 1.0 intensity (Intensidad de sentimiento)
   priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
-  category: string          // e.g. "billing", "technical", "account" (Categoría)
-  language: string          // ISO 639-1 code: "en", "es", "fr" (Código ISO)
-  summary: string           // 1-2 sentence summary (Resumen de 1-2 oraciones)
+  category: string // e.g. "billing", "technical", "account" (Categoría)
+  language: string // ISO 639-1 code: "en", "es", "fr" (Código ISO)
+  summary: string // 1-2 sentence summary (Resumen de 1-2 oraciones)
 }
 
 export interface SuggestedReply {
-  suggestedReply: string    // The full reply text (Texto completo de la respuesta)
-  confidence: number        // 0.0 – 1.0 how confident the AI is (Confianza)
-  reasoning: string         // Why the AI chose this reply (Por qué la IA eligió esta respuesta)
+  suggestedReply: string // The full reply text (Texto completo de la respuesta)
+  confidence: number // 0.0 – 1.0 how confident the AI is (Confianza)
+  reasoning: string // Why the AI chose this reply (Por qué la IA eligió esta respuesta)
 }
 
 // ── Gemini API call helper ─────────────────────────────────────────────────────
@@ -107,16 +107,32 @@ async function callGemini(prompt: string): Promise<string> {
       // (Solo reintentar en 429 (límite de tasa) o 503 (servicio no disponible))
       if ((status === 429 || status === 503) && attempt < MAX_RETRIES - 1) {
         const delay = Math.pow(2, attempt + 1) * 1000 // 2s, 4s, 8s
-        console.warn(`[Gemini] Rate limited (${status}), retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`)
-        await new Promise(resolve => setTimeout(resolve, delay))
+        console.warn(
+          `[Gemini] Rate limited (${status}), retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`,
+        )
+        await new Promise((resolve) => setTimeout(resolve, delay))
         continue
       }
 
-      throw err
+      // Sanitize error to never expose API key in client-facing messages
+      const sanitizedError = createError({
+        statusCode: status === 429 ? 429 : status || 500,
+        message:
+          status === 429
+            ? 'AI service is temporarily rate-limited. Please wait a moment and try again.'
+            : status === 503
+              ? 'AI service is temporarily unavailable. Please try again later.'
+              : 'AI analysis failed. Please try again later.',
+      })
+      throw sanitizedError
     }
   }
 
-  throw lastError
+  // Sanitize the last error too
+  throw createError({
+    statusCode: 429,
+    message: 'AI service is temporarily rate-limited. Please wait a moment and try again.',
+  })
 }
 
 // ── Public functions ───────────────────────────────────────────────────────────
@@ -167,9 +183,13 @@ RULES:
     const parsed = JSON.parse(text) as TicketAnalysis
     // Validate and clamp values (Validar y restringir valores)
     return {
-      sentiment: ['POSITIVE', 'NEUTRAL', 'NEGATIVE'].includes(parsed.sentiment) ? parsed.sentiment : 'NEUTRAL',
+      sentiment: ['POSITIVE', 'NEUTRAL', 'NEGATIVE'].includes(parsed.sentiment)
+        ? parsed.sentiment
+        : 'NEUTRAL',
       sentimentScore: Math.max(0, Math.min(1, Number(parsed.sentimentScore) || 0.5)),
-      priority: ['LOW', 'MEDIUM', 'HIGH', 'URGENT'].includes(parsed.priority) ? parsed.priority : 'MEDIUM',
+      priority: ['LOW', 'MEDIUM', 'HIGH', 'URGENT'].includes(parsed.priority)
+        ? parsed.priority
+        : 'MEDIUM',
       category: String(parsed.category || 'general').toLowerCase(),
       language: String(parsed.language || 'en').slice(0, 5),
       summary: String(parsed.summary || '').slice(0, 500),
@@ -207,9 +227,7 @@ export async function suggestReply(
   category?: string | null,
 ): Promise<SuggestedReply> {
   // Build conversation history for context (Construir historial de conversación para contexto)
-  const conversationHistory = messages
-    .map((m, i) => `[${m.senderType}] ${m.body}`)
-    .join('\n\n')
+  const conversationHistory = messages.map((m, i) => `[${m.senderType}] ${m.body}`).join('\n\n')
 
   const prompt = `You are a helpful, professional customer support agent. Generate a suggested reply for the following ticket.
 
