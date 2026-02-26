@@ -12,17 +12,40 @@
     <!-- ═══════════════════════════════════════════════════════════
          LEFT PANEL — Visual branding (hidden on mobile)
          ═══════════════════════════════════════════════════════════ -->
-    <div class="hidden lg:flex lg:w-[55%] relative flex-col items-center justify-center p-12 overflow-hidden">
+    <div
+      class="hidden lg:flex lg:w-[55%] relative flex-col items-center justify-center p-12 overflow-hidden"
+    >
       <!-- Background gradient -->
-      <div class="absolute inset-0" style="background: linear-gradient(135deg, #0c0a2a 0%, #1a0e35 35%, #1e0a2e 65%, #150a20 100%);" />
-      
+      <div
+        class="absolute inset-0"
+        style="
+          background: linear-gradient(135deg, #0c0a2a 0%, #1a0e35 35%, #1e0a2e 65%, #150a20 100%);
+        "
+      />
+
       <!-- Ambient glow orbs -->
-      <div class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] animate-pulse-soft" />
-      <div class="absolute bottom-0 right-0 w-[400px] h-[400px] bg-purple-600/15 rounded-full blur-[80px] animate-pulse-soft" style="animation-delay: 1s" />
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-pink-600/[0.07] rounded-full blur-[60px] animate-pulse-soft" style="animation-delay: 2s" />
-      
+      <div
+        class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px] animate-pulse-soft"
+      />
+      <div
+        class="absolute bottom-0 right-0 w-[400px] h-[400px] bg-purple-600/15 rounded-full blur-[80px] animate-pulse-soft"
+        style="animation-delay: 1s"
+      />
+      <div
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-pink-600/[0.07] rounded-full blur-[60px] animate-pulse-soft"
+        style="animation-delay: 2s"
+      />
+
       <!-- Grid pattern overlay -->
-      <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px); background-size: 48px 48px;" />
+      <div
+        class="absolute inset-0 opacity-[0.03]"
+        style="
+          background-image:
+            linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+          background-size: 48px 48px;
+        "
+      />
 
       <!-- Content -->
       <div class="relative z-10 max-w-md text-center">
@@ -37,11 +60,24 @@
         <!-- Floating glass cards as visual decoration -->
         <div class="relative h-64 w-full">
           <!-- Card 1: KPI card -->
-          <div class="absolute left-0 top-0 w-52 p-4 bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-xl animate-fade-in" style="animation-delay: 0.3s">
+          <div
+            class="absolute left-0 top-0 w-52 p-4 bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-xl animate-fade-in"
+            style="animation-delay: 0.3s"
+          >
             <div class="flex items-center gap-3 mb-3">
               <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                <svg
+                  class="w-4 h-4 text-emerald-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                  />
                 </svg>
               </div>
               <div>
@@ -50,7 +86,9 @@
               </div>
             </div>
             <div class="h-8 flex items-end gap-1">
-              <div v-for="(h, i) in [40, 65, 45, 80, 55, 90, 70]" :key="i"
+              <div
+                v-for="(h, i) in [40, 65, 45, 80, 55, 90, 70]"
+                :key="i"
                 class="flex-1 rounded-sm bg-gradient-to-t from-emerald-500/40 to-emerald-500/10"
                 :style="{ height: `${h}%` }"
               />
@@ -58,30 +96,68 @@
           </div>
 
           <!-- Card 2: AI suggestion -->
-          <div class="absolute right-0 top-8 w-56 p-4 bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-xl animate-fade-in" style="animation-delay: 0.6s">
+          <div
+            class="absolute right-0 top-8 w-56 p-4 bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-xl animate-fade-in"
+            style="animation-delay: 0.6s"
+          >
             <div class="flex items-center gap-2 mb-2">
-              <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              <svg
+                class="w-3.5 h-3.5 text-purple-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
               </svg>
               <span class="text-[10px] text-purple-300 font-medium">AI Suggested Reply</span>
             </div>
-            <p class="text-[11px] text-white/50 leading-relaxed">Thank you for reaching out! I've reviewed your account and can see the issue with...</p>
+            <p class="text-[11px] text-white/50 leading-relaxed">
+              Thank you for reaching out! I've reviewed your account and can see the issue with...
+            </p>
             <div class="flex items-center gap-2 mt-3">
-              <span class="px-2 py-0.5 rounded-full bg-purple-500/20 text-[9px] text-purple-300 font-medium">95% confidence</span>
-              <span class="px-2 py-0.5 rounded-full bg-green-500/20 text-[9px] text-green-300 font-medium">Positive</span>
+              <span
+                class="px-2 py-0.5 rounded-full bg-purple-500/20 text-[9px] text-purple-300 font-medium"
+                >95% confidence</span
+              >
+              <span
+                class="px-2 py-0.5 rounded-full bg-green-500/20 text-[9px] text-green-300 font-medium"
+                >Positive</span
+              >
             </div>
           </div>
 
           <!-- Card 3: Notification -->
-          <div class="absolute left-8 bottom-0 w-48 p-3 bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-xl animate-fade-in" style="animation-delay: 0.9s">
+          <div
+            class="absolute left-8 bottom-0 w-48 p-3 bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-xl animate-fade-in"
+            style="animation-delay: 0.9s"
+          >
             <div class="flex items-center gap-2">
-              <div class="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                <svg class="w-3 h-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              <div
+                class="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0"
+              >
+                <svg
+                  class="w-3 h-3 text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  />
                 </svg>
               </div>
               <div class="min-w-0">
-                <p class="text-[10px] text-white/70 font-medium truncate">New ticket from WhatsApp</p>
+                <p class="text-[10px] text-white/70 font-medium truncate">
+                  New ticket from WhatsApp
+                </p>
                 <p class="text-[9px] text-white/30">Maria G. · Just now</p>
               </div>
             </div>
@@ -92,13 +168,23 @@
         <div class="mt-8 flex items-center justify-center gap-6">
           <div class="flex items-center gap-1.5 text-white/25 text-[10px]">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
             </svg>
             End-to-end encrypted
           </div>
           <div class="flex items-center gap-1.5 text-white/25 text-[10px]">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
             </svg>
             SOC 2 Compliant
           </div>
@@ -111,12 +197,16 @@
          ═══════════════════════════════════════════════════════════ -->
     <div class="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 relative">
       <!-- Subtle background glow for the right panel -->
-      <div class="absolute top-0 right-0 w-80 h-80 bg-indigo-600/[0.06] rounded-full blur-[100px] pointer-events-none" />
-      <div class="absolute bottom-0 left-0 w-60 h-60 bg-purple-600/[0.04] rounded-full blur-[80px] pointer-events-none" />
+      <div
+        class="absolute top-0 right-0 w-80 h-80 bg-indigo-600/[0.06] rounded-full blur-[100px] pointer-events-none"
+      />
+      <div
+        class="absolute bottom-0 left-0 w-60 h-60 bg-purple-600/[0.04] rounded-full blur-[80px] pointer-events-none"
+      />
 
       <!-- Mobile-only compact header -->
       <div class="lg:hidden text-center mb-8">
-<img src="/logo.svg" alt="AuraDesk" class="w-12 h-12 mb-4 mx-auto" />
+        <img src="/logo.svg" alt="AuraDesk" class="w-12 h-12 mb-4 mx-auto" />
         <h1 class="text-xl font-bold text-white">AuraDesk</h1>
         <p class="text-white/50 text-sm mt-1">AI-powered customer triage</p>
       </div>
