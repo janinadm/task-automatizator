@@ -214,7 +214,7 @@
           />
           <button
             type="button"
-            class="absolute right-3 top-1/2 -translate-y-1/2 z-10 text-white/60 hover:text-white transition-colors p-1"
+            class="absolute right-3 top-1/2 -translate-y-1/2 z-10 text-indigo-500 hover:text-indigo-700 transition-colors p-1"
             @click="showPassword = !showPassword"
             tabindex="-1"
           >
