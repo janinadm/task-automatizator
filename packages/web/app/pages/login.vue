@@ -35,7 +35,6 @@
   })
 
   const supabase = useSupabaseClient()
-  const router = useRouter()
 
   // --- Form State (Estado del formulario) ---
   // ref() creates a reactive variable — when it changes, the UI updates automatically
@@ -83,9 +82,16 @@
         return
       }
 
+      // Wait for @nuxtjs/supabase module to sync session cookies
+      // signInWithPassword() resolves immediately but cookies are written
+      // asynchronously via onAuthStateChange — without this wait, the
+      // dashboard API calls fire before cookies exist → 401 Unauthorized
+      // (Esperar a que el módulo @nuxtjs/supabase sincronice las cookies de sesión)
+      await new Promise(resolve => setTimeout(resolve, 300))
+
       // Success — navigate to dashboard
       // (Éxito — navegar al dashboard)
-      await router.push('/dashboard')
+      await navigateTo('/dashboard')
     } catch (e) {
       error.value = 'An unexpected error occurred. Please try again.'
     } finally {

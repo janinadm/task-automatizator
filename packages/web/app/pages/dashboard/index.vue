@@ -51,6 +51,8 @@ type DashboardStatsResponse = {
 // (Nuxt deduplica automáticamente este fetch usando la `key`.)
 const { data: stats, pending, error, refresh } = await useFetch<DashboardStatsResponse>('/api/dashboard/stats', {
   key: 'dashboard-stats',
+  retry: 2,
+  retryDelay: 500,
 })
 
 // Time-based greeting (Saludo según la hora del día)
