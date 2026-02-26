@@ -27,7 +27,7 @@
       <!-- Content -->
       <div class="relative z-10 max-w-md text-center">
         <!-- Logo -->
-        <img src="/logo.svg" alt="AuraDesk" class="w-16 h-16 mb-8" />
+        <img src="/logo.svg" alt="AuraDesk" class="w-16 h-16 mb-8 mx-auto" />
 
         <h1 class="text-3xl font-extrabold text-white mb-3">AuraDesk</h1>
         <p class="text-white/50 leading-relaxed mb-12">
@@ -116,7 +116,7 @@
 
       <!-- Mobile-only compact header -->
       <div class="lg:hidden text-center mb-8">
-        <img src="/logo.svg" alt="AuraDesk" class="w-12 h-12 mb-4" />
+<img src="/logo.svg" alt="AuraDesk" class="w-12 h-12 mb-4 mx-auto" />
         <h1 class="text-xl font-bold text-white">AuraDesk</h1>
         <p class="text-white/50 text-sm mt-1">AI-powered customer triage</p>
       </div>
