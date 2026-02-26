@@ -65,6 +65,21 @@ export default defineEventHandler(async (event) => {
     },
   })
 
+  // ── Create the initial message from the ticket body ───────────────────────
+  // The ticket detail page shows ticket.messages (conversation thread).
+  // Without this, the original body text would be invisible on the detail page.
+  // senderType = CUSTOMER because the ticket represents a customer request.
+  // (La página de detalle muestra ticket.messages. Sin esto, el body original
+  //  sería invisible en la página de detalle.)
+  await prisma.ticketMessage.create({
+    data: {
+      ticketId: ticket.id,
+      body: ticket.body,
+      senderType: 'CUSTOMER',
+      senderName: body.customerName || null,
+    },
+  })
+
   // ── Fire-and-forget AI enrichment ──────────────────────────────────────────
   // We do NOT await this — it runs in the background while the 201 response is sent
   // The .catch() ensures errors don't crash the server (they're just logged)
@@ -84,7 +99,9 @@ export default defineEventHandler(async (event) => {
           summary: analysis.summary,
         },
       })
-      console.log(`[AI] Enriched ticket ${ticket.id}: ${analysis.category} / ${analysis.sentiment} / ${analysis.priority}`)
+      console.log(
+        `[AI] Enriched ticket ${ticket.id}: ${analysis.category} / ${analysis.sentiment} / ${analysis.priority}`,
+      )
     })
     .catch((err: unknown) => {
       console.error(`[AI] Failed to enrich ticket ${ticket.id}:`, err)

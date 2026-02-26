@@ -87,7 +87,7 @@
       // asynchronously via onAuthStateChange — without this wait, the
       // dashboard API calls fire before cookies exist → 401 Unauthorized
       // (Esperar a que el módulo @nuxtjs/supabase sincronice las cookies de sesión)
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 300))
 
       // Success — navigate to dashboard
       // (Éxito — navegar al dashboard)

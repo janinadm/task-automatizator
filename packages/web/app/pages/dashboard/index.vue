@@ -16,126 +16,138 @@
    - `data` es reactivo. `pending` es true mientras carga.)
 -->
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
+  import { useAuthStore } from '~/stores/auth'
 
-definePageMeta({ layout: 'dashboard' })
+  definePageMeta({ layout: 'dashboard' })
 
-const authStore = useAuthStore()
+  const authStore = useAuthStore()
 
-// Type the expected API response so TypeScript knows what `stats.value.data` contains.
-// Without this, useFetch returns Ref<unknown> and we'd get type errors on nested access.
-// (Tipar la respuesta esperada de la API para que TypeScript sepa qué contiene `stats.value.data`.)
-type DashboardStatsResponse = {
-  data: {
-    openTickets: number
-    resolvedToday: number
-    slaBreaching: number
-    aiSuggestionsGenerated: number
-    sentiment: { positive: number; neutral: number; negative: number }
-    priority: { urgent: number; high: number; medium: number; low: number }
-    recentTickets: Array<{
-      id: string
-      subject: string
-      status: string
-      priority: string
-      sentiment: string | null
-      category: string | null
-      createdAt: string
-      isBreachingSla: boolean
-    }>
+  // Type the expected API response so TypeScript knows what `stats.value.data` contains.
+  // Without this, useFetch returns Ref<unknown> and we'd get type errors on nested access.
+  // (Tipar la respuesta esperada de la API para que TypeScript sepa qué contiene `stats.value.data`.)
+  type DashboardStatsResponse = {
+    data: {
+      openTickets: number
+      resolvedToday: number
+      slaBreaching: number
+      aiSuggestionsGenerated: number
+      sentiment: { positive: number; neutral: number; negative: number }
+      priority: { urgent: number; high: number; medium: number; low: number }
+      recentTickets: Array<{
+        id: string
+        subject: string
+        status: string
+        priority: string
+        sentiment: string | null
+        category: string | null
+        createdAt: string
+        isBreachingSla: boolean
+      }>
+    }
   }
-}
 
-// useFetch('/api/dashboard/stats') calls our server API route.
-// Nuxt automatically deduplicates this fetch using the `key`.
-// (Nuxt deduplica automáticamente este fetch usando la `key`.)
-const { data: stats, pending, error, refresh } = await useFetch<DashboardStatsResponse>('/api/dashboard/stats', {
-  key: 'dashboard-stats',
-  retry: 2,
-  retryDelay: 500,
-})
+  // useFetch('/api/dashboard/stats') calls our server API route.
+  // Nuxt automatically deduplicates this fetch using the `key`.
+  // (Nuxt deduplica automáticamente este fetch usando la `key`.)
+  const {
+    data: stats,
+    pending,
+    error,
+    refresh,
+  } = await useFetch<DashboardStatsResponse>('/api/dashboard/stats', {
+    key: 'dashboard-stats',
+    retry: 2,
+    retryDelay: 500,
+  })
 
-// Time-based greeting (Saludo según la hora del día)
-const greeting = computed(() => {
-  const h = new Date().getHours()
-  if (h < 12) return 'Good morning'
-  if (h < 17) return 'Good afternoon'
-  return 'Good evening'
-})
+  // Time-based greeting (Saludo según la hora del día)
+  const greeting = computed(() => {
+    const h = new Date().getHours()
+    if (h < 12) return 'Good morning'
+    if (h < 17) return 'Good afternoon'
+    return 'Good evening'
+  })
 
-// Build KPI card data from the stats response
-// (Construir datos de tarjeta KPI desde la respuesta de stats)
-const kpis = computed(() => {
-  const s = stats.value?.data
-  return [
-    {
-      label: 'Open Tickets',
-      value: s?.openTickets ?? '—',
-      icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
-      color: 'bg-blue-500/[0.08] border-blue-500/20 hover:border-blue-400/40',
-      iconColor: 'text-blue-400',
-      link: '/dashboard/tickets?status=OPEN',
+  // Build KPI card data from the stats response
+  // (Construir datos de tarjeta KPI desde la respuesta de stats)
+  const kpis = computed(() => {
+    const s = stats.value?.data
+    return [
+      {
+        label: 'Open Tickets',
+        value: s?.openTickets ?? '—',
+        icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+        color: 'bg-blue-500/[0.08] border-blue-500/20 hover:border-blue-400/40',
+        iconColor: 'text-blue-400',
+        link: '/dashboard/tickets?status=OPEN',
+      },
+      {
+        label: 'Resolved Today',
+        value: s?.resolvedToday ?? '—',
+        icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+        color: 'bg-emerald-500/[0.08] border-emerald-500/20 hover:border-emerald-400/40',
+        iconColor: 'text-emerald-400',
+        link: '/dashboard/tickets?status=RESOLVED',
+      },
+      {
+        label: 'SLA Breaching',
+        value: s?.slaBreaching ?? '—',
+        icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z',
+        color:
+          (s?.slaBreaching ?? 0) > 0
+            ? 'bg-red-500/[0.1] border-red-500/30 hover:border-red-400/50'
+            : 'bg-white/[0.03] border-white/[0.06] hover:border-white/10',
+        iconColor: (s?.slaBreaching ?? 0) > 0 ? 'text-red-400' : 'text-white/40',
+        link: '/dashboard/tickets',
+      },
+      {
+        label: 'AI Suggestions',
+        value: s?.aiSuggestionsGenerated ?? '—',
+        icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+        color: 'bg-purple-500/[0.08] border-purple-500/20 hover:border-purple-400/40',
+        iconColor: 'text-purple-400',
+        link: '/dashboard/analytics',
+      },
+    ]
+  })
+
+  // Denominator for sentiment percentage bars (Denominador para barras de porcentaje de sentimiento)
+  const sentimentTotal = computed(() => {
+    const s = stats.value?.data?.sentiment
+    return s ? s.positive + s.neutral + s.negative || 1 : 1
+  })
+
+  // Display helpers (Helpers de visualización)
+  const statusConfig: Record<string, { label: string; class: string }> = {
+    OPEN: { label: 'Open', class: 'bg-blue-500/20 text-blue-300 border border-blue-500/30' },
+    IN_PROGRESS: {
+      label: 'In Progress',
+      class: 'bg-amber-500/20 text-amber-300 border border-amber-500/30',
     },
-    {
-      label: 'Resolved Today',
-      value: s?.resolvedToday ?? '—',
-      icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-      color: 'bg-emerald-500/[0.08] border-emerald-500/20 hover:border-emerald-400/40',
-      iconColor: 'text-emerald-400',
-      link: '/dashboard/tickets?status=RESOLVED',
+    RESOLVED: {
+      label: 'Resolved',
+      class: 'bg-green-500/20 text-green-300 border border-green-500/30',
     },
-    {
-      label: 'SLA Breaching',
-      value: s?.slaBreaching ?? '—',
-      icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z',
-      color: (s?.slaBreaching ?? 0) > 0
-        ? 'bg-red-500/[0.1] border-red-500/30 hover:border-red-400/50'
-        : 'bg-white/[0.03] border-white/[0.06] hover:border-white/10',
-      iconColor: (s?.slaBreaching ?? 0) > 0 ? 'text-red-400' : 'text-white/40',
-      link: '/dashboard/tickets',
-    },
-    {
-      label: 'AI Suggestions',
-      value: s?.aiSuggestionsGenerated ?? '—',
-      icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-      color: 'bg-purple-500/[0.08] border-purple-500/20 hover:border-purple-400/40',
-      iconColor: 'text-purple-400',
-      link: '/dashboard/analytics',
-    },
-  ]
-})
+    CLOSED: { label: 'Closed', class: 'bg-white/10 text-white/50 border border-white/10' },
+  }
 
-// Denominator for sentiment percentage bars (Denominador para barras de porcentaje de sentimiento)
-const sentimentTotal = computed(() => {
-  const s = stats.value?.data?.sentiment
-  return s ? (s.positive + s.neutral + s.negative) || 1 : 1
-})
+  const priorityConfig: Record<string, { label: string; dot: string }> = {
+    URGENT: { label: 'Urgent', dot: 'bg-red-500' },
+    HIGH: { label: 'High', dot: 'bg-orange-400' },
+    MEDIUM: { label: 'Medium', dot: 'bg-amber-400' },
+    LOW: { label: 'Low', dot: 'bg-green-400' },
+  }
 
-// Display helpers (Helpers de visualización)
-const statusConfig: Record<string, { label: string; class: string }> = {
-  OPEN: { label: 'Open', class: 'bg-blue-500/20 text-blue-300 border border-blue-500/30' },
-  IN_PROGRESS: { label: 'In Progress', class: 'bg-amber-500/20 text-amber-300 border border-amber-500/30' },
-  RESOLVED: { label: 'Resolved', class: 'bg-green-500/20 text-green-300 border border-green-500/30' },
-  CLOSED: { label: 'Closed', class: 'bg-white/10 text-white/50 border border-white/10' },
-}
-
-const priorityConfig: Record<string, { label: string; dot: string }> = {
-  URGENT: { label: 'Urgent', dot: 'bg-red-500' },
-  HIGH: { label: 'High', dot: 'bg-orange-400' },
-  MEDIUM: { label: 'Medium', dot: 'bg-amber-400' },
-  LOW: { label: 'Low', dot: 'bg-green-400' },
-}
-
-function timeAgo(date: string | Date) {
-  const d = typeof date === 'string' ? new Date(date) : date
-  const diff = Date.now() - d.getTime()
-  const minutes = Math.floor(diff / 60000)
-  if (minutes < 1) return 'just now'
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  return `${Math.floor(hours / 24)}d ago`
-}
+  function timeAgo(date: string | Date) {
+    const d = typeof date === 'string' ? new Date(date) : date
+    const diff = Date.now() - d.getTime()
+    const minutes = Math.floor(diff / 60000)
+    if (minutes < 1) return 'just now'
+    if (minutes < 60) return `${minutes}m ago`
+    const hours = Math.floor(minutes / 60)
+    if (hours < 24) return `${hours}h ago`
+    return `${Math.floor(hours / 24)}d ago`
+  }
 </script>
 
 <template>
@@ -160,14 +172,22 @@ function timeAgo(date: string | Date) {
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
         </svg>
         Refresh
       </button>
     </div>
 
     <!-- Error state (Estado de error) -->
-    <div v-if="error" class="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-300 text-sm">
+    <div
+      v-if="error"
+      class="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-300 text-sm"
+    >
       Could not load dashboard data. Check your connection and try refreshing.
     </div>
 
@@ -196,7 +216,13 @@ function timeAgo(date: string | Date) {
         >
           <!-- Icon -->
           <div class="flex items-start justify-between mb-4">
-            <svg class="w-6 h-6" :class="kpi.iconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              class="w-6 h-6"
+              :class="kpi.iconColor"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="kpi.icon" />
             </svg>
           </div>
@@ -210,7 +236,6 @@ function timeAgo(date: string | Date) {
     <!-- Main content grid: recent tickets + right sidebar stats -->
     <!-- (Cuadrícula de contenido principal: tickets recientes + sidebar de estadísticas) -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
       <!-- Recent Tickets Table — spans 2 of 3 columns on XL -->
       <!-- (Tabla de tickets recientes — ocupa 2 de 3 columnas en XL) -->
       <UiGlassCard padding="none" class="xl:col-span-2">
@@ -261,7 +286,9 @@ function timeAgo(date: string | Date) {
 
               <!-- Title + category (Título + categoría) -->
               <div class="flex-1 min-w-0">
-                <p class="text-white text-sm font-medium truncate group-hover:text-indigo-300 transition-colors">
+                <p
+                  class="text-white text-sm font-medium truncate group-hover:text-indigo-300 transition-colors"
+                >
                   {{ ticket.subject }}
                 </p>
                 <p v-if="ticket.category" class="text-white/40 text-xs">
@@ -284,7 +311,12 @@ function timeAgo(date: string | Date) {
                 title="SLA Breaching"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </span>
 
@@ -300,7 +332,6 @@ function timeAgo(date: string | Date) {
       <!-- Right column: sentiment + priority stats -->
       <!-- (Columna derecha: stats de sentimiento + prioridad) -->
       <div class="space-y-4">
-
         <!-- Sentiment Breakdown (Desglose de sentimiento) -->
         <UiGlassCard padding="md">
           <h3 class="text-white font-semibold text-sm mb-4">Sentiment Overview</h3>
@@ -316,12 +347,16 @@ function timeAgo(date: string | Date) {
             <div>
               <div class="flex justify-between text-xs mb-1">
                 <span class="text-green-400">😊 Positive</span>
-                <span class="text-white/50 tabular-nums">{{ stats?.data?.sentiment?.positive ?? 0 }}</span>
+                <span class="text-white/50 tabular-nums">{{
+                  stats?.data?.sentiment?.positive ?? 0
+                }}</span>
               </div>
               <div class="h-1.5 rounded-full bg-white/10 overflow-hidden">
                 <div
                   class="h-full rounded-full bg-green-500 transition-all duration-700"
-                  :style="{ width: `${((stats?.data?.sentiment?.positive ?? 0) / sentimentTotal) * 100}%` }"
+                  :style="{
+                    width: `${((stats?.data?.sentiment?.positive ?? 0) / sentimentTotal) * 100}%`,
+                  }"
                 />
               </div>
             </div>
@@ -330,12 +365,16 @@ function timeAgo(date: string | Date) {
             <div>
               <div class="flex justify-between text-xs mb-1">
                 <span class="text-white/60">😐 Neutral</span>
-                <span class="text-white/50 tabular-nums">{{ stats?.data?.sentiment?.neutral ?? 0 }}</span>
+                <span class="text-white/50 tabular-nums">{{
+                  stats?.data?.sentiment?.neutral ?? 0
+                }}</span>
               </div>
               <div class="h-1.5 rounded-full bg-white/10 overflow-hidden">
                 <div
                   class="h-full rounded-full bg-white/40 transition-all duration-700"
-                  :style="{ width: `${((stats?.data?.sentiment?.neutral ?? 0) / sentimentTotal) * 100}%` }"
+                  :style="{
+                    width: `${((stats?.data?.sentiment?.neutral ?? 0) / sentimentTotal) * 100}%`,
+                  }"
                 />
               </div>
             </div>
@@ -344,12 +383,16 @@ function timeAgo(date: string | Date) {
             <div>
               <div class="flex justify-between text-xs mb-1">
                 <span class="text-red-400">😡 Negative</span>
-                <span class="text-white/50 tabular-nums">{{ stats?.data?.sentiment?.negative ?? 0 }}</span>
+                <span class="text-white/50 tabular-nums">{{
+                  stats?.data?.sentiment?.negative ?? 0
+                }}</span>
               </div>
               <div class="h-1.5 rounded-full bg-white/10 overflow-hidden">
                 <div
                   class="h-full rounded-full bg-red-500 transition-all duration-700"
-                  :style="{ width: `${((stats?.data?.sentiment?.negative ?? 0) / sentimentTotal) * 100}%` }"
+                  :style="{
+                    width: `${((stats?.data?.sentiment?.negative ?? 0) / sentimentTotal) * 100}%`,
+                  }"
                 />
               </div>
             </div>
@@ -382,7 +425,6 @@ function timeAgo(date: string | Date) {
             </div>
           </div>
         </UiGlassCard>
-
       </div>
     </div>
   </div>

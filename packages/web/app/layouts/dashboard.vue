@@ -54,6 +54,25 @@
   const notifications = ref<Notification[]>([])
   const unreadCount = ref(0)
 
+  // Persist "last read" timestamp so badge resets across page loads
+  // (Persistir timestamp de "última lectura" para que el badge se reinicie entre cargas)
+  const NOTIF_READ_KEY = 'auradesk_notif_last_read'
+
+  function getLastReadAt(): number {
+    try {
+      return parseInt(localStorage.getItem(NOTIF_READ_KEY) || '0', 10) || 0
+    } catch {
+      return 0
+    }
+  }
+
+  function markAllAsRead() {
+    try {
+      localStorage.setItem(NOTIF_READ_KEY, String(Date.now()))
+    } catch {}
+    unreadCount.value = 0
+  }
+
   async function fetchNotifications() {
     notifLoading.value = true
     try {
@@ -61,7 +80,15 @@
         '/api/notifications',
       )
       notifications.value = res.data.notifications
-      unreadCount.value = res.data.unreadCount
+      // Only count notifications newer than the last time user opened the panel
+      const lastRead = getLastReadAt()
+      if (lastRead > 0) {
+        unreadCount.value = res.data.notifications.filter(
+          (n) => new Date(n.createdAt).getTime() > lastRead,
+        ).length
+      } else {
+        unreadCount.value = res.data.unreadCount
+      }
     } catch {
       /* silently fail */
     } finally {
@@ -71,7 +98,11 @@
 
   function toggleNotifications() {
     showNotifications.value = !showNotifications.value
-    if (showNotifications.value) fetchNotifications()
+    if (showNotifications.value) {
+      fetchNotifications()
+      // Mark all as read when opening the panel
+      markAllAsRead()
+    }
   }
 
   function closeNotifications() {
