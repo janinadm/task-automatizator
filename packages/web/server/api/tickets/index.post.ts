@@ -86,26 +86,46 @@ export default defineEventHandler(async (event) => {
   //
   // (NO esperamos esto — corre en segundo plano mientras se envía la respuesta 201
   //  El .catch() asegura que los errores no crasheen el servidor — solo se loguean)
-  analyzeTicket(ticket.subject, ticket.body)
-    .then(async (analysis: Awaited<ReturnType<typeof analyzeTicket>>) => {
-      await prisma.ticket.update({
-        where: { id: ticket.id },
-        data: {
-          sentiment: analysis.sentiment,
-          sentimentScore: analysis.sentimentScore,
-          priority: analysis.priority,
-          category: analysis.category,
-          language: analysis.language,
-          summary: analysis.summary,
-        },
-      })
+  ;(async () => {
+    try {
+      // Run analysis and suggested reply in parallel
+      const [analysis, reply] = await Promise.all([
+        analyzeTicket(ticket.subject, ticket.body),
+        suggestReply(ticket.subject, ticket.body, [], null, null),
+      ])
+
+      // Update ticket fields + create AI suggestion in a transaction
+      await prisma.$transaction([
+        prisma.ticket.update({
+          where: { id: ticket.id },
+          data: {
+            sentiment: analysis.sentiment,
+            sentimentScore: analysis.sentimentScore,
+            priority: analysis.priority,
+            category: analysis.category,
+            language: analysis.language,
+            summary: analysis.summary,
+          },
+        }),
+        ...(reply.suggestedReply
+          ? [
+              prisma.aiSuggestion.create({
+                data: {
+                  ticketId: ticket.id,
+                  suggestedReply: reply.suggestedReply,
+                  confidence: reply.confidence,
+                },
+              }),
+            ]
+          : []),
+      ])
       console.log(
         `[AI] Enriched ticket ${ticket.id}: ${analysis.category} / ${analysis.sentiment} / ${analysis.priority}`,
       )
-    })
-    .catch((err: unknown) => {
+    } catch (err: unknown) {
       console.error(`[AI] Failed to enrich ticket ${ticket.id}:`, err)
-    })
+    }
+  })()
 
   // Return immediately — don't wait for AI (Retornar inmediatamente — no esperar a la IA)
   setResponseStatus(event, 201)

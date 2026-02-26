@@ -154,6 +154,11 @@
     allTags.value.filter((t) => !ticketTags.value.some((tt: any) => tt.id === t.id)),
   )
 
+  // Inline tag creation
+  const newTagName = ref('')
+  const newTagColor = ref('#6366f1')
+  const isCreatingTag = ref(false)
+
   async function fetchTags() {
     try {
       const res = await $fetch<{ data: any[] }>('/api/tags')
@@ -164,24 +169,71 @@
   }
 
   async function addTagToTicket(tagId: string) {
+    // Optimistic: add the tag locally before the server confirms
+    const tagObj = allTags.value.find((t) => t.id === tagId)
+    const ct = ticketsStore.currentTicket
+    if (tagObj && ct) {
+      const currentTags = ct.tags ?? []
+      ticketsStore.currentTicket = { ...ct, tags: [...currentTags, { tag: tagObj }] } as any
+    }
+    showTagPicker.value = false
+
     try {
       await $fetch(`/api/tickets/${ticketId.value}/tags`, {
         method: 'POST',
         body: { tagId },
       })
-      await ticketsStore.fetchTicket(ticketId.value)
-      showTagPicker.value = false
     } catch {
-      /* ignore */
+      // Rollback on error
+      const ct2 = ticketsStore.currentTicket
+      if (ct2) {
+        ticketsStore.currentTicket = {
+          ...ct2,
+          tags: (ct2.tags ?? []).filter((tt: any) => (tt.tag?.id ?? tt.id) !== tagId),
+        } as any
+      }
     }
   }
 
   async function removeTagFromTicket(tagId: string) {
+    // Optimistic: remove the tag locally before the server confirms
+    const ct = ticketsStore.currentTicket
+    const previousTags = ct?.tags ?? []
+    if (ct) {
+      ticketsStore.currentTicket = {
+        ...ct,
+        tags: previousTags.filter((tt: any) => (tt.tag?.id ?? tt.id) !== tagId),
+      } as any
+    }
+
     try {
       await $fetch(`/api/tickets/${ticketId.value}/tags/${tagId}`, { method: 'DELETE' })
-      await ticketsStore.fetchTicket(ticketId.value)
     } catch {
-      /* ignore */
+      // Rollback on error
+      const ct2 = ticketsStore.currentTicket
+      if (ct2) {
+        ticketsStore.currentTicket = { ...ct2, tags: previousTags } as any
+      }
+    }
+  }
+
+  async function createAndAddTag() {
+    if (!newTagName.value.trim()) return
+    isCreatingTag.value = true
+    try {
+      const res = await $fetch<{ data: { id: string; name: string; color: string } }>('/api/tags', {
+        method: 'POST',
+        body: { name: newTagName.value.trim(), color: newTagColor.value },
+      })
+      // Add new tag to allTags so it's immediately available
+      allTags.value = [...allTags.value, res.data]
+      newTagName.value = ''
+      // Add to ticket optimistically
+      await addTagToTicket(res.data.id)
+    } catch (e: any) {
+      console.error('Failed to create tag:', e)
+    } finally {
+      isCreatingTag.value = false
     }
   }
 
@@ -432,8 +484,12 @@
 
           <!-- Message list (Lista de mensajes) -->
           <div class="divide-y divide-white/5 max-h-[512px] overflow-y-auto">
-            <!-- Fallback: show ticket.body for old tickets with no messages -->
-            <div v-if="!ticket.messages?.length && ticket.body" class="px-5 py-4">
+            <!-- Show ticket.body as first message when no CUSTOMER message exists in thread -->
+            <!-- This covers old tickets created before TicketMessage was added on creation -->
+            <div
+              v-if="ticket.body && !ticket.messages?.some((m: any) => m.senderType === 'CUSTOMER')"
+              class="px-5 py-4"
+            >
               <div class="flex items-start gap-3">
                 <div
                   class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 bg-white/10 text-white/60"
@@ -455,7 +511,7 @@
 
             <!-- Empty (Sin mensajes ni body) -->
             <div
-              v-else-if="!ticket.messages?.length"
+              v-if="!ticket.messages?.length && !ticket.body"
               class="py-10 text-center text-white/30 text-sm"
             >
               No messages yet — the conversation starts here.
@@ -909,7 +965,7 @@
         </UiGlassCard>
 
         <!-- Tags -->
-        <UiGlassCard padding="md">
+        <UiGlassCard padding="md" :class="{ 'relative z-20': showTagPicker }">
           <h3 class="text-white/60 text-xs font-medium uppercase tracking-wider mb-3">Tags</h3>
           <div class="flex flex-wrap gap-1.5 mb-2">
             <span
@@ -956,9 +1012,10 @@
             </button>
             <Transition name="fade">
               <div
-                v-if="showTagPicker && availableTags.length"
-                class="absolute left-0 top-full mt-1 w-48 bg-[#12101f] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
+                v-if="showTagPicker"
+                class="absolute left-0 top-full mt-1 w-56 bg-[#12101f] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
               >
+                <!-- Existing tags to add -->
                 <button
                   v-for="tag in availableTags"
                   :key="tag.id"
@@ -968,6 +1025,35 @@
                   <div class="w-2.5 h-2.5 rounded-full" :style="{ backgroundColor: tag.color }" />
                   <span class="text-white/70 text-sm">{{ tag.name }}</span>
                 </button>
+                <!-- Separator if there are existing tags -->
+                <div v-if="availableTags.length" class="border-t border-white/[0.06]" />
+                <!-- Inline tag creation -->
+                <div class="px-3 py-2">
+                  <p v-if="!availableTags.length" class="text-white/30 text-xs mb-2">
+                    No tags available
+                  </p>
+                  <div class="flex items-center gap-1.5">
+                    <input
+                      v-model="newTagColor"
+                      type="color"
+                      class="w-5 h-5 rounded cursor-pointer border-0 bg-transparent p-0"
+                    />
+                    <input
+                      v-model="newTagName"
+                      type="text"
+                      placeholder="New tag name..."
+                      class="input-glass flex-1 text-xs py-1 px-2"
+                      @keydown.enter.prevent="createAndAddTag"
+                    />
+                    <button
+                      class="text-xs px-2 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 transition-colors disabled:opacity-40"
+                      :disabled="!newTagName.trim() || isCreatingTag"
+                      @click="createAndAddTag"
+                    >
+                      {{ isCreatingTag ? '...' : '+' }}
+                    </button>
+                  </div>
+                </div>
               </div>
             </Transition>
           </div>
